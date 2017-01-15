@@ -24,6 +24,7 @@ struct Unit {
 	struct Thing items[UNIT_MAX_ITEMS_CARRIED];
 };
 
+void InitUnitSystem();
 void NewUnit(Entity, const char *, int);
 void UnitHarm(Entity, int damage);
 
