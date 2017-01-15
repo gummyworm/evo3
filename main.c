@@ -52,6 +52,7 @@ int main() {
 	glfwSwapInterval(1);
 
 	init(window);
+	GLuint tex = GetTexture("test.png");
 
 	while (!glfwWindowShouldClose(window)) {
 		int width, height;
@@ -59,7 +60,8 @@ int main() {
 		glViewport(0, 0, width, height);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		Rect(window, 0, 0, 1, 1, 0xffffffff);
+		// Rect(window, 0, 0, 1, 1, 0xffffffff);
+		TexRect(window, 0, 0, 1, 1, 0, 0, 1, 1, tex);
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}

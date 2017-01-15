@@ -9,22 +9,22 @@
 static GLchar const *vertexShaderC =
     "#version 150\n"
     "in vec4 vPos;\n"
-    "in vec2 vCol;\n"
-    "out vec2 out_texco;\n"
+    "in vec4 vCol;\n"
+    "out vec4 oCol;\n"
     "uniform mat4 MVP;\n"
     "void main( void ) {"
     "    gl_Position = MVP * vPos;\n"
-    "    out_texco = vCol;\n"
+    "    oCol = vCol;\n"
     "}\n";
 
 /* fragmentShaderC is the fragment shader used for rendering. */
 static GLchar const *fragmentShaderC =
     "#version 150\n"
-    "in vec2 out_texco;\n"
+    "in vec4 oCol ;\n"
     "out vec4 out_color;\n"
     "void main()\n"
     "{\n"
-    "  out_color = vec4(out_texco, 1, 0);\n //texture(tex0, out_texco);\n"
+    "  out_color = oCol;\n"
     "}\n";
 
 /* vertexShaderT is the vertex shader used for rendering textured items. */
@@ -44,9 +44,10 @@ static GLchar const *fragmentShaderT =
     "#version 150\n"
     "in vec2 out_texco;\n"
     "out vec4 out_color;\n"
+    "uniform sampler2D tex0;\n"
     "void main()\n"
     "{\n"
-    "  out_color = texture(tex0, out_texco);\n"
+    "  out_color = vec4(out_texco,1,1); //texture(tex0, out_texco);\n"
     "}\n";
 
 /* makeProgram returns a compiled and linked shader from the given vertex and
@@ -156,7 +157,6 @@ void Rect(GLFWwindow *window, unsigned x, unsigned y, unsigned w, unsigned h,
 	  uint32_t rgba) {
 	GLint program;
 	static GLuint vao;
-	static GLuint tex;
 	static struct { GLuint col, pos; } buffs;
 	static struct { GLint col, pos; } attrs;
 	uint8_t r = (rgba & 0xff000000) >> 24;
@@ -233,12 +233,11 @@ void Rect(GLFWwindow *window, unsigned x, unsigned y, unsigned w, unsigned h,
 
 /* TexRect draws a w x h rectangle @ (x,y). */
 void TexRect(GLFWwindow *window, unsigned x, unsigned y, unsigned w, unsigned h,
-	     float clipx, float clipy, float clipw, float cliph) {
+	     float clipx, float clipy, float clipw, float cliph, GLuint tex) {
 	GLint program;
 	static GLuint vao;
-	static GLuint tex;
-	static struct { GLuint col, pos; } buffs;
-	static struct { GLint col, pos; } attrs;
+	static struct { GLuint texco, pos; } buffs;
+	static struct { GLint texco, pos; } attrs;
 	float u, v;
 	float ustep, vstep;
 	u = clipx;
@@ -260,7 +259,7 @@ void TexRect(GLFWwindow *window, unsigned x, unsigned y, unsigned w, unsigned h,
 	glUseProgram(program);
 	if (vao == 0) {
 		glGenBuffers(1, &buffs.pos);
-		glGenBuffers(1, &buffs.col);
+		glGenBuffers(1, &buffs.texco);
 
 		glGenVertexArrays(1, &vao);
 		glBindVertexArray(vao);
@@ -270,16 +269,12 @@ void TexRect(GLFWwindow *window, unsigned x, unsigned y, unsigned w, unsigned h,
 			    "error: could not find attribute \"pos\" "
 			    "in "
 			    "shader program.");
-		attrs.col = glGetAttribLocation(program, "vCol");
-		if (attrs.col == -1)
+		attrs.texco = glGetAttribLocation(program, "vTexco");
+		if (attrs.texco == -1)
 			puts(
-			    "error: could not find attribute \"col\" "
+			    "error: could not find attribute \"texco\" "
 			    "in "
 			    "shader program.");
-		tex = SOIL_load_OGL_texture(
-		    "test.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID,
-		    SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y |
-			SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT);
 	}
 	glBindVertexArray(vao);
 
@@ -294,30 +289,58 @@ void TexRect(GLFWwindow *window, unsigned x, unsigned y, unsigned w, unsigned h,
 	mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
 	mat4x4_mul(mvp, p, m);
 
-	// glUniform1i(tex_location, 0);
-	GLint mvp_location;
-	mvp_location = glGetUniformLocation(program, "MVP");
-	if (mvp_location == -1) {
-		puts(
-		    "error: uniform \"MVP\" not found in shader "
-		    "source\n");
-	}
+	GLint tex_location, mvp_location;
+	if ((tex_location = glGetUniformLocation(program, "tex0")) < 0) return;
+	if ((mvp_location = glGetUniformLocation(program, "MVP")) < 0) return;
+
 	glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat *)mvp);
 	glBindBuffer(GL_ARRAY_BUFFER, buffs.pos);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vd), vd, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, buffs.col);
+	glBindBuffer(GL_ARRAY_BUFFER, buffs.texco);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(td), td, GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(attrs.pos);
 	glBindBuffer(GL_ARRAY_BUFFER, buffs.pos);
 	glVertexAttribPointer(attrs.pos, 4, GL_UNSIGNED_SHORT, GL_FALSE, 0, 0);
 
-	glEnableVertexAttribArray(attrs.col);
-	glBindBuffer(GL_ARRAY_BUFFER, buffs.col);
-	glVertexAttribPointer(attrs.col, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, 0);
+	glEnableVertexAttribArray(attrs.texco);
+	glBindBuffer(GL_ARRAY_BUFFER, buffs.texco);
+	glVertexAttribPointer(attrs.texco, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+	/*
+	glEnable(GL_TEXTURE_2D);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glUniform1i(tex_location, 0);
+	*/
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
+}
+
+/* GetTexture returns a handle to the texture stored in the given file.
+ */
+GLuint GetTexture(const char *filename) {
+	int width, height;
+	GLuint tex;
+
+	glGenTextures(1, &tex);
+	glActiveTexture(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, tex);
+
+	/*
+	unsigned char *image =
+	    SOIL_load_image(filename, &width, &height, 0, SOIL_LOAD_RGB);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+		     GL_UNSIGNED_BYTE, image);
+	SOIL_free_image_data(image);
+	*/
+	float pixels[] = {0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+			  1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f};
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RGB, GL_FLOAT,
+		     pixels);
+
+	return tex;
 }
 
 void DrawInit() {}
