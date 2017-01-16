@@ -4,8 +4,8 @@
 #include <GLFW/glfw3.h>
 #include <stdbool.h>
 
-enum InputLayer = {
-    INPUT_LAYER_DEFAULT = 1 << 0,
+enum InputLayer {
+	INPUT_LAYER_DEFAULT = 1 << 0,
 };
 
 struct InputUpdate {
