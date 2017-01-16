@@ -10,6 +10,9 @@ enum { MAX_MOVEMENTS = 8192,
  * entity. */
 struct Movement {
 	float speed;
+	struct {
+		float x, y, z;
+	} dest;
 };
 
 /* MovementUpdate is the update message used to communicate entity movement. */
@@ -22,5 +25,6 @@ void InitMovementSystem();
 void UpdateMovementSystem();
 void AddMovement(Entity, float speed);
 struct MovementUpdate *GetMovementUpdates(int *);
+void MovementMoveTo(Entity, float, float, float);
 
 #endif

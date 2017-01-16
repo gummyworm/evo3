@@ -32,8 +32,8 @@ void InitMovementSystem() {}
 /* UpdateMovementSystem updates all movements that have been created. */
 void UpdateMovementSystem() { numUpdates = 0; }
 
-/* NewMovement adds a movement component to the entity e. */
-void NewMovement(Entity e, float speed) {
+/* AddMovement adds a movement component to the entity e. */
+void AddMovement(Entity e, float speed) {
 	struct entityToMovement *item;
 
 	if (getMovement(e) != NULL)
@@ -53,4 +53,17 @@ void NewMovement(Entity e, float speed) {
 struct MovementUpdate *GetMovementUpdates(int *num) {
 	*num = numUpdates;
 	return updates;
+}
+
+/* MovementMoveTo moves the entity e to (x, y, z). */
+void MovementMoveTo(Entity e, float x, float y, float z) {
+	struct Movement *m;
+	m = getMovement(e);
+
+	if (m == NULL)
+		return;
+
+	m->dest.x = x;
+	m->dest.y = y;
+	m->dest.z = z;
 }

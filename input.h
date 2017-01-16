@@ -4,6 +4,10 @@
 #include <GLFW/glfw3.h>
 #include <stdbool.h>
 
+enum InputLayer = {
+    INPUT_LAYER_DEFAULT = 1 << 0,
+};
+
 struct InputUpdate {
 	bool mouseMoved;
 	bool keyPressed;
@@ -20,5 +24,10 @@ struct InputUpdate *InputGetUpdates();
 
 bool InputKeyPressed(int scancode);
 void InputGetMouse(double *, double *);
+void InputEnable(uint32_t layers);
+void InputDisable(uint32_t layers);
+
+void InputRegisterKeyEvent(uint32_t, int, int, int, int);
+void InputRegisterMouseEvent(uint32_t, void (*)(double, double));
 
 #endif
