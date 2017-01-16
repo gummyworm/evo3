@@ -1,43 +1,40 @@
+#include "third-party/include/linmath.h"
 #include <GLFW/glfw3.h>
 #include <SOIL.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "third-party/include/linmath.h"
 
 /* vertexShaderC is the vertex shader used for rendering with color. */
-static GLchar const *vertexShaderC =
-    "#version 150\n"
-    "in vec4 vPos;\n"
-    "in vec4 vCol;\n"
-    "out vec4 oCol;\n"
-    "uniform mat4 MVP;\n"
-    "void main( void ) {"
-    "    gl_Position = MVP * vPos;\n"
-    "    oCol = vCol;\n"
-    "}\n";
+static GLchar const *vertexShaderC = "#version 150\n"
+                                     "in vec4 vPos;\n"
+                                     "in vec4 vCol;\n"
+                                     "out vec4 oCol;\n"
+                                     "uniform mat4 MVP;\n"
+                                     "void main( void ) {"
+                                     "    gl_Position = MVP * vPos;\n"
+                                     "    oCol = vCol;\n"
+                                     "}\n";
 
 /* fragmentShaderC is the fragment shader used for rendering. */
-static GLchar const *fragmentShaderC =
-    "#version 150\n"
-    "in vec4 oCol ;\n"
-    "out vec4 out_color;\n"
-    "void main()\n"
-    "{\n"
-    "  out_color = oCol;\n"
-    "}\n";
+static GLchar const *fragmentShaderC = "#version 150\n"
+                                       "in vec4 oCol ;\n"
+                                       "out vec4 out_color;\n"
+                                       "void main()\n"
+                                       "{\n"
+                                       "  out_color = oCol;\n"
+                                       "}\n";
 
 /* vertexShaderT is the vertex shader used for rendering textured items. */
-static GLchar const *vertexShaderT =
-    "#version 150\n"
-    "in vec4 vPos;\n"
-    "in vec2 vTexco;\n"
-    "out vec2 out_texco;\n"
-    "uniform mat4 MVP;\n"
-    "void main( void ) {"
-    "    gl_Position = MVP * vPos;\n"
-    "    out_texco = vTexco;\n"
-    "}\n";
+static GLchar const *vertexShaderT = "#version 150\n"
+                                     "in vec4 vPos;\n"
+                                     "in vec2 vTexco;\n"
+                                     "out vec2 out_texco;\n"
+                                     "uniform mat4 MVP;\n"
+                                     "void main( void ) {"
+                                     "    gl_Position = MVP * vPos;\n"
+                                     "    out_texco = vTexco;\n"
+                                     "}\n";
 
 /* fragmentShaderT is the fragment shader used for rendering textured items. */
 static GLchar const *fragmentShaderT =
@@ -47,7 +44,7 @@ static GLchar const *fragmentShaderT =
     "uniform sampler2D tex0;\n"
     "void main()\n"
     "{\n"
-    "  out_color = vec4(out_texco,1,1); //texture(tex0, out_texco);\n"
+    "  out_color = vec4(texture(tex0, out_texco));\n"
     "}\n";
 
 /* makeProgram returns a compiled and linked shader from the given vertex and
@@ -120,23 +117,12 @@ static GLint makeProgram(GLchar const *vertSource, GLchar const *fragSource) {
 	return program;
 }
 
-/* getMVP gets the given uniform's handle. */
-GLint getUniform(GLint program, const char *name) {
-	GLint u;
-	u = glGetUniformLocation(program, name);
-	if (u == -1) {
-		printf("error: no %s uniform found in shader program", name);
-		return -1;
-	}
-
-	return u;
-}
-
 /* getColorProgram returns the color shader program. */
 static GLint getColorProgram() {
 	static GLint program;
 
-	if (program != 0) return program;
+	if (program != 0)
+		return program;
 
 	program = makeProgram(vertexShaderC, fragmentShaderC);
 	return program;
@@ -146,7 +132,8 @@ static GLint getColorProgram() {
 static GLint getTextureProgram() {
 	static GLint program;
 
-	if (program != 0) return program;
+	if (program != 0)
+		return program;
 
 	program = makeProgram(vertexShaderT, fragmentShaderT);
 	return program;
@@ -154,7 +141,7 @@ static GLint getTextureProgram() {
 
 /* Rect draws a w x h rectangle @ (x,y). */
 void Rect(GLFWwindow *window, unsigned x, unsigned y, unsigned w, unsigned h,
-	  uint32_t rgba) {
+          uint32_t rgba) {
 	GLint program;
 	static GLuint vao;
 	static struct { GLuint col, pos; } buffs;
@@ -168,10 +155,11 @@ void Rect(GLFWwindow *window, unsigned x, unsigned y, unsigned w, unsigned h,
 	    r, g, b, a, r, g, b, a, r, g, b, a,
 	};
 	uint16_t v[] = {x, y, 1, 1, x + w, y,     1, 1, x + w, y + h, 1, 1,
-			x, y, 1, 1, x + w, y + h, 1, 1, x,     y + h, 1, 1};
+	                x, y, 1, 1, x + w, y + h, 1, 1, x,     y + h, 1, 1};
 
-	program = getColorProgram();
-	if (program < 0) return;
+	if ((program = getColorProgram()) < 0)
+		return;
+	glUseProgram(program);
 
 	glUseProgram(program);
 	if (vao == 0) {
@@ -182,16 +170,14 @@ void Rect(GLFWwindow *window, unsigned x, unsigned y, unsigned w, unsigned h,
 		glBindVertexArray(vao);
 		attrs.pos = glGetAttribLocation(program, "vPos");
 		if (attrs.pos == -1)
-			puts(
-			    "error: could not find attribute \"pos\" "
-			    "in "
-			    "shader program.");
+			puts("error: could not find attribute \"pos\" "
+			     "in "
+			     "shader program.");
 		attrs.col = glGetAttribLocation(program, "vCol");
 		if (attrs.col == -1)
-			puts(
-			    "error: could not find attribute \"col\" "
-			    "in "
-			    "shader program.");
+			puts("error: could not find attribute \"col\" "
+			     "in "
+			     "shader program.");
 	}
 	glBindVertexArray(vao);
 
@@ -209,9 +195,8 @@ void Rect(GLFWwindow *window, unsigned x, unsigned y, unsigned w, unsigned h,
 	GLint mvp_location;
 	mvp_location = glGetUniformLocation(program, "MVP");
 	if (mvp_location == -1) {
-		puts(
-		    "error: uniform \"MVP\" not found in shader "
-		    "source\n");
+		puts("error: uniform \"MVP\" not found in shader "
+		     "source\n");
 	}
 	glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat *)mvp);
 	glBindBuffer(GL_ARRAY_BUFFER, buffs.pos);
@@ -233,30 +218,30 @@ void Rect(GLFWwindow *window, unsigned x, unsigned y, unsigned w, unsigned h,
 
 /* TexRect draws a w x h rectangle @ (x,y). */
 void TexRect(GLFWwindow *window, unsigned x, unsigned y, unsigned w, unsigned h,
-	     float clipx, float clipy, float clipw, float cliph, GLuint tex) {
+             float clipx, float clipy, float clipw, float cliph, GLuint tex) {
 	GLint program;
 	static GLuint vao;
 	static struct { GLuint texco, pos; } buffs;
 	static struct { GLint texco, pos; } attrs;
 	float u, v;
-	float ustep, vstep;
 	u = clipx;
 	v = clipy;
-	ustep = clipw;
-	vstep = cliph;
-
-	w = 1;
-	h = 1;
 
 	uint16_t vd[] = {x, y, 1, 1, x + w, y,     1, 1, x + w, y + h, 1, 1,
-			 x, y, 1, 1, x + w, y + h, 1, 1, x,     y + h, 1, 1};
-	float td[] = {u, v, u + ustep, v,	 u + ustep, v + vstep,
-		      u, v, u + ustep, v + vstep, u,	 v + vstep};
+	                 x, y, 1, 1, x + w, y + h, 1, 1, x,     y + h, 1, 1};
 
-	program = getTextureProgram();
-	if (program < 0) return;
+	float td[] = {u, v, u + clipw, v,         u + clipw, v - cliph,
+	              u, v, u + clipw, v - cliph, u,         v - cliph};
 
+	uint8_t c[] = {
+	    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	};
+
+	if ((program = getTextureProgram()) < 0)
+		return;
 	glUseProgram(program);
+
 	if (vao == 0) {
 		glGenBuffers(1, &buffs.pos);
 		glGenBuffers(1, &buffs.texco);
@@ -265,16 +250,14 @@ void TexRect(GLFWwindow *window, unsigned x, unsigned y, unsigned w, unsigned h,
 		glBindVertexArray(vao);
 		attrs.pos = glGetAttribLocation(program, "vPos");
 		if (attrs.pos == -1)
-			puts(
-			    "error: could not find attribute \"pos\" "
-			    "in "
-			    "shader program.");
+			puts("error: could not find attribute \"pos\" "
+			     "in "
+			     "shader program.");
 		attrs.texco = glGetAttribLocation(program, "vTexco");
 		if (attrs.texco == -1)
-			puts(
-			    "error: could not find attribute \"texco\" "
-			    "in "
-			    "shader program.");
+			puts("error: could not find attribute \"texco\" "
+			     "in "
+			     "shader program.");
 	}
 	glBindVertexArray(vao);
 
@@ -282,7 +265,7 @@ void TexRect(GLFWwindow *window, unsigned x, unsigned y, unsigned w, unsigned h,
 	int width, height;
 	mat4x4 m, p, mvp;
 	mat4x4_identity(m);
-	mat4x4_rotate_Z(m, m, (float)glfwGetTime());
+	// mat4x4_rotate_Z(m, m, (float)glfwGetTime());
 	glfwGetFramebufferSize(window, &width, &height);
 	ratio = width / (float)height;
 
@@ -290,8 +273,11 @@ void TexRect(GLFWwindow *window, unsigned x, unsigned y, unsigned w, unsigned h,
 	mat4x4_mul(mvp, p, m);
 
 	GLint tex_location, mvp_location;
-	if ((tex_location = glGetUniformLocation(program, "tex0")) < 0) return;
-	if ((mvp_location = glGetUniformLocation(program, "MVP")) < 0) return;
+
+	if ((tex_location = glGetUniformLocation(program, "tex0")) < 0)
+		return;
+	if ((mvp_location = glGetUniformLocation(program, "MVP")) < 0)
+		return;
 
 	glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat *)mvp);
 	glBindBuffer(GL_ARRAY_BUFFER, buffs.pos);
@@ -307,12 +293,9 @@ void TexRect(GLFWwindow *window, unsigned x, unsigned y, unsigned w, unsigned h,
 	glBindBuffer(GL_ARRAY_BUFFER, buffs.texco);
 	glVertexAttribPointer(attrs.texco, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
-	/*
-	glEnable(GL_TEXTURE_2D);
+	glUniform1i(tex_location, 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, tex);
-	glUniform1i(tex_location, 0);
-	*/
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
@@ -325,21 +308,19 @@ GLuint GetTexture(const char *filename) {
 	GLuint tex;
 
 	glGenTextures(1, &tex);
-	glActiveTexture(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, tex);
+	glActiveTexture(GL_TEXTURE0);
 
-	/*
 	unsigned char *image =
 	    SOIL_load_image(filename, &width, &height, 0, SOIL_LOAD_RGB);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
-		     GL_UNSIGNED_BYTE, image);
-	SOIL_free_image_data(image);
-	*/
-	float pixels[] = {0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-			  1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f};
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RGB, GL_FLOAT,
-		     pixels);
 
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+	             GL_UNSIGNED_BYTE, image);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	SOIL_free_image_data(image);
 	return tex;
 }
 

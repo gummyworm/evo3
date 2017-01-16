@@ -1,10 +1,10 @@
 #include <glad/glad.h>
 
+#include "linmath.h"
 #include <GLFW/glfw3.h>
 #include <SOIL.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "linmath.h"
 
 #include "draw.h"
 #include "systems.h"
@@ -34,7 +34,8 @@ int main() {
 	GLFWwindow *window;
 	glfwSetErrorCallback(onError);
 
-	if (!glfwInit()) exit(EXIT_FAILURE);
+	if (!glfwInit())
+		exit(EXIT_FAILURE);
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
@@ -58,6 +59,7 @@ int main() {
 		int width, height;
 		glfwGetFramebufferSize(window, &width, &height);
 		glViewport(0, 0, width, height);
+		glClearColor(1, 1, 1, 1);
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		// Rect(window, 0, 0, 1, 1, 0xffffffff);

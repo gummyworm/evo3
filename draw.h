@@ -6,8 +6,8 @@
 
 void DrawInit();
 void Rect(GLFWwindow *, unsigned, unsigned, unsigned, unsigned, uint32_t);
-void TexRect(GLFWwindow *, unsigned, unsigned, unsigned, GLuint, uint32_t,
-	     float, float, float, float);
+void TexRect(GLFWwindow *, unsigned, unsigned, unsigned, unsigned, float, float,
+             float, float, GLuint);
 GLuint GetTexture(const char *filename);
 
 #endif
