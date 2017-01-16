@@ -103,3 +103,16 @@ void InputEnable(uint32_t layers) { enabled |= layers; }
 
 /* InputDisable disables the given input layers. */
 void InputDisable(uint32_t layers) { enabled &= ~(layers); }
+
+void InputRegisterKeyEvent(uint32_t layer,
+                           void (*callback)(int, int, int, int)) {
+	keyCallbacks[numKeyCallbacks].layer = layer;
+	keyCallbacks[numKeyCallbacks].key = callback;
+	numKeyCallbacks++;
+}
+
+void InputRegisterMouseEvent(uint32_t layer, void (*move)(double, double)) {
+	mouseCallbacks[numMouseCallbacks].layer = layer;
+	mouseCallbacks[numMouseCallbacks].moved = move;
+	numMouseCallbacks++;
+}

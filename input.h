@@ -27,7 +27,7 @@ void InputGetMouse(double *, double *);
 void InputEnable(uint32_t layers);
 void InputDisable(uint32_t layers);
 
-void InputRegisterKeyEvent(uint32_t, int, int, int, int);
+void InputRegisterKeyEvent(uint32_t, void (*)(int, int, int, int));
 void InputRegisterMouseEvent(uint32_t, void (*)(double, double));
 
 #endif
