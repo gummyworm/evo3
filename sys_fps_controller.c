@@ -16,15 +16,20 @@ static int numUpdates;
 static struct FPSControllerUpdate updates[MAX_FPS_CONTROLLERS];
 
 /* key is the input callback to handle key events. */
-static void key(int key, int scancode, int action, int mods) {}
+static void key(int key, int scancode, int action, int mods) {
+	puts("KEYDOWN");
+}
 
 /* getFPSController returns the fpsController attached to entity e (if there is
  * one). */
 static struct FPSController *getFPSController(Entity e) {
-	struct entityToFPSController *t;
-	HASH_FIND_INT(entitiesToFPSControllers, &e, t);
-	e = t->e;
-	return fpsControllers + e;
+	struct entityToFPSController *f;
+
+	if (entitiesToFPSControllers == NULL)
+		return NULL;
+
+	HASH_FIND_INT(entitiesToFPSControllers, &e, f);
+	return f->fpsController;
 }
 
 /* addUpdate adds a new update for this frame. */

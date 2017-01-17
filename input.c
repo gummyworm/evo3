@@ -12,13 +12,14 @@ enum { MAX_KEY_CALLBACKS = 16,
        MAX_MOUSE_CALLBACKS = 16,
 };
 
+/* keyCallbacks contains the callbacks executed upon keyboard events. */
 static struct {
 	void (*key)(int, int, int, int);
 	uint32_t layer;
 } keyCallbacks[MAX_KEY_CALLBACKS];
 static int numKeyCallbacks;
 
-/* mouseCallbacks contain the callbacks to be executed on mouse events. */
+/* mouseCallbacks contains the callbacks to be executed on mouse events. */
 struct {
 	void (*moved)(double, double);
 	uint32_t layer;
@@ -104,6 +105,7 @@ void InputEnable(uint32_t layers) { enabled |= layers; }
 /* InputDisable disables the given input layers. */
 void InputDisable(uint32_t layers) { enabled &= ~(layers); }
 
+/* InputRegisterKeyEvent registers the given keyboard event callback. */
 void InputRegisterKeyEvent(uint32_t layer,
                            void (*callback)(int, int, int, int)) {
 	keyCallbacks[numKeyCallbacks].layer = layer;
@@ -111,6 +113,7 @@ void InputRegisterKeyEvent(uint32_t layer,
 	numKeyCallbacks++;
 }
 
+/* InputRegisterMouseEvent registers the given mouse motion callback. */
 void InputRegisterMouseEvent(uint32_t layer, void (*move)(double, double)) {
 	mouseCallbacks[numMouseCallbacks].layer = layer;
 	mouseCallbacks[numMouseCallbacks].moved = move;

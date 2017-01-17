@@ -22,12 +22,27 @@ static void init(GLFWwindow *win) {
 	InitSpriteSystem();
 	InitTransformSystem();
 	InitCommanderSystem();
+	InitFPSControllerSystem();
 }
 
 /* update updates the game. */
 static void update() {
+	UpdateInput();
 	UpdateTransformSystem();
 	UpdateSpriteSystem();
+}
+
+/* test spawns test entities. */
+static void test() {
+	enum entities {
+		E_PLAYER = 1,
+		E_APPLE,
+	};
+
+	AddTransform(E_PLAYER, 0, 0, 0, 0);
+	AddCamera(E_PLAYER, 0);
+	CameraPerspective(E_PLAYER, 45.0f, 640.0f / 480.0f);
+	AddFPSController(E_PLAYER);
 }
 
 int main() {
@@ -53,6 +68,7 @@ int main() {
 	glfwSwapInterval(1);
 
 	init(window);
+	test();
 	GLuint tex = GetTexture("test.png");
 
 	while (!glfwWindowShouldClose(window)) {

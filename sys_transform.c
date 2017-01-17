@@ -17,9 +17,12 @@ static struct TransformUpdate updates[MAX_TRANSFORMS];
 /* getTransform returns the transform attached to entity e (if there is one). */
 static struct Transform *getTransform(Entity e) {
 	struct entityToTransform *t;
+
+	if (entitiesToTransforms == NULL)
+		return NULL;
+
 	HASH_FIND_INT(entitiesToTransforms, &e, t);
-	e = t->e;
-	return transforms + e;
+	return t->transform;
 }
 
 /* addUpdate adds a new update for this frame. */
@@ -31,11 +34,12 @@ void InitTransformSystem() {}
 /* UpdateTransformSystem updates all transforms that have been created. */
 void UpdateTransformSystem() { numUpdates = 0; }
 
-/* NewTransform adds a transform component to the entity e. */
-void NewTransform(Entity e, int x, int y, int z, float rot) {
+/* AddTransform adds a transform component to the entity e. */
+void AddTransform(Entity e, int x, int y, int z, float rot) {
 	struct entityToTransform *item;
 
-	if (getTransform(e) != NULL) return;
+	if (getTransform(e) != NULL)
+		return;
 
 	item = malloc(sizeof(struct entityToTransform));
 	item->transform = transforms + numTransforms;
@@ -61,7 +65,8 @@ void TransformMove(Entity e, int dx, int dy, int dz) {
 	struct Transform *t;
 
 	t = getTransform(e);
-	if (t == NULL) return;
+	if (t == NULL)
+		return;
 
 	t->x += dx;
 	t->y += dy;
@@ -73,7 +78,8 @@ void TransforSet(Entity e, int x, int y, int z) {
 	struct Transform *t;
 
 	t = getTransform(e);
-	if (t == NULL) return;
+	if (t == NULL)
+		return;
 
 	{
 		struct TransformUpdate u = {e, t->x - x, t->y - y, t->z - z};
@@ -90,7 +96,8 @@ void TransformRotate(Entity e, float dr) {
 	struct Transform *t;
 
 	t = getTransform(e);
-	if (t == NULL) return;
+	if (t == NULL)
+		return;
 
 	{
 		struct TransformUpdate u = {e, 0, 0, 0, t->rot - dr};
@@ -106,7 +113,8 @@ void TransformSetRotation(Entity e, float r) {
 	struct Transform *t;
 
 	t = getTransform(e);
-	if (t == NULL) return;
+	if (t == NULL)
+		return;
 
 	{
 		struct TransformUpdate u = {e, 0, 0, 0, r};

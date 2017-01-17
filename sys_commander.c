@@ -16,10 +16,13 @@ static struct CommanderUpdate updates[MAX_COMMANDERS];
 
 /* getCommander returns the commander attached to entity e (if there is one). */
 static struct Commander *getCommander(Entity e) {
-	struct entityToCommander *u;
-	HASH_FIND_INT(entitiesToCommanders, &e, u);
-	e = u->e;
-	return commanders + e;
+	struct entityToCommander *c;
+
+	if (entitiesToCommanders == NULL)
+		return NULL;
+
+	HASH_FIND_INT(entitiesToCommanders, &e, c);
+	return c->commander;
 }
 
 /* addUpdate adds a new update for this frame. */
@@ -29,7 +32,8 @@ static void addUpdate(struct CommanderUpdate *u) { updates[numUpdates++] = *u; }
 void NewCommander(Entity e) {
 	struct entityToCommander *item;
 
-	if (getCommander(e) != NULL) return;
+	if (getCommander(e) != NULL)
+		return;
 
 	item = malloc(sizeof(struct entityToCommander));
 	item->commander = commanders + numCommanders;

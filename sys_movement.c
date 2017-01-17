@@ -17,10 +17,13 @@ static struct MovementUpdate updates[MAX_MOVEMENTS];
 
 /* getMovement returns the movement attached to entity e (if there is one). */
 static struct Movement *getMovement(Entity e) {
-	struct entityToMovement *t;
-	HASH_FIND_INT(entitiesToMovements, &e, t);
-	e = t->e;
-	return movements + e;
+	struct entityToMovement *m;
+
+	if (entitiesToMovements == NULL)
+		return NULL;
+
+	HASH_FIND_INT(entitiesToMovements, &e, m);
+	return m->movement;
 }
 
 /* addUpdate adds a new update for this frame. */

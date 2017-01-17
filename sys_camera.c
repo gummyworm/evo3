@@ -1,5 +1,6 @@
 #include "sys_camera.h"
 #include "third-party/include/uthash.h"
+#include <stdio.h>
 
 struct entityToCamera {
 	Entity e;
@@ -16,10 +17,16 @@ static struct CameraUpdate updates[MAX_CAMERAS];
 
 /* getCamera returns the camera attached to entity e (if there is one). */
 static struct Camera *getCamera(Entity e) {
-	struct entityToCamera *t;
-	HASH_FIND_INT(entitiesToCameras, &e, t);
-	e = t->e;
-	return cameras + e;
+	struct entityToCamera *c;
+
+	if (entitiesToCameras == NULL)
+		return NULL;
+
+	HASH_FIND_INT(entitiesToCameras, &e, c);
+	if (c == NULL)
+		return NULL;
+
+	return c->camera;
 }
 
 /* addUpdate adds a new update for this frame. */
@@ -35,8 +42,10 @@ void UpdateCameraSystem() { numUpdates = 0; }
 void AddCamera(Entity e, uint32_t layers) {
 	struct entityToCamera *item;
 
-	if (getCamera(e) != NULL)
+	if (getCamera(e) != NULL) {
+		puts("No camera found");
 		return;
+	}
 
 	item = malloc(sizeof(struct entityToCamera));
 	item->camera = cameras + numCameras;
@@ -81,7 +90,7 @@ void CameraOrtho(Entity e, float aspect, float left, float right, float top,
 	if ((c = getCamera(e)) == NULL)
 		return;
 
-	c->type = CAMERA_PERSPECTIVE;
+	c->type = CAMERA_ORTHO;
 	c->params.ortho.aspect = aspect;
 	c->params.ortho.left = left;
 	c->params.ortho.right = right;

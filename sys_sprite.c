@@ -18,9 +18,12 @@ static struct SpriteUpdate updates[MAX_SPRITES];
 /* getSprite returns the sprite attached to entity e (if there is one). */
 static struct Sprite *getSprite(Entity e) {
 	struct entityToSprite *s;
+
+	if (entitiesToSprites == NULL)
+		return NULL;
+
 	HASH_FIND_INT(entitiesToSprites, &e, s);
-	e = s->e;
-	return sprites + e;
+	return s->sprite;
 }
 
 /* addUpdate adds a new update for this frame. */
