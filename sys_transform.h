@@ -2,6 +2,7 @@
 #define SYS_TRANSFORM_H
 
 #include "entity.h"
+#include <stdbool.h>
 
 enum { MAX_TRANSFORMS = 8192 };
 
@@ -29,5 +30,7 @@ void TransformMove(Entity, int, int, int);
 void TransformSet(Entity, int, int, int);
 void TransformRotate(Entity, float);
 void TransformSetRotation(Entity, float);
+
+bool GetPos(Entity, float *, float *, float *);
 
 #endif

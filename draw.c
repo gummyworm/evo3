@@ -140,8 +140,8 @@ static GLint getTextureProgram() {
 }
 
 /* Rect draws a w x h rectangle @ (x,y). */
-void Rect(GLFWwindow *window, unsigned x, unsigned y, unsigned w, unsigned h,
-          uint32_t rgba) {
+void Rect(GLFWwindow *window, mat4x4 mvp, unsigned x, unsigned y, unsigned w,
+          unsigned h, uint32_t rgba) {
 	GLint program;
 	static GLuint vao;
 	static struct { GLuint col, pos; } buffs;
@@ -183,15 +183,17 @@ void Rect(GLFWwindow *window, unsigned x, unsigned y, unsigned w, unsigned h,
 
 	float ratio;
 	int width, height;
-	mat4x4 m, p, mvp;
-	mat4x4_identity(m);
-	mat4x4_rotate_Z(m, m, (float)glfwGetTime());
-	glfwGetFramebufferSize(window, &width, &height);
-	ratio = width / (float)height;
+	mat4x4 m, p;
+	if (mvp == NULL) {
+		mat4x4_identity(m);
+		mat4x4_rotate_Z(m, m, (float)glfwGetTime());
+		glfwGetFramebufferSize(window, &width, &height);
+		ratio = width / (float)height;
 
-	mat4x4_perspective(p, 45.0f, ratio, 0.0f, 100.0f);
-	// mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
-	mat4x4_mul(mvp, p, m);
+		mat4x4_perspective(p, 45.0f, ratio, 0.0f, 100.0f);
+		// mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
+		mat4x4_mul(mvp, p, m);
+	}
 
 	GLint mvp_location;
 	mvp_location = glGetUniformLocation(program, "MVP");

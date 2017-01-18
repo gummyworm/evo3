@@ -43,6 +43,9 @@ static void test() {
 	AddCamera(E_PLAYER, 0);
 	CameraPerspective(E_PLAYER, 45.0f, 640.0f / 480.0f);
 	AddFPSController(E_PLAYER);
+
+	AddTransform(E_APPLE, 0, 0, 7.0f, 0);
+	AddRender(E_APPLE);
 }
 
 int main() {

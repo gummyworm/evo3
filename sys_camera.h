@@ -5,10 +5,14 @@
 #include "linmath.h"
 #include <stdint.h>
 
-enum { MAX_CAMERAS = 16 };
+enum { MAX_CAMERAS = 16,
+       MAX_RENDERS = 1024,
+};
 
 /* Camera is a struct the view through which the game is rendered. */
 struct Camera {
+	Entity e;
+
 	enum { CAMERA_ORTHO,
 	       CAMERA_PERSPECTIVE,
 	} type;
@@ -24,7 +28,7 @@ struct Camera {
 			float top, bot;
 		} ortho;
 	} params;
-	mat4x4 projection;
+	mat4x4 projection, view;
 	uint32_t layers;
 };
 
@@ -39,6 +43,8 @@ struct CameraUpdate {
 	int dx, dy, dz;
 	float dr;
 };
+
+void AddRender(Entity);
 
 void InitCameraSystem();
 void UpdateCameraSystem();

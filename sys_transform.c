@@ -22,6 +22,9 @@ static struct Transform *getTransform(Entity e) {
 		return NULL;
 
 	HASH_FIND_INT(entitiesToTransforms, &e, t);
+	if (t == NULL)
+		return NULL;
+
 	return t->transform;
 }
 
@@ -40,7 +43,6 @@ void AddTransform(Entity e, int x, int y, int z, float rot) {
 
 	if (getTransform(e) != NULL)
 		return;
-
 	item = malloc(sizeof(struct entityToTransform));
 	item->transform = transforms + numTransforms;
 	item->e = e;
@@ -122,4 +124,17 @@ void TransformSetRotation(Entity e, float r) {
 	}
 
 	t->rot = r;
+}
+
+/* GetPos sets x, y, and z to the position of entity e and returns the success
+ * of the operation. */
+bool GetPos(Entity e, float *x, float *y, float *z) {
+	struct Transform *t;
+	if ((t = getTransform(e)) == NULL)
+		return false;
+
+	*x = t->x;
+	*y = t->y;
+	*z = t->z;
+	return true;
 }

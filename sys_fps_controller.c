@@ -1,5 +1,6 @@
 #include "sys_fps_controller.h"
 #include "input.h"
+#include "sys_transform.h"
 #include "third-party/include/uthash.h"
 
 struct entityToFPSController {
@@ -17,7 +18,13 @@ static struct FPSControllerUpdate updates[MAX_FPS_CONTROLLERS];
 
 /* key is the input callback to handle key events. */
 static void key(int key, int scancode, int action, int mods) {
-	puts("KEYDOWN");
+	int i;
+
+	for (i = 0; i < numFPSControllers; ++i) {
+		struct FPSController *f;
+		f = fpsControllers + i;
+		TransformMove(f->e, f->speed, 0, 0);
+	}
 }
 
 /* getFPSController returns the fpsController attached to entity e (if there is
@@ -56,6 +63,8 @@ void AddFPSController(Entity e) {
 	item->e = e;
 	HASH_ADD_INT(entitiesToFPSControllers, e, item);
 
+	fpsControllers[numFPSControllers].e = e;
+	fpsControllers[numFPSControllers].speed = 1.0f;
 	fpsControllers[numFPSControllers].keyCodes.forward = 'w';
 	fpsControllers[numFPSControllers].keyCodes.backward = 's';
 
