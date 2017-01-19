@@ -1,8 +1,9 @@
 #ifndef SYS_TRANSFORM_H
 #define SYS_TRANSFORM_H
 
-#include <stdbool.h>
 #include "entity.h"
+#include "third-party/include/linmath.h"
+#include <stdbool.h>
 
 enum { MAX_TRANSFORMS = 8192 };
 
@@ -11,7 +12,7 @@ enum { MAX_TRANSFORMS = 8192 };
 struct Transform {
 	Entity e;
 	float x, y, z;
-	float rot;
+	vec4 rot;
 };
 
 /* TransformUpdate defines an update message that can be polled by interested
@@ -33,5 +34,6 @@ void TransformRotate(Entity, float);
 void TransformSetRotation(Entity, float);
 
 bool GetPos(Entity, float *, float *, float *);
+vec4 *GetRot(Entity);
 
 #endif

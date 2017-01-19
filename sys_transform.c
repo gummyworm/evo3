@@ -18,10 +18,12 @@ static struct TransformUpdate updates[MAX_TRANSFORMS];
 static struct Transform *getTransform(Entity e) {
 	struct entityToTransform *t;
 
-	if (entitiesToTransforms == NULL) return NULL;
+	if (entitiesToTransforms == NULL)
+		return NULL;
 
 	HASH_FIND_INT(entitiesToTransforms, &e, t);
-	if (t == NULL) return NULL;
+	if (t == NULL)
+		return NULL;
 
 	return t->transform;
 }
@@ -39,7 +41,8 @@ void UpdateTransformSystem() { numUpdates = 0; }
 void AddTransform(Entity e, float x, float y, float z, float rot) {
 	struct entityToTransform *item;
 
-	if (getTransform(e) != NULL) return;
+	if (getTransform(e) != NULL)
+		return;
 	item = malloc(sizeof(struct entityToTransform));
 	item->transform = transforms + numTransforms;
 	item->e = e;
@@ -48,7 +51,9 @@ void AddTransform(Entity e, float x, float y, float z, float rot) {
 	transforms[numTransforms].x = x;
 	transforms[numTransforms].y = y;
 	transforms[numTransforms].z = z;
-	transforms[numTransforms].rot = rot;
+	transforms[numTransforms].rot.x = rot;
+	transforms[numTransforms].rot.y = 0;
+	transforms[numTransforms].rot.z = 0;
 
 	HASH_ADD_INT(entitiesToTransforms, e, item);
 	numTransforms++;
@@ -65,12 +70,13 @@ void TransformMove(Entity e, float dx, float dy, float dz) {
 	struct Transform *t;
 
 	t = getTransform(e);
-	if (t == NULL) return;
+	if (t == NULL)
+		return;
 
 	t->x += dx;
 	t->y += dy;
 	t->z += dz;
-	printf("%f\n", t->x);
+	// printf("%f\n", t->z);
 }
 
 /* TransformSet sets the given entity to the position (x, y, z). */
@@ -78,7 +84,8 @@ void TransforSet(Entity e, float x, float y, float z) {
 	struct Transform *t;
 
 	t = getTransform(e);
-	if (t == NULL) return;
+	if (t == NULL)
+		return;
 
 	{
 		struct TransformUpdate u = {e, t->x - x, t->y - y, t->z - z};
@@ -95,14 +102,15 @@ void TransformRotate(Entity e, float dr) {
 	struct Transform *t;
 
 	t = getTransform(e);
-	if (t == NULL) return;
+	if (t == NULL)
+		return;
 
 	{
 		struct TransformUpdate u = {e, 0, 0, 0, t->rot - dr};
 		addUpdate(&u);
 	}
 
-	t->rot += dr;
+	t->rot[0] += dr;
 }
 
 /* TransformSetRotation sets the rotation of the transform attached to e to r
@@ -111,24 +119,33 @@ void TransformSetRotation(Entity e, float r) {
 	struct Transform *t;
 
 	t = getTransform(e);
-	if (t == NULL) return;
+	if (t == NULL)
+		return;
 
 	{
 		struct TransformUpdate u = {e, 0, 0, 0, r};
 		addUpdate(&u);
 	}
 
-	t->rot = r;
+	t->rot[0] = r;
 }
 
 /* GetPos sets x, y, and z to the position of entity e and returns the success
  * of the operation. */
 bool GetPos(Entity e, float *x, float *y, float *z) {
 	struct Transform *t;
-	if ((t = getTransform(e)) == NULL) return false;
+	if ((t = getTransform(e)) == NULL)
+		return false;
 
 	*x = t->x;
 	*y = t->y;
 	*z = t->z;
 	return true;
+}
+
+vec4 *GetRot(Entity e) {
+	struct Transform *t;
+	if ((t = getTransform(e)) == NULL)
+		return NULL;
+	return &t->rot;
 }

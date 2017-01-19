@@ -22,8 +22,23 @@ static void key(int key, int scancode, int action, int mods) {
 
 	for (i = 0; i < numFPSControllers; ++i) {
 		struct FPSController *f;
+		float dx, dy, dz;
+
 		f = fpsControllers + i;
-		TransformMove(f->e, 0, 0, 1.0f);  // f->speed, 0, 0);
+		dx = 0.f;
+		dy = 0.f;
+		dz = 0.f;
+		if (key == f->keyCodes.forward) {
+			dz = 1.0f;
+		} else if (key == f->keyCodes.backward) {
+			dz = -1.0f;
+		} else if (key == f->keyCodes.left) {
+			dx = -1.0f;
+		} else if (key == f->keyCodes.right) {
+			dx = 1.0f;
+		}
+
+		TransformMove(f->e, dx, dy, dz); // f->speed, 0, 0);
 	}
 }
 
@@ -32,7 +47,8 @@ static void key(int key, int scancode, int action, int mods) {
 static struct FPSController *getFPSController(Entity e) {
 	struct entityToFPSController *f;
 
-	if (entitiesToFPSControllers == NULL) return NULL;
+	if (entitiesToFPSControllers == NULL)
+		return NULL;
 
 	HASH_FIND_INT(entitiesToFPSControllers, &e, f);
 	return f->fpsController;
@@ -54,7 +70,8 @@ void UpdateFPSControllerSystem() { numUpdates = 0; }
 void AddFPSController(Entity e) {
 	struct entityToFPSController *item;
 
-	if (getFPSController(e) != NULL) return;
+	if (getFPSController(e) != NULL)
+		return;
 
 	item = malloc(sizeof(struct entityToFPSController));
 	item->fpsController = fpsControllers + numFPSControllers;
@@ -63,8 +80,10 @@ void AddFPSController(Entity e) {
 
 	fpsControllers[numFPSControllers].e = e;
 	fpsControllers[numFPSControllers].speed = 1.0f;
-	fpsControllers[numFPSControllers].keyCodes.forward = 'w';
-	fpsControllers[numFPSControllers].keyCodes.backward = 's';
+	fpsControllers[numFPSControllers].keyCodes.forward = GLFW_KEY_W;
+	fpsControllers[numFPSControllers].keyCodes.backward = GLFW_KEY_S;
+	fpsControllers[numFPSControllers].keyCodes.left = GLFW_KEY_A;
+	fpsControllers[numFPSControllers].keyCodes.right = GLFW_KEY_D;
 
 	InputRegisterKeyEvent(INPUT_LAYER_DEFAULT, key);
 
