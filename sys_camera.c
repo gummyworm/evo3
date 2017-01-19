@@ -54,22 +54,29 @@ void InitCameraSystem(GLFWwindow *window) { win = window; }
 void UpdateCameraSystem() {
 	int i, j;
 	for (i = 0; i < numCameras; ++i) {
-		float x, y, z;
-		vec4 rot;
+		struct {
+			float x, y, z
+		} pos;
+		struct {
+			float x, y, z
+		} rot;
 		mat4x4 m, v, mv, mvp;
+		mat4x4 translated, xrotated, yrotated;
 
-		if (!GetPos(cameras[i].e, &x, &y, &z))
+		if (!GetPos(cameras[i].e, &pos.x, &pos.y, &pos.z))
 			continue;
-		rot = GetRot(cameras[i].e);
+		if (!GetRot(cameras[i].e, &rot.x, &rot.y, &rot.z))
+			continue;
 
-		mat4x4_identity(v);
-		mat4x4_translate(v, x, y, z);
-		mat4x4_rotate_X(v, rot[0], 1.0f);
-		printf("%f\n", z);
+		mat4x4_translate(translated, pos.x, pos.y, pos.z);
+		mat4x4_rotate_X(xrotated, translated, rot.x);
+		mat4x4_rotate_Y(yrotated, xrotated, rot.y);
+		mat4x4_rotate_Z(v, yrotated, rot.z);
 		for (j = 0; j < numRenders; ++j) {
-			if (!GetPos(renders[i].e, &x, &y, &z))
+			if (!GetPos(renders[i].e, &pos.x, &pos.y, &pos.z))
 				continue;
-			mat4x4_translate(m, x, y, z);
+			mat4x4_identity(m);
+			mat4x4_translate(m, pos.x, pos.y, pos.z);
 			mat4x4_mul(mv, v, m);
 			mat4x4_mul(mvp, cameras[i].projection, mv);
 			Rect(win, mvp, 0, 0, 1, 1, 0xff00ffff);

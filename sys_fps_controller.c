@@ -1,4 +1,5 @@
 #include "sys_fps_controller.h"
+#include "base.h"
 #include "input.h"
 #include "sys_transform.h"
 #include "third-party/include/uthash.h"
@@ -18,11 +19,17 @@ static struct FPSControllerUpdate updates[MAX_FPS_CONTROLLERS];
 
 /* key is the input callback to handle key events. */
 static void key(int key, int scancode, int action, int mods) {
+	UNUSED(scancode);
+	UNUSED(action);
+	UNUSED(mods);
 	int i;
 
 	for (i = 0; i < numFPSControllers; ++i) {
 		struct FPSController *f;
 		float dx, dy, dz;
+		struct {
+			float x, y, z;
+		} drot = {};
 
 		f = fpsControllers + i;
 		dx = 0.f;
@@ -36,9 +43,14 @@ static void key(int key, int scancode, int action, int mods) {
 			dx = -1.0f;
 		} else if (key == f->keyCodes.right) {
 			dx = 1.0f;
+		} else if (key == f->keyCodes.turnL) {
+			drot.y = .1f;
+		} else if (key == f->keyCodes.turnR) {
+			drot.y = -.1f;
 		}
 
 		TransformMove(f->e, dx, dy, dz); // f->speed, 0, 0);
+		TransformRotate(f->e, drot.x, drot.y, drot.z);
 	}
 }
 
@@ -84,6 +96,8 @@ void AddFPSController(Entity e) {
 	fpsControllers[numFPSControllers].keyCodes.backward = GLFW_KEY_S;
 	fpsControllers[numFPSControllers].keyCodes.left = GLFW_KEY_A;
 	fpsControllers[numFPSControllers].keyCodes.right = GLFW_KEY_D;
+	fpsControllers[numFPSControllers].keyCodes.turnL = GLFW_KEY_LEFT;
+	fpsControllers[numFPSControllers].keyCodes.turnR = GLFW_KEY_RIGHT;
 
 	InputRegisterKeyEvent(INPUT_LAYER_DEFAULT, key);
 

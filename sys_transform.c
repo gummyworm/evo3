@@ -76,7 +76,6 @@ void TransformMove(Entity e, float dx, float dy, float dz) {
 	t->x += dx;
 	t->y += dy;
 	t->z += dz;
-	// printf("%f\n", t->z);
 }
 
 /* TransformSet sets the given entity to the position (x, y, z). */
@@ -88,7 +87,8 @@ void TransforSet(Entity e, float x, float y, float z) {
 		return;
 
 	{
-		struct TransformUpdate u = {e, t->x - x, t->y - y, t->z - z};
+		struct TransformUpdate u = {
+		    e, t->x - x, t->y - y, t->z - z, {}};
 		addUpdate(&u);
 	}
 
@@ -98,7 +98,7 @@ void TransforSet(Entity e, float x, float y, float z) {
 }
 
 /* TransformRotate rotates the transform attached to e by dr degrees. */
-void TransformRotate(Entity e, float dr) {
+void TransformRotate(Entity e, float dx, float dy, float dz) {
 	struct Transform *t;
 
 	t = getTransform(e);
@@ -106,16 +106,19 @@ void TransformRotate(Entity e, float dr) {
 		return;
 
 	{
-		struct TransformUpdate u = {e, 0, 0, 0, t->rot - dr};
+		struct TransformUpdate u = {
+		    e, 0, 0, 0, {t->rot.x - dx, t->rot.y - dy, t->rot.z - dz}};
 		addUpdate(&u);
 	}
 
-	t->rot[0] += dr;
+	t->rot.x += dx;
+	t->rot.y += dy;
+	t->rot.z += dz;
 }
 
 /* TransformSetRotation sets the rotation of the transform attached to e to r
  * degrees. */
-void TransformSetRotation(Entity e, float r) {
+void TransformSetRotation(Entity e, float x, float y, float z) {
 	struct Transform *t;
 
 	t = getTransform(e);
@@ -123,11 +126,12 @@ void TransformSetRotation(Entity e, float r) {
 		return;
 
 	{
-		struct TransformUpdate u = {e, 0, 0, 0, r};
+		struct TransformUpdate u = {e, 0, 0, 0, {x, y, z}};
 		addUpdate(&u);
 	}
-
-	t->rot[0] = r;
+	t->rot.x = x;
+	t->rot.y = y;
+	t->rot.z = z;
 }
 
 /* GetPos sets x, y, and z to the position of entity e and returns the success
@@ -143,9 +147,14 @@ bool GetPos(Entity e, float *x, float *y, float *z) {
 	return true;
 }
 
-vec4 *GetRot(Entity e) {
+/* GetRot sets the x, y, and z rotation of entity e and returns the success. */
+bool GetRot(Entity e, float *x, float *y, float *z) {
 	struct Transform *t;
 	if ((t = getTransform(e)) == NULL)
-		return NULL;
-	return &t->rot;
+		return false;
+
+	*x = t->rot.x;
+	*y = t->rot.y;
+	*z = t->rot.z;
+	return true;
 }
