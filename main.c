@@ -1,13 +1,19 @@
 #include <glad/glad.h>
 
-#include "linmath.h"
 #include <GLFW/glfw3.h>
 #include <SOIL.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "linmath.h"
 
 #include "draw.h"
+#include "sys_fps_controller.h"
 #include "systems.h"
+
+enum testEntities {
+	E_PLAYER = 1,
+	E_APPLE,
+};
 
 /* onError is the GLFW callback for error handling. */
 static void onError(int error, const char *description) {
@@ -18,6 +24,7 @@ static void onError(int error, const char *description) {
 static void init(GLFWwindow *win) {
 	DrawInit();
 	InitInput(win);
+	InitCameraSystem(win);
 	InitUnitSystem();
 	InitSpriteSystem();
 	InitTransformSystem();
@@ -30,21 +37,18 @@ static void update() {
 	UpdateInput();
 	UpdateTransformSystem();
 	UpdateSpriteSystem();
+	UpdateCameraSystem();
 }
 
 /* test spawns test entities. */
 static void test() {
-	enum entities {
-		E_PLAYER = 1,
-		E_APPLE,
-	};
-
 	AddTransform(E_PLAYER, 0, 0, 0, 0);
 	AddCamera(E_PLAYER, 0);
-	CameraPerspective(E_PLAYER, 45.0f, 640.0f / 480.0f);
 	AddFPSController(E_PLAYER);
 
-	AddTransform(E_APPLE, 0, 0, 7.0f, 0);
+	CameraPerspective(E_PLAYER, 45.0f, 640.0f / 480.0f);
+
+	AddTransform(E_APPLE, 0, 0, -7.0f, 0);
 	AddRender(E_APPLE);
 }
 
@@ -52,8 +56,7 @@ int main() {
 	GLFWwindow *window;
 	glfwSetErrorCallback(onError);
 
-	if (!glfwInit())
-		exit(EXIT_FAILURE);
+	if (!glfwInit()) exit(EXIT_FAILURE);
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
@@ -81,8 +84,9 @@ int main() {
 		glClearColor(1, 1, 1, 1);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		// Rect(window, 0, 0, 1, 1, 0xffffffff);
-		TexRect(window, 0, 0, 1, 1, 0, 0, 1, 1, tex);
+		// Rect(window, NULL, 0, 0, 1, 1, 0xffffffff);
+		// TexRect(window, NULL, 0, 0, 1, 1, 0, 0, 1, 1, tex);
+		update();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}

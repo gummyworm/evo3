@@ -1,15 +1,16 @@
 #ifndef SYS_TRANSFORM_H
 #define SYS_TRANSFORM_H
 
-#include "entity.h"
 #include <stdbool.h>
+#include "entity.h"
 
 enum { MAX_TRANSFORMS = 8192 };
 
 /* Transform is a struct that represents the position/orientation of something.
  */
 struct Transform {
-	int x, y, z;
+	Entity e;
+	float x, y, z;
 	float rot;
 };
 
@@ -17,17 +18,17 @@ struct Transform {
  * systems. */
 struct TransformUpdate {
 	Entity e;
-	int dx, dy, dz;
+	float dx, dy, dz;
 	float dr;
 };
 
 void InitTransformSystem();
 void UpdateTransformSystem();
-void AddTransform(Entity, int, int, int, float);
+void AddTransform(Entity, float, float, float, float);
 struct TransformUpdate *GetTransformUpdates(int *);
 
-void TransformMove(Entity, int, int, int);
-void TransformSet(Entity, int, int, int);
+void TransformMove(Entity, float, float, float);
+void TransformSet(Entity, float, float, float);
 void TransformRotate(Entity, float);
 void TransformSetRotation(Entity, float);
 

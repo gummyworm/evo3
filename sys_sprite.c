@@ -1,6 +1,6 @@
 #include "sys_sprite.h"
-#include "third-party/include/uthash.h"
 #include <SOIL.h>
+#include "third-party/include/uthash.h"
 
 struct entityToSprite {
 	Entity e;
@@ -9,7 +9,7 @@ struct entityToSprite {
 };
 
 static struct entityToSprite *entitiesToSprites;
-struct Sprite sprites[MAX_SPRITES];
+static struct Sprite sprites[MAX_SPRITES];
 static int numSprites;
 
 static int numUpdates;
@@ -19,10 +19,11 @@ static struct SpriteUpdate updates[MAX_SPRITES];
 static struct Sprite *getSprite(Entity e) {
 	struct entityToSprite *s;
 
-	if (entitiesToSprites == NULL)
-		return NULL;
+	if (entitiesToSprites == NULL) return NULL;
 
 	HASH_FIND_INT(entitiesToSprites, &e, s);
+	if (s == NULL) return NULL;
+
 	return s->sprite;
 }
 
@@ -39,8 +40,7 @@ void UpdateSpriteSystem() {}
 void NewSprite(Entity e, const char *filename) {
 	struct entityToSprite *item;
 
-	if (getSprite(e) != NULL)
-		return;
+	if (getSprite(e) != NULL) return;
 
 	item = malloc(sizeof(struct entityToSprite));
 	item->sprite = sprites + numSprites;
@@ -49,7 +49,7 @@ void NewSprite(Entity e, const char *filename) {
 	sprites[numSprites].texture = SOIL_load_OGL_texture(
 	    filename, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID,
 	    SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB |
-	        SOIL_FLAG_COMPRESS_TO_DXT);
+		SOIL_FLAG_COMPRESS_TO_DXT);
 
 	HASH_ADD_INT(entitiesToSprites, e, item);
 	numSprites++;

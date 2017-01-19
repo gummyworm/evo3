@@ -3,6 +3,6 @@
 
 #include <stdint.h>
 
-typedef uint16_t Entity;
+typedef int Entity;
 
 #endif

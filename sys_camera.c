@@ -1,8 +1,9 @@
 #include "sys_camera.h"
+#include <stdio.h>
 #include "draw.h"
 #include "sys_transform.h"
+#include "third-party/include/linmath.h"
 #include "third-party/include/uthash.h"
-#include <stdio.h>
 
 struct entityToCamera {
 	Entity e;
@@ -11,7 +12,7 @@ struct entityToCamera {
 };
 
 static struct entityToCamera *entitiesToCameras;
-struct Camera cameras[MAX_CAMERAS];
+static struct Camera cameras[MAX_CAMERAS];
 static int numCameras;
 
 static int numUpdates;
@@ -24,7 +25,7 @@ struct entityToRender {
 };
 
 static struct entityToRender *entitiesToRenders;
-struct Render renders[MAX_RENDERS];
+static struct Render renders[MAX_RENDERS];
 static int numRenders;
 
 static GLFWwindow *win;
@@ -33,12 +34,10 @@ static GLFWwindow *win;
 static struct Camera *getCamera(Entity e) {
 	struct entityToCamera *c;
 
-	if (entitiesToCameras == NULL)
-		return NULL;
+	if (entitiesToCameras == NULL) return NULL;
 
 	HASH_FIND_INT(entitiesToCameras, &e, c);
-	if (c == NULL)
-		return NULL;
+	if (c == NULL) return NULL;
 
 	return c->camera;
 }
@@ -56,12 +55,14 @@ void UpdateCameraSystem() {
 		float x, y, z;
 		mat4x4 mv, mvp;
 
-		if (GetPos(cameras[i].e, &x, &y, &z) == false)
-			continue;
+		if (!GetPos(cameras[i].e, &x, &y, &z)) continue;
+
 		mat4x4_identity(mv);
-		mat4x4_translate(mv, -x, -y, -z);
-		mat4x4_mul(mvp, cameras[i].projection, mv);
-		for (j = 0; i < numRenders; ++j) {
+		mat4x4_translate(mv, x, y, z);
+		for (j = 0; j < numRenders; ++j) {
+			if (!GetPos(renders[i].e, &x, &y, &z)) continue;
+			mat4x4_translate(mv, x, y, z);
+			mat4x4_mul(mvp, cameras[i].projection, mv);
 			Rect(win, mvp, 0, 0, 1, 1, 0xff00ffff);
 		}
 	}
@@ -72,10 +73,7 @@ void UpdateCameraSystem() {
 void AddCamera(Entity e, uint32_t layers) {
 	struct entityToCamera *item;
 
-	if (getCamera(e) != NULL) {
-		puts("No camera found");
-		return;
-	}
+	if (getCamera(e) != NULL) return;
 
 	item = malloc(sizeof(struct entityToCamera));
 	item->camera = cameras + numCameras;
@@ -98,8 +96,11 @@ void CameraPerspective(Entity e, float fov, float aspect) {
 	struct Camera *c;
 	float near, far;
 
-	if ((c = getCamera(e)) == NULL)
+	c = getCamera(e);
+	if (c == NULL) {
+		printf("warning: no camera component found on entity %d\n", e);
 		return;
+	}
 
 	near = 0.f;
 	far = 100.f;
@@ -115,11 +116,10 @@ void CameraPerspective(Entity e, float fov, float aspect) {
 
 /* CameraOrtho sets the parameters of the camera attached to e. */
 void CameraOrtho(Entity e, float aspect, float left, float right, float top,
-                 float bot) {
+		 float bot) {
 	struct Camera *c;
 
-	if ((c = getCamera(e)) == NULL)
-		return;
+	if ((c = getCamera(e)) == NULL) return;
 
 	c->type = CAMERA_ORTHO;
 	c->params.ortho.aspect = aspect;
@@ -136,12 +136,10 @@ void CameraOrtho(Entity e, float aspect, float left, float right, float top,
 static struct Render *getRender(Entity e) {
 	struct entityToRender *c;
 
-	if (entitiesToRenders == NULL)
-		return NULL;
+	if (entitiesToRenders == NULL) return NULL;
 
 	HASH_FIND_INT(entitiesToRenders, &e, c);
-	if (c == NULL)
-		return NULL;
+	if (c == NULL) return NULL;
 
 	return c->render;
 }
@@ -149,13 +147,13 @@ static struct Render *getRender(Entity e) {
 void AddRender(Entity e) {
 	struct entityToRender *item;
 
-	if (getRender(e) != NULL)
-		return;
+	if (getRender(e) != NULL) return;
 
 	item = malloc(sizeof(struct entityToRender));
 	item->render = renders + numRenders;
 	item->e = e;
 	HASH_ADD_INT(entitiesToRenders, e, item);
 
+	renders[numRenders].e = e;
 	numRenders++;
 }

@@ -9,7 +9,7 @@ struct entityToMovement {
 };
 
 static struct entityToMovement *entitiesToMovements;
-struct Movement movements[MAX_MOVEMENTS];
+static struct Movement movements[MAX_MOVEMENTS];
 static int numMovements;
 
 static int numUpdates;
@@ -19,10 +19,11 @@ static struct MovementUpdate updates[MAX_MOVEMENTS];
 static struct Movement *getMovement(Entity e) {
 	struct entityToMovement *m;
 
-	if (entitiesToMovements == NULL)
-		return NULL;
+	if (entitiesToMovements == NULL) return NULL;
 
 	HASH_FIND_INT(entitiesToMovements, &e, m);
+	if (m == NULL) return NULL;
+
 	return m->movement;
 }
 
@@ -39,8 +40,7 @@ void UpdateMovementSystem() { numUpdates = 0; }
 void AddMovement(Entity e, float speed) {
 	struct entityToMovement *item;
 
-	if (getMovement(e) != NULL)
-		return;
+	if (getMovement(e) != NULL) return;
 
 	item = malloc(sizeof(struct entityToMovement));
 	item->movement = movements + numMovements;
@@ -63,8 +63,7 @@ void MovementMoveTo(Entity e, float x, float y, float z) {
 	struct Movement *m;
 	m = getMovement(e);
 
-	if (m == NULL)
-		return;
+	if (m == NULL) return;
 
 	m->dest.x = x;
 	m->dest.y = y;

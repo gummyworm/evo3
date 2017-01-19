@@ -10,7 +10,7 @@ struct entityToFPSController {
 };
 
 static struct entityToFPSController *entitiesToFPSControllers;
-struct FPSController fpsControllers[MAX_FPS_CONTROLLERS];
+static struct FPSController fpsControllers[MAX_FPS_CONTROLLERS];
 static int numFPSControllers;
 
 static int numUpdates;
@@ -23,7 +23,7 @@ static void key(int key, int scancode, int action, int mods) {
 	for (i = 0; i < numFPSControllers; ++i) {
 		struct FPSController *f;
 		f = fpsControllers + i;
-		TransformMove(f->e, f->speed, 0, 0);
+		TransformMove(f->e, 0, 0, 1.0f);  // f->speed, 0, 0);
 	}
 }
 
@@ -32,8 +32,7 @@ static void key(int key, int scancode, int action, int mods) {
 static struct FPSController *getFPSController(Entity e) {
 	struct entityToFPSController *f;
 
-	if (entitiesToFPSControllers == NULL)
-		return NULL;
+	if (entitiesToFPSControllers == NULL) return NULL;
 
 	HASH_FIND_INT(entitiesToFPSControllers, &e, f);
 	return f->fpsController;
@@ -55,8 +54,7 @@ void UpdateFPSControllerSystem() { numUpdates = 0; }
 void AddFPSController(Entity e) {
 	struct entityToFPSController *item;
 
-	if (getFPSController(e) != NULL)
-		return;
+	if (getFPSController(e) != NULL) return;
 
 	item = malloc(sizeof(struct entityToFPSController));
 	item->fpsController = fpsControllers + numFPSControllers;

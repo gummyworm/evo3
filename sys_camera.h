@@ -1,9 +1,9 @@
 #ifndef SYS_CAMERA_H
 #define SYS_CAMERA_H
 
-#include "entity.h"
-#include "linmath.h"
 #include <stdint.h>
+#include "entity.h"
+#include "third-party/include/linmath.h"
 
 enum { MAX_CAMERAS = 16,
        MAX_RENDERS = 1024,
@@ -33,7 +33,9 @@ struct Camera {
 };
 
 /* Render is a component that is visible to cameras. */
-struct Render {};
+struct Render {
+	Entity e;
+};
 
 /* CameraUpdate defines an update message that can be polled by
  * interested

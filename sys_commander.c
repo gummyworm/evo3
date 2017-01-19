@@ -8,7 +8,7 @@ struct entityToCommander {
 };
 
 static struct entityToCommander *entitiesToCommanders;
-struct Commander commanders[MAX_COMMANDERS];
+static struct Commander commanders[MAX_COMMANDERS];
 static int numCommanders;
 
 static int numUpdates;
@@ -18,10 +18,11 @@ static struct CommanderUpdate updates[MAX_COMMANDERS];
 static struct Commander *getCommander(Entity e) {
 	struct entityToCommander *c;
 
-	if (entitiesToCommanders == NULL)
-		return NULL;
+	if (entitiesToCommanders == NULL) return NULL;
 
 	HASH_FIND_INT(entitiesToCommanders, &e, c);
+	if (c == NULL) return NULL;
+
 	return c->commander;
 }
 
@@ -32,8 +33,7 @@ static void addUpdate(struct CommanderUpdate *u) { updates[numUpdates++] = *u; }
 void NewCommander(Entity e) {
 	struct entityToCommander *item;
 
-	if (getCommander(e) != NULL)
-		return;
+	if (getCommander(e) != NULL) return;
 
 	item = malloc(sizeof(struct entityToCommander));
 	item->commander = commanders + numCommanders;

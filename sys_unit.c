@@ -8,7 +8,7 @@ struct entityToUnit {
 };
 
 static struct entityToUnit *entitiesToUnits;
-struct Unit units[MAX_UNITS];
+static struct Unit units[MAX_UNITS];
 static int numUnits;
 
 static int numUpdates;
@@ -18,10 +18,11 @@ static struct UnitUpdate updates[MAX_UNITS];
 static struct Unit *getUnit(Entity e) {
 	struct entityToUnit *u;
 
-	if (entitiesToUnits == NULL)
-		return NULL;
+	if (entitiesToUnits == NULL) return NULL;
 
 	HASH_FIND_INT(entitiesToUnits, &e, u);
+	if (u == NULL) return NULL;
+
 	return u->unit;
 }
 
@@ -32,8 +33,7 @@ static void addUpdate(struct UnitUpdate *u) { updates[numUpdates++] = *u; }
 void NewUnit(Entity e, const char *name, int hp) {
 	struct entityToUnit *item;
 
-	if (getUnit(e) != NULL)
-		return;
+	if (getUnit(e) != NULL) return;
 
 	item = malloc(sizeof(struct entityToUnit));
 	item->unit = units + numUnits;
@@ -51,8 +51,7 @@ void UnitHarm(Entity e, int damage) {
 	struct Unit *u;
 
 	u = getUnit(e);
-	if (u == NULL)
-		return;
+	if (u == NULL) return;
 
 	{
 		struct UnitUpdate u = {.e = e, .damageTaken = damage};

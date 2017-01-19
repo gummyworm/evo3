@@ -8,7 +8,7 @@ struct entityToTransform {
 };
 
 static struct entityToTransform *entitiesToTransforms;
-struct Transform transforms[MAX_TRANSFORMS];
+static struct Transform transforms[MAX_TRANSFORMS];
 static int numTransforms;
 
 static int numUpdates;
@@ -18,12 +18,10 @@ static struct TransformUpdate updates[MAX_TRANSFORMS];
 static struct Transform *getTransform(Entity e) {
 	struct entityToTransform *t;
 
-	if (entitiesToTransforms == NULL)
-		return NULL;
+	if (entitiesToTransforms == NULL) return NULL;
 
 	HASH_FIND_INT(entitiesToTransforms, &e, t);
-	if (t == NULL)
-		return NULL;
+	if (t == NULL) return NULL;
 
 	return t->transform;
 }
@@ -38,15 +36,15 @@ void InitTransformSystem() {}
 void UpdateTransformSystem() { numUpdates = 0; }
 
 /* AddTransform adds a transform component to the entity e. */
-void AddTransform(Entity e, int x, int y, int z, float rot) {
+void AddTransform(Entity e, float x, float y, float z, float rot) {
 	struct entityToTransform *item;
 
-	if (getTransform(e) != NULL)
-		return;
+	if (getTransform(e) != NULL) return;
 	item = malloc(sizeof(struct entityToTransform));
 	item->transform = transforms + numTransforms;
 	item->e = e;
 
+	transforms[numTransforms].e = e;
 	transforms[numTransforms].x = x;
 	transforms[numTransforms].y = y;
 	transforms[numTransforms].z = z;
@@ -63,25 +61,24 @@ struct TransformUpdate *GetTransformUpdates(int *num) {
 }
 
 /* TransformMove moves the given entity by (dx, dy, dz) units. */
-void TransformMove(Entity e, int dx, int dy, int dz) {
+void TransformMove(Entity e, float dx, float dy, float dz) {
 	struct Transform *t;
 
 	t = getTransform(e);
-	if (t == NULL)
-		return;
+	if (t == NULL) return;
 
 	t->x += dx;
 	t->y += dy;
 	t->z += dz;
+	printf("%f\n", t->x);
 }
 
 /* TransformSet sets the given entity to the position (x, y, z). */
-void TransforSet(Entity e, int x, int y, int z) {
+void TransforSet(Entity e, float x, float y, float z) {
 	struct Transform *t;
 
 	t = getTransform(e);
-	if (t == NULL)
-		return;
+	if (t == NULL) return;
 
 	{
 		struct TransformUpdate u = {e, t->x - x, t->y - y, t->z - z};
@@ -98,8 +95,7 @@ void TransformRotate(Entity e, float dr) {
 	struct Transform *t;
 
 	t = getTransform(e);
-	if (t == NULL)
-		return;
+	if (t == NULL) return;
 
 	{
 		struct TransformUpdate u = {e, 0, 0, 0, t->rot - dr};
@@ -115,8 +111,7 @@ void TransformSetRotation(Entity e, float r) {
 	struct Transform *t;
 
 	t = getTransform(e);
-	if (t == NULL)
-		return;
+	if (t == NULL) return;
 
 	{
 		struct TransformUpdate u = {e, 0, 0, 0, r};
@@ -130,8 +125,7 @@ void TransformSetRotation(Entity e, float r) {
  * of the operation. */
 bool GetPos(Entity e, float *x, float *y, float *z) {
 	struct Transform *t;
-	if ((t = getTransform(e)) == NULL)
-		return false;
+	if ((t = getTransform(e)) == NULL) return false;
 
 	*x = t->x;
 	*y = t->y;
