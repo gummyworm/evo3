@@ -1,4 +1,4 @@
-LIBS  = -lm -lSOIL -lglew -lglfw -framework OpenGL -framework CoreFoundation
+LIBS  = -lm -lSOIL -lglew -lglfw -framework OpenGL -framework CoreFoundation -lassimp
 INCLUDE = -I. -Ithird-party/include 
 CFLAGS = -Wall --std=c11
 
