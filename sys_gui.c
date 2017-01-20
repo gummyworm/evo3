@@ -10,6 +10,7 @@
 
 #include "sys_gui.h"
 #include <stdio.h>
+#include "base.h"
 #include "third-party/include/nuklear.h"
 #include "third-party/include/nuklear_glfw_gl3.h"
 #include "third-party/include/uthash.h"
@@ -57,6 +58,13 @@ void InitWidgetSystem(GLFWwindow *win) {
 
 /* UpdateWidgetSystem updates all widgets that have been created. */
 void UpdateWidgetSystem() {
+	int i;
+	for (i = 0; i < numWidgets; ++i) {
+		struct Widget *w;
+
+		w = widgets + i;
+		DrawWidget(w);
+	}
 	nk_glfw3_render(NK_ANTI_ALIASING_ON, MAX_VERTEX_BUFFER,
 			MAX_ELEMENT_BUFFER);
 	numUpdates = 0;
@@ -85,6 +93,7 @@ struct WidgetUpdate *GetWidgetUpdates(int *num) {
 
 /* DrawWidget renders the widget w. */
 static void DrawWidget(struct Widget *w) {
+	UNUSED(w);
 	if (nk_begin(ctx, "Demo", nk_rect(50, 50, 230, 250),
 		     NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE |
 			 NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE)) {
