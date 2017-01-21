@@ -51,7 +51,7 @@ void AddMesh(Entity e, const char *filename) {
 
 /* MeshLoad loads m with the mesh described by filename. */
 void MeshLoad(struct Mesh *m, const char *filename) {
-	unsigned int i;
+	unsigned i;
 	struct aiMesh *iMesh;
 	const struct aiScene *scene = aiImportFile(
 	    filename, aiProcess_CalcTangentSpace | aiProcess_Triangulate |
@@ -69,7 +69,6 @@ void MeshLoad(struct Mesh *m, const char *filename) {
 		dwarnf("no mesh found in scene for file %s", filename);
 		return;
 	}
-	dinfof("loading mesh %s", filename);
 
 	m->numVertices = scene->mMeshes[0]->mNumVertices;
 	m->numFaces = scene->mMeshes[0]->mNumFaces;
@@ -90,7 +89,7 @@ void MeshLoad(struct Mesh *m, const char *filename) {
 		faces = malloc(sizeof(GLshort) * 3 * 3 * m->numFaces);
 
 	/* get the vertices */
-	for (i = 0; i < iMesh->mNumVertices; ++i) {
+	for (i = 0; i < m->numVertices; ++i) {
 		vertices[i * 3 + 0] = iMesh->mVertices[i].x;
 		vertices[i * 3 + 1] = iMesh->mVertices[i].y;
 		vertices[i * 3 + 2] = iMesh->mVertices[i].z;
@@ -112,8 +111,10 @@ void MeshLoad(struct Mesh *m, const char *filename) {
 			colors[i * 4 + 2] = iMesh->mColors[i][0].b;
 			colors[i * 4 + 3] = iMesh->mColors[i][0].a;
 		}
+	}
 
-		if (iMesh->mFaces) {
+	if (iMesh->mFaces) {
+		for (i = 0; i < m->numFaces; ++i) {
 			faces[i * 3 + 0] = iMesh->mFaces[i].mIndices[0];
 			faces[i * 3 + 1] = iMesh->mFaces[i].mIndices[1];
 			faces[i * 3 + 2] = iMesh->mFaces[i].mIndices[2];

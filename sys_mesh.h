@@ -16,7 +16,7 @@ struct Mesh {
 		GLuint pos, normal, texture, color, index;
 	} vbos;
 
-	int numVertices, numFaces;
+	unsigned numVertices, numFaces;
 };
 
 void AddMesh(Entity e, const char *);
