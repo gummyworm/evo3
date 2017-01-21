@@ -2,18 +2,16 @@
 #define SYS_MESH_H
 
 #include "entity.h"
+#include "third-party/include/linmath.h"
 #include <GLFW/glfw3.h>
 
 enum { MAX_MESHES = 8192,
 };
 
-struct MeshUpdate {
-	Entity e;
-};
-
 struct Mesh {
 	Entity e;
-	GLuint vao;
+	GLuint vao, program;
+	GLuint texture;
 	struct {
 		GLuint pos, normal, texture, color, index;
 	} vbos;
@@ -21,7 +19,8 @@ struct Mesh {
 	int numVertices, numFaces;
 };
 
-void InitMeshSystem();
 void AddMesh(Entity e, const char *);
+void MeshDraw(Entity, mat4x4);
+struct Mesh *GetMesh(Entity e);
 
 #endif

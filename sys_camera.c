@@ -1,9 +1,10 @@
 #include "sys_camera.h"
-#include <stdio.h>
 #include "draw.h"
+#include "sys_mesh.h"
 #include "sys_transform.h"
 #include "third-party/include/linmath.h"
 #include "third-party/include/uthash.h"
+#include <stdio.h>
 
 struct entityToCamera {
 	Entity e;
@@ -34,10 +35,12 @@ static GLFWwindow *win;
 static struct Camera *getCamera(Entity e) {
 	struct entityToCamera *c;
 
-	if (entitiesToCameras == NULL) return NULL;
+	if (entitiesToCameras == NULL)
+		return NULL;
 
 	HASH_FIND_INT(entitiesToCameras, &e, c);
-	if (c == NULL) return NULL;
+	if (c == NULL)
+		return NULL;
 
 	return c->camera;
 }
@@ -61,8 +64,10 @@ void UpdateCameraSystem() {
 		mat4x4 m, v, mv, mvp;
 		mat4x4 translated, xrotated, yrotated;
 
-		if (!GetPos(cameras[i].e, &pos.x, &pos.y, &pos.z)) continue;
-		if (!GetRot(cameras[i].e, &rot.x, &rot.y, &rot.z)) continue;
+		if (!GetPos(cameras[i].e, &pos.x, &pos.y, &pos.z))
+			continue;
+		if (!GetRot(cameras[i].e, &rot.x, &rot.y, &rot.z))
+			continue;
 
 		mat4x4_translate(translated, pos.x, pos.y, pos.z);
 		mat4x4_rotate_X(xrotated, translated, rot.x);
@@ -75,6 +80,10 @@ void UpdateCameraSystem() {
 			mat4x4_translate(m, pos.x, pos.y, pos.z);
 			mat4x4_mul(mv, v, m);
 			mat4x4_mul(mvp, cameras[i].projection, mv);
+
+			if (GetMesh(renders[i].e) != NULL)
+				MeshDraw(renders[i].e, mvp);
+
 			Rect(win, mvp, 0, 0, 1, 1, 0xff00ffff);
 		}
 	}
@@ -85,7 +94,8 @@ void UpdateCameraSystem() {
 void AddCamera(Entity e, uint32_t layers) {
 	struct entityToCamera *item;
 
-	if (getCamera(e) != NULL) return;
+	if (getCamera(e) != NULL)
+		return;
 
 	item = malloc(sizeof(struct entityToCamera));
 	item->camera = cameras + numCameras;
@@ -128,10 +138,11 @@ void CameraPerspective(Entity e, float fov, float aspect) {
 
 /* CameraOrtho sets the parameters of the camera attached to e. */
 void CameraOrtho(Entity e, float aspect, float left, float right, float top,
-		 float bot) {
+                 float bot) {
 	struct Camera *c;
 
-	if ((c = getCamera(e)) == NULL) return;
+	if ((c = getCamera(e)) == NULL)
+		return;
 
 	c->type = CAMERA_ORTHO;
 	c->params.ortho.aspect = aspect;
@@ -148,18 +159,22 @@ void CameraOrtho(Entity e, float aspect, float left, float right, float top,
 static struct Render *getRender(Entity e) {
 	struct entityToRender *c;
 
-	if (entitiesToRenders == NULL) return NULL;
+	if (entitiesToRenders == NULL)
+		return NULL;
 
 	HASH_FIND_INT(entitiesToRenders, &e, c);
-	if (c == NULL) return NULL;
+	if (c == NULL)
+		return NULL;
 
 	return c->render;
 }
 
-void AddRender(Entity e) {
+/* AddRender adds a mesh loaded from filename. */
+void AddRender(Entity e, const char *filename) {
 	struct entityToRender *item;
 
-	if (getRender(e) != NULL) return;
+	if (getRender(e) != NULL)
+		return;
 
 	item = malloc(sizeof(struct entityToRender));
 	item->render = renders + numRenders;
@@ -168,4 +183,7 @@ void AddRender(Entity e) {
 
 	renders[numRenders].e = e;
 	numRenders++;
+
+	if (filename != NULL)
+		AddMesh(e, filename);
 }

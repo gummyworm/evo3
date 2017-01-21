@@ -1,9 +1,9 @@
 #ifndef SYS_CAMERA_H
 #define SYS_CAMERA_H
 
-#include <stdint.h>
 #include "entity.h"
 #include "third-party/include/linmath.h"
+#include <stdint.h>
 
 enum { MAX_CAMERAS = 16,
        MAX_RENDERS = 1024,
@@ -46,7 +46,7 @@ struct CameraUpdate {
 	float dr;
 };
 
-void AddRender(Entity);
+void AddRender(Entity, const char *);
 
 void InitCameraSystem();
 void UpdateCameraSystem();

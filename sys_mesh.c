@@ -1,4 +1,5 @@
 #include "sys_mesh.h"
+#include "sys_transform.h"
 #include "third-party/include/uthash.h"
 #include <assimp/cimport.h>
 #include <assimp/mesh.h>
@@ -15,39 +16,27 @@ static struct entityToMesh *entitiesToMeshes;
 static struct Mesh meshes[MAX_MESHES];
 static int numMeshes;
 
-static int numUpdates;
-static struct MeshUpdate updates[MAX_MESHES];
-
 static void MeshLoad(struct Mesh *, const char *);
 
-/* getMesh returns the mesh attached to entity e (if there is one). */
-static struct Mesh *getMesh(Entity e) {
-	struct entityToMesh *t;
+/* GetMesh returns the mesh attached to entity e (if there is one). */
+struct Mesh *GetMesh(Entity e) {
+	struct entityToMesh *m;
 
 	if (entitiesToMeshes == NULL)
 		return NULL;
 
-	HASH_FIND_INT(entitiesToMeshes, &e, t);
-	if (t == NULL)
+	HASH_FIND_INT(entitiesToMeshes, &e, m);
+	if (m == NULL)
 		return NULL;
 
-	return t->mesh;
+	return m->mesh;
 }
-
-/* addUpdate adds a new update for this frame. */
-static void addUpdate(struct MeshUpdate *u) { updates[numUpdates++] = *u; }
-
-/* InitMeshSystem initializes the mesh system. */
-void InitMeshSystem() {}
-
-/* UpdateMeshSystem updates all meshs that have been created. */
-void UpdateMeshSystem() { numUpdates = 0; }
 
 /* AddMesh adds a mesh component to the entity e. */
 void AddMesh(Entity e, const char *filename) {
 	struct entityToMesh *item;
 
-	if (getMesh(e) != NULL)
+	if (GetMesh(e) != NULL)
 		return;
 	item = malloc(sizeof(struct entityToMesh));
 	item->mesh = meshes + numMeshes;
@@ -57,12 +46,6 @@ void AddMesh(Entity e, const char *filename) {
 
 	MeshLoad(meshes + numMeshes, filename);
 	numMeshes++;
-}
-
-/* GetMeshUpdates returns the mesh updates this frame. */
-struct MeshUpdate *GetMeshUpdates(int *num) {
-	*num = numUpdates;
-	return updates;
 }
 
 /* MeshLoad loads m with the mesh described by filename. */
@@ -155,4 +138,29 @@ void MeshLoad(struct Mesh *m, const char *filename) {
 	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+/* MeshDraw renders the e's mesh using the given modelview-projection matrix. */
+void MeshDraw(Entity e, mat4x4 mvp) {
+	struct Mesh *m;
+	GLint tex_location, mvp_location;
+
+	m = GetMesh(e);
+	if (m == NULL)
+		return;
+
+	glUseProgram(m->program);
+	if ((tex_location = glGetUniformLocation(m->program, "tex0")) > 0) {
+		glUniform1i(tex_location, 0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, m->texture);
+	}
+
+	if ((mvp_location = glGetUniformLocation(m->program, "MVP")) < 0)
+		return;
+	glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat *)mvp);
+
+	glBindVertexArray(m->vao);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindVertexArray(0);
 }

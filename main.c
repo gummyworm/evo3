@@ -1,10 +1,10 @@
 #include <glad/glad.h>
 
+#include "linmath.h"
 #include <GLFW/glfw3.h>
 #include <SOIL.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "linmath.h"
 
 #include "draw.h"
 #include "sys_fps_controller.h"
@@ -49,14 +49,15 @@ static void test() {
 	CameraPerspective(E_PLAYER, 45.0f, 640.0f / 480.0f);
 
 	AddTransform(E_APPLE, 0, 0, -7.0f, 0);
-	AddRender(E_APPLE);
+	AddRender(E_APPLE, NULL);
 }
 
 int main() {
 	GLFWwindow *window;
 	glfwSetErrorCallback(onError);
 
-	if (!glfwInit()) exit(EXIT_FAILURE);
+	if (!glfwInit())
+		exit(EXIT_FAILURE);
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
