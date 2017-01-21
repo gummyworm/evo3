@@ -75,15 +75,15 @@ void AddMesh(Entity e, const char *filename) {
 
 /* MeshLoad loads m with the mesh described by filename. */
 void MeshLoad(struct Mesh *m, const char *filename) {
-	unsigned i;
+	unsigned i, j;
 	struct aiMesh *iMesh;
 	const struct aiScene *scene = aiImportFile(
 	    filename, aiProcess_CalcTangentSpace | aiProcess_Triangulate |
 	                  aiProcess_JoinIdenticalVertices |
 	                  aiProcess_SortByPType);
 
-	float *vertices, *colors, *texcos, *normals;
-	GLshort *faces;
+	float *vertices, *colors, *texcos, *normals, *v, *c, *vn, *t;
+	GLshort *faces, *f;
 
 	if (scene == NULL) {
 		dwarnf("no scene found in file %s", filename);
@@ -100,53 +100,68 @@ void MeshLoad(struct Mesh *m, const char *filename) {
 	vertices = normals = colors = texcos = NULL;
 	faces = NULL;
 
+	m->numVertices = 0;
+	m->numFaces = 0;
+	for (i = 0; i < scene->mNumMeshes; ++i) {
+		iMesh = scene->mMeshes[i];
+		m->numVertices += iMesh->mNumVertices;
+		m->numFaces += iMesh->mNumFaces;
+	}
+
 	iMesh = scene->mMeshes[0];
-	if (iMesh->mVertices)
-		vertices = malloc(sizeof(float) * 3 * m->numVertices);
+	vertices = malloc(sizeof(float) * 3 * m->numVertices);
+	colors = malloc(sizeof(float) * 4 * m->numVertices);
 	if (iMesh->mTextureCoords[0])
 		texcos = malloc(sizeof(float) * 2 * m->numVertices);
 	if (iMesh->mNormals)
 		normals = malloc(sizeof(float) * 3 * m->numVertices);
-	colors = malloc(sizeof(float) * 4 * m->numVertices);
 
 	if (m->numFaces > 0)
 		faces = malloc(sizeof(GLshort) * 3 * 3 * m->numFaces);
 
 	/* get the vertices */
-	for (i = 0; i < m->numVertices; ++i) {
-		vertices[i * 3 + 0] = iMesh->mVertices[i].x;
-		vertices[i * 3 + 1] = iMesh->mVertices[i].y;
-		vertices[i * 3 + 2] = iMesh->mVertices[i].z;
+	v = vertices;
+	c = colors;
+	vn = normals;
+	t = texcos;
+	f = faces;
+	for (j = 0; j < scene->mNumMeshes; ++j) {
+		iMesh = scene->mMeshes[j];
+		for (i = 0; i < iMesh->mNumVertices; ++i) {
+			*v++ = iMesh->mVertices[i].x;
+			*v++ = iMesh->mVertices[i].y;
+			*v++ = iMesh->mVertices[i].z;
 
-		if (iMesh->mNormals) {
-			normals[i * 3 + 0] = iMesh->mNormals[i].x;
-			normals[i * 3 + 1] = iMesh->mNormals[i].y;
-			normals[i * 3 + 2] = iMesh->mNormals[i].z;
+			if (iMesh->mNormals) {
+				*vn++ = iMesh->mNormals[i].x;
+				*vn++ = iMesh->mNormals[i].y;
+				*vn++ = iMesh->mNormals[i].z;
+			}
+
+			if (iMesh->mTextureCoords[0]) {
+				*t++ = iMesh->mTextureCoords[i][0].x;
+				*t++ = iMesh->mTextureCoords[i][0].y;
+			}
+
+			if (iMesh->mColors[0]) {
+				*c++ = iMesh->mColors[i][0].r;
+				*c++ = iMesh->mColors[i][0].g;
+				*c++ = iMesh->mColors[i][0].b;
+				*c++ = iMesh->mColors[i][0].a;
+			} else {
+				*c++ = 0.0f;
+				*c++ = 0.0f;
+				*c++ = 0.0f;
+				*c++ = 1.0f;
+			}
 		}
 
-		if (iMesh->mTextureCoords[0]) {
-			texcos[i * 2 + 0] = iMesh->mTextureCoords[i][0].x;
-			texcos[i * 2 + 1] = iMesh->mTextureCoords[i][0].y;
-		}
-
-		if (iMesh->mColors[0]) {
-			colors[i * 4 + 0] = iMesh->mColors[i][0].r;
-			colors[i * 4 + 1] = iMesh->mColors[i][0].g;
-			colors[i * 4 + 2] = iMesh->mColors[i][0].b;
-			colors[i * 4 + 3] = iMesh->mColors[i][0].a;
-		} else {
-			colors[i * 4 + 0] = 0.0f;
-			colors[i * 4 + 1] = 0.0f;
-			colors[i * 4 + 2] = 0.0f;
-			colors[i * 4 + 3] = 1.0f;
-		}
-	}
-
-	if (iMesh->mFaces) {
-		for (i = 0; i < m->numFaces; ++i) {
-			faces[i * 3 + 0] = iMesh->mFaces[i].mIndices[0];
-			faces[i * 3 + 1] = iMesh->mFaces[i].mIndices[1];
-			faces[i * 3 + 2] = iMesh->mFaces[i].mIndices[2];
+		if (iMesh->mFaces) {
+			for (i = 0; i < iMesh->mNumFaces; ++i) {
+				*f++ = iMesh->mFaces[i].mIndices[0];
+				*f++ = iMesh->mFaces[i].mIndices[1];
+				*f++ = iMesh->mFaces[i].mIndices[2];
+			}
 		}
 	}
 
@@ -223,7 +238,8 @@ void MeshLoad(struct Mesh *m, const char *filename) {
 	aiReleaseImport(scene);
 }
 
-/* MeshDraw renders the e's mesh using the given modelview-projection matrix. */
+/* MeshDraw renders the e's mesh using the given modelview-projection
+ * matrix. */
 void MeshDraw(Entity e, mat4x4 mvp) {
 	struct Mesh *m;
 	GLint tex_location, mvp_location;

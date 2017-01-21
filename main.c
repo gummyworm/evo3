@@ -43,12 +43,12 @@ static void update() {
 }
 
 /* test spawns test entities. */
-extern Player(int);
+extern void Player(int);
 static void test() {
 	Player(E_PLAYER);
 
 	AddTransform(E_APPLE, 0, 0, -7.0f);
-	AddRender(E_APPLE, "cube.obj");
+	AddRender(E_APPLE, "person.obj");
 }
 
 int main() {
