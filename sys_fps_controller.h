@@ -9,6 +9,7 @@ enum { MAX_FPS_CONTROLLERS = 16 };
 struct FPSController {
 	Entity e;
 	float speed;
+	float turnSpeed;
 	struct {
 		int forward;
 		int backward;
@@ -22,6 +23,7 @@ struct FPSController {
 struct FPSControllerUpdate {};
 
 void InitFPSControllerSystem();
-void AddFPSController(Entity);
+void UpdateFPSControllerSystem();
+void AddFPSController(Entity, float);
 
 #endif

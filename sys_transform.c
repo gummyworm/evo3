@@ -38,7 +38,7 @@ void InitTransformSystem() {}
 void UpdateTransformSystem() { numUpdates = 0; }
 
 /* AddTransform adds a transform component to the entity e. */
-void AddTransform(Entity e, float x, float y, float z, float rot) {
+void AddTransform(Entity e, float x, float y, float z) {
 	struct entityToTransform *item;
 
 	if (getTransform(e) != NULL)
@@ -51,7 +51,7 @@ void AddTransform(Entity e, float x, float y, float z, float rot) {
 	transforms[numTransforms].x = x;
 	transforms[numTransforms].y = y;
 	transforms[numTransforms].z = z;
-	transforms[numTransforms].rot.x = rot;
+	transforms[numTransforms].rot.x = 0;
 	transforms[numTransforms].rot.y = 0;
 	transforms[numTransforms].rot.z = 0;
 

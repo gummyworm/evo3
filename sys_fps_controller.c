@@ -1,6 +1,7 @@
 #include "sys_fps_controller.h"
 #include "base.h"
 #include "input.h"
+#include "sys_time.h"
 #include "sys_transform.h"
 #include "third-party/include/uthash.h"
 
@@ -14,6 +15,7 @@ static struct entityToFPSController *entitiesToFPSControllers;
 static struct FPSController fpsControllers[MAX_FPS_CONTROLLERS];
 static int numFPSControllers;
 
+static float dt;
 static int numUpdates;
 static struct FPSControllerUpdate updates[MAX_FPS_CONTROLLERS];
 
@@ -26,30 +28,29 @@ static void key(int key, int scancode, int action, int mods) {
 
 	for (i = 0; i < numFPSControllers; ++i) {
 		struct FPSController *f;
-		float dx, dy, dz;
+		struct {
+			float x, y, z;
+		} dpos = {};
 		struct {
 			float x, y, z;
 		} drot = {};
 
 		f = fpsControllers + i;
-		dx = 0.f;
-		dy = 0.f;
-		dz = 0.f;
 		if (key == f->keyCodes.forward) {
-			dz = 1.0f;
+			dpos.z = f->speed * dt;
 		} else if (key == f->keyCodes.backward) {
-			dz = -1.0f;
+			dpos.z = -f->speed * dt;
 		} else if (key == f->keyCodes.left) {
-			dx = -1.0f;
+			dpos.x = -f->speed * dt;
 		} else if (key == f->keyCodes.right) {
-			dx = 1.0f;
+			dpos.x = f->speed * dt;
 		} else if (key == f->keyCodes.turnL) {
-			drot.y = .1f;
+			drot.y = f->turnSpeed * dt;
 		} else if (key == f->keyCodes.turnR) {
-			drot.y = -.1f;
+			drot.y = -f->turnSpeed * dt;
 		}
 
-		TransformMove(f->e, dx, dy, dz); // f->speed, 0, 0);
+		TransformMove(f->e, dpos.x, dpos.y, dpos.z);
 		TransformRotate(f->e, drot.x, drot.y, drot.z);
 	}
 }
@@ -76,10 +77,15 @@ void InitFPSControllerSystem() {}
 
 /* UpdateFPSControllerSystem updates all fpsControllers that have been created.
  */
-void UpdateFPSControllerSystem() { numUpdates = 0; }
+void UpdateFPSControllerSystem() {
+	static float lastUpdate = 0.0f;
+	dt = GetTime() - lastUpdate;
+	lastUpdate = GetTime();
+	numUpdates = 0;
+}
 
 /* AddFPSController adds a fpsController component to the entity e. */
-void AddFPSController(Entity e) {
+void AddFPSController(Entity e, float speed) {
 	struct entityToFPSController *item;
 
 	if (getFPSController(e) != NULL)
@@ -91,7 +97,8 @@ void AddFPSController(Entity e) {
 	HASH_ADD_INT(entitiesToFPSControllers, e, item);
 
 	fpsControllers[numFPSControllers].e = e;
-	fpsControllers[numFPSControllers].speed = 1.0f;
+	fpsControllers[numFPSControllers].speed = speed;
+	fpsControllers[numFPSControllers].turnSpeed = 1.0f;
 	fpsControllers[numFPSControllers].keyCodes.forward = GLFW_KEY_W;
 	fpsControllers[numFPSControllers].keyCodes.backward = GLFW_KEY_S;
 	fpsControllers[numFPSControllers].keyCodes.left = GLFW_KEY_A;

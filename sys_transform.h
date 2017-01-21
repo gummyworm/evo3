@@ -29,7 +29,7 @@ struct TransformUpdate {
 
 void InitTransformSystem();
 void UpdateTransformSystem();
-void AddTransform(Entity, float, float, float, float);
+void AddTransform(Entity, float, float, float);
 struct TransformUpdate *GetTransformUpdates(int *);
 
 void TransformMove(Entity, float, float, float);

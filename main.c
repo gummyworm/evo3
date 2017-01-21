@@ -27,6 +27,7 @@ static void init(GLFWwindow *win) {
 	InitCameraSystem(win);
 	InitUnitSystem();
 	InitSpriteSystem();
+	InitTimeSystem();
 	InitTransformSystem();
 	InitCommanderSystem();
 	InitFPSControllerSystem();
@@ -38,17 +39,15 @@ static void update() {
 	UpdateTransformSystem();
 	UpdateSpriteSystem();
 	UpdateCameraSystem();
+	UpdateFPSControllerSystem();
 }
 
 /* test spawns test entities. */
+extern Player(int);
 static void test() {
-	AddTransform(E_PLAYER, 0, 0, 0, 0);
-	AddCamera(E_PLAYER, 0);
-	AddFPSController(E_PLAYER);
+	Player(E_PLAYER);
 
-	CameraPerspective(E_PLAYER, 45.0f, 640.0f / 480.0f);
-
-	AddTransform(E_APPLE, 0, 0, -7.0f, 0);
+	AddTransform(E_APPLE, 0, 0, -7.0f);
 	AddRender(E_APPLE, "cube.obj");
 }
 
