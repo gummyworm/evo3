@@ -15,6 +15,9 @@ struct Mesh {
 	struct {
 		GLuint pos, normal, texture, color, index;
 	} vbos;
+	struct {
+		GLint pos, color, texco, normal;
+	} attrs;
 
 	unsigned numVertices, numFaces;
 };

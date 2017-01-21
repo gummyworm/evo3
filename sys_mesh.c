@@ -1,11 +1,32 @@
 #include "sys_mesh.h"
 #include "debug.h"
+#include "draw.h"
 #include "sys_transform.h"
 #include "third-party/include/uthash.h"
 #include <assimp/cimport.h>
 #include <assimp/mesh.h>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
+
+/* vertexShaderC is the vertex shader used for rendering with color. */
+static GLchar const *vertexShaderC = "#version 150\n"
+                                     "in vec4 vPos;\n"
+                                     "in vec4 vCol;\n"
+                                     "out vec4 oCol;\n"
+                                     "uniform mat4 MVP;\n"
+                                     "void main( void ) {"
+                                     "    gl_Position = MVP * vPos;\n"
+                                     "    oCol = vCol;\n"
+                                     "}\n";
+
+/* fragmentShaderC is the fragment shader used for rendering. */
+static GLchar const *fragmentShaderC = "#version 150\n"
+                                       "in vec4 oCol ;\n"
+                                       "out vec4 out_color;\n"
+                                       "void main()\n"
+                                       "{\n"
+                                       "  out_color = oCol;\n"
+                                       "}\n";
 
 struct entityToMesh {
 	Entity e;
@@ -39,13 +60,16 @@ void AddMesh(Entity e, const char *filename) {
 
 	if (GetMesh(e) != NULL)
 		return;
+
 	item = malloc(sizeof(struct entityToMesh));
 	item->mesh = meshes + numMeshes;
 	item->e = e;
+	HASH_ADD_INT(entitiesToMeshes, e, item);
 
 	meshes[numMeshes].e = e;
 
 	MeshLoad(meshes + numMeshes, filename);
+	dinfof("loaded mesh %s", filename);
 	numMeshes++;
 }
 
@@ -83,8 +107,8 @@ void MeshLoad(struct Mesh *m, const char *filename) {
 		texcos = malloc(sizeof(float) * 2 * m->numVertices);
 	if (iMesh->mNormals)
 		normals = malloc(sizeof(float) * 3 * m->numVertices);
-	if (iMesh->mColors[0])
-		colors = malloc(sizeof(float) * 4 * m->numVertices);
+	colors = malloc(sizeof(float) * 4 * m->numVertices);
+
 	if (m->numFaces > 0)
 		faces = malloc(sizeof(GLshort) * 3 * 3 * m->numFaces);
 
@@ -110,6 +134,11 @@ void MeshLoad(struct Mesh *m, const char *filename) {
 			colors[i * 4 + 1] = iMesh->mColors[i][0].g;
 			colors[i * 4 + 2] = iMesh->mColors[i][0].b;
 			colors[i * 4 + 3] = iMesh->mColors[i][0].a;
+		} else {
+			colors[i * 4 + 0] = 0.0f;
+			colors[i * 4 + 1] = 0.0f;
+			colors[i * 4 + 2] = 0.0f;
+			colors[i * 4 + 3] = 1.0f;
 		}
 	}
 
@@ -121,14 +150,14 @@ void MeshLoad(struct Mesh *m, const char *filename) {
 		}
 	}
 
-	glGenBuffers(1, &m->vao);
-	glBindBuffer(GL_ARRAY_BUFFER, m->vao);
+	glGenVertexArrays(1, &m->vao);
+	glBindVertexArray(m->vao);
 
 	if (vertices) {
 		glGenBuffers(1, &m->vbos.pos);
 		glBindBuffer(GL_ARRAY_BUFFER, m->vbos.pos);
 		glBufferData(GL_ARRAY_BUFFER,
-		             sizeof(float) * 3 * iMesh->mNumVertices, vertices,
+		             sizeof(float) * 3 * m->numVertices, vertices,
 		             GL_STATIC_DRAW);
 		free(vertices);
 	}
@@ -137,7 +166,7 @@ void MeshLoad(struct Mesh *m, const char *filename) {
 		glGenBuffers(1, &m->vbos.color);
 		glBindBuffer(GL_ARRAY_BUFFER, m->vbos.color);
 		glBufferData(GL_ARRAY_BUFFER,
-		             sizeof(float) * 4 * iMesh->mNumVertices, colors,
+		             sizeof(float) * 4 * m->numVertices, colors,
 		             GL_STATIC_DRAW);
 		free(colors);
 	}
@@ -146,7 +175,7 @@ void MeshLoad(struct Mesh *m, const char *filename) {
 		glGenBuffers(1, &m->vbos.texture);
 		glBindBuffer(GL_ARRAY_BUFFER, m->vbos.texture);
 		glBufferData(GL_ARRAY_BUFFER,
-		             sizeof(float) * 2 * iMesh->mNumVertices, texcos,
+		             sizeof(float) * 2 * m->numVertices, texcos,
 		             GL_STATIC_DRAW);
 		free(texcos);
 	}
@@ -155,12 +184,43 @@ void MeshLoad(struct Mesh *m, const char *filename) {
 		glGenBuffers(1, &m->vbos.normal);
 		glBindBuffer(GL_ARRAY_BUFFER, m->vbos.normal);
 		glBufferData(GL_ARRAY_BUFFER,
-		             sizeof(float) * 3 * iMesh->mNumVertices, normals,
+		             sizeof(float) * 3 * m->numVertices, normals,
 		             GL_STATIC_DRAW);
 		free(normals);
 	}
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	if (faces > 0) {
+		glGenBuffers(1, &m->vbos.index);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m->vbos.index);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+		             sizeof(GLshort) * 3 * m->numFaces, faces,
+		             GL_STATIC_DRAW);
+	}
+
+	m->program = makeProgram(vertexShaderC, fragmentShaderC);
+	m->attrs.pos = glGetAttribLocation(m->program, "vPos");
+	m->attrs.color = glGetAttribLocation(m->program, "vCol");
+
+	if (m->attrs.pos >= 0) {
+		glEnableVertexAttribArray(m->attrs.pos);
+		glBindBuffer(GL_ARRAY_BUFFER, m->vbos.pos);
+		glVertexAttribPointer(m->attrs.pos, 3, GL_FLOAT, GL_FALSE, 0,
+		                      0);
+	} else {
+		dwarnf("no position attribute found in shader program");
+	}
+
+	if (m->attrs.color >= 0) {
+		glEnableVertexAttribArray(m->attrs.color);
+		glBindBuffer(GL_ARRAY_BUFFER, m->vbos.color);
+		glVertexAttribPointer(m->attrs.color, 4, GL_FLOAT, GL_FALSE, 0,
+		                      0);
+	} else {
+		dwarnf("no color attribute found in shader program");
+	}
+
+	glBindVertexArray(0);
+	aiReleaseImport(scene);
 }
 
 /* MeshDraw renders the e's mesh using the given modelview-projection matrix. */
@@ -179,11 +239,33 @@ void MeshDraw(Entity e, mat4x4 mvp) {
 		glBindTexture(GL_TEXTURE_2D, m->texture);
 	}
 
-	if ((mvp_location = glGetUniformLocation(m->program, "MVP")) < 0)
+	if ((mvp_location = glGetUniformLocation(m->program, "MVP")) < 0) {
+		dwarnf("no MVP uniform found in program");
 		return;
+	}
 	glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat *)mvp);
 
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m->vbos.index);
 	glBindVertexArray(m->vao);
+
+	if (m->attrs.pos >= 0) {
+		glEnableVertexAttribArray(m->attrs.pos);
+		glBindBuffer(GL_ARRAY_BUFFER, m->vbos.pos);
+		glVertexAttribPointer(m->attrs.pos, 3, GL_FLOAT, GL_FALSE, 0,
+		                      0);
+	} else {
+		dwarnf("no position attribute");
+	}
+
+	if (m->attrs.color >= 0) {
+		glEnableVertexAttribArray(m->attrs.color);
+		glBindBuffer(GL_ARRAY_BUFFER, m->vbos.color);
+		glVertexAttribPointer(m->attrs.color, 4, GL_FLOAT, GL_FALSE, 0,
+		                      0);
+	} else {
+		dwarnf("no color attribute");
+	}
+
 	if (m->numFaces > 0)
 		glDrawElements(GL_TRIANGLES, m->numFaces * 3, GL_UNSIGNED_SHORT,
 		               0);

@@ -1,4 +1,5 @@
 #include "sys_camera.h"
+#include "debug.h"
 #include "draw.h"
 #include "sys_mesh.h"
 #include "sys_transform.h"
@@ -81,10 +82,11 @@ void UpdateCameraSystem() {
 			mat4x4_mul(mv, v, m);
 			mat4x4_mul(mvp, cameras[i].projection, mv);
 
-			if (GetMesh(renders[i].e) != NULL)
+			if (GetMesh(renders[i].e) != NULL) {
 				MeshDraw(renders[i].e, mvp);
+			}
 
-			Rect(win, mvp, 0, 0, 1, 1, 0xff00ffff);
+			// Rect(win, mvp, 0, 0, 1, 1, 0xff00ffff);
 		}
 	}
 	numUpdates = 0;
