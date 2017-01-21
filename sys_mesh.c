@@ -1,4 +1,5 @@
 #include "sys_mesh.h"
+#include "debug.h"
 #include "sys_transform.h"
 #include "third-party/include/uthash.h"
 #include <assimp/cimport.h>
@@ -61,15 +62,35 @@ void MeshLoad(struct Mesh *m, const char *filename) {
 	GLshort *faces;
 
 	if (scene == NULL) {
+		dwarnf("no scene found in file %s", filename);
 		return;
 	}
 	if (scene->mNumMeshes == 0) {
+		dwarnf("no mesh found in scene for file %s", filename);
 		return;
 	}
+	dinfof("loading mesh %s", filename);
+
+	m->numVertices = scene->mMeshes[0]->mNumVertices;
+	m->numFaces = scene->mMeshes[0]->mNumFaces;
+
+	vertices = normals = colors = texcos = NULL;
+	faces = NULL;
+
+	iMesh = scene->mMeshes[0];
+	if (iMesh->mVertices)
+		vertices = malloc(sizeof(float) * 3 * m->numVertices);
+	if (iMesh->mTextureCoords[0])
+		texcos = malloc(sizeof(float) * 2 * m->numVertices);
+	if (iMesh->mNormals)
+		normals = malloc(sizeof(float) * 3 * m->numVertices);
+	if (iMesh->mColors[0])
+		colors = malloc(sizeof(float) * 4 * m->numVertices);
+	if (m->numFaces > 0)
+		faces = malloc(sizeof(GLshort) * 3 * 3 * m->numFaces);
 
 	/* get the vertices */
-	vertices = malloc(sizeof(float) * 3 * scene->mMeshes[0]->mNumVertices);
-	for (i = 0, iMesh = scene->mMeshes[0]; i < iMesh->mNumVertices; ++i) {
+	for (i = 0; i < iMesh->mNumVertices; ++i) {
 		vertices[i * 3 + 0] = iMesh->mVertices[i].x;
 		vertices[i * 3 + 1] = iMesh->mVertices[i].y;
 		vertices[i * 3 + 2] = iMesh->mVertices[i].z;
@@ -91,16 +112,13 @@ void MeshLoad(struct Mesh *m, const char *filename) {
 			colors[i * 4 + 2] = iMesh->mColors[i][0].b;
 			colors[i * 4 + 3] = iMesh->mColors[i][0].a;
 		}
-	}
-	m->numVertices = iMesh->mNumVertices;
 
-	/* get the indices for the faces */
-	for (i = 0; i < iMesh->mNumFaces; ++i) {
-		faces[i * 3 + 0] = iMesh->mFaces[i].mIndices[0];
-		faces[i * 3 + 1] = iMesh->mFaces[i].mIndices[1];
-		faces[i * 3 + 2] = iMesh->mFaces[i].mIndices[2];
+		if (iMesh->mFaces) {
+			faces[i * 3 + 0] = iMesh->mFaces[i].mIndices[0];
+			faces[i * 3 + 1] = iMesh->mFaces[i].mIndices[1];
+			faces[i * 3 + 2] = iMesh->mFaces[i].mIndices[2];
+		}
 	}
-	m->numFaces = iMesh->mNumFaces;
 
 	glGenBuffers(1, &m->vao);
 	glBindBuffer(GL_ARRAY_BUFFER, m->vao);
@@ -111,6 +129,7 @@ void MeshLoad(struct Mesh *m, const char *filename) {
 		glBufferData(GL_ARRAY_BUFFER,
 		             sizeof(float) * 3 * iMesh->mNumVertices, vertices,
 		             GL_STATIC_DRAW);
+		free(vertices);
 	}
 
 	if (colors) {
@@ -119,6 +138,7 @@ void MeshLoad(struct Mesh *m, const char *filename) {
 		glBufferData(GL_ARRAY_BUFFER,
 		             sizeof(float) * 4 * iMesh->mNumVertices, colors,
 		             GL_STATIC_DRAW);
+		free(colors);
 	}
 
 	if (texcos) {
@@ -127,6 +147,7 @@ void MeshLoad(struct Mesh *m, const char *filename) {
 		glBufferData(GL_ARRAY_BUFFER,
 		             sizeof(float) * 2 * iMesh->mNumVertices, texcos,
 		             GL_STATIC_DRAW);
+		free(texcos);
 	}
 
 	if (normals) {
@@ -135,6 +156,7 @@ void MeshLoad(struct Mesh *m, const char *filename) {
 		glBufferData(GL_ARRAY_BUFFER,
 		             sizeof(float) * 3 * iMesh->mNumVertices, normals,
 		             GL_STATIC_DRAW);
+		free(normals);
 	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -161,6 +183,11 @@ void MeshDraw(Entity e, mat4x4 mvp) {
 	glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat *)mvp);
 
 	glBindVertexArray(m->vao);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	if (m->numFaces > 0)
+		glDrawElements(GL_TRIANGLES, m->numFaces * 3, GL_UNSIGNED_SHORT,
+		               0);
+	else
+		glDrawArrays(GL_TRIANGLES, 0, m->numVertices);
+
 	glBindVertexArray(0);
 }
