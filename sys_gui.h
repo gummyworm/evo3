@@ -1,8 +1,8 @@
 #ifndef SYS_TRANSFORM_H
 #define SYS_TRANSFORM_H
 
-#include <GLFW/glfw3.h>
 #include "entity.h"
+#include <GLFW/glfw3.h>
 
 enum { MAX_WIDGETS = 8192,
 };
@@ -15,7 +15,7 @@ struct Widget {
 	Entity e;
 };
 
-void InitWidgetSystem(GLFWwindow*);
+void InitWidgetSystem(GLFWwindow *);
 void UpdateWidgetSystem();
 void AddWidget(Entity e);
 

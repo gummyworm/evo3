@@ -150,7 +150,7 @@ void MeshLoad(struct Mesh *m, const char *filename) {
 				*c++ = iMesh->mColors[i][0].a;
 			} else {
 				*c++ = 0.0f;
-				*c++ = 0.0f;
+				*c++ = 1.0f;
 				*c++ = 0.0f;
 				*c++ = 1.0f;
 			}
@@ -235,6 +235,9 @@ void MeshLoad(struct Mesh *m, const char *filename) {
 	}
 
 	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
 	aiReleaseImport(scene);
 }
 
@@ -249,39 +252,23 @@ void MeshDraw(Entity e, mat4x4 mvp) {
 		return;
 
 	glUseProgram(m->program);
-	if ((tex_location = glGetUniformLocation(m->program, "tex0")) > 0) {
+	if ((tex_location = glGetUniformLocation(m->program, "tex0")) >= 0) {
+		glEnable(GL_TEXTURE_2D);
 		glUniform1i(tex_location, 0);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, m->texture);
+	} else {
+		glDisable(GL_TEXTURE_2D);
 	}
 
 	if ((mvp_location = glGetUniformLocation(m->program, "MVP")) < 0) {
 		dwarnf("no MVP uniform found in program");
 		return;
 	}
+
 	glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat *)mvp);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m->vbos.index);
 	glBindVertexArray(m->vao);
-
-	if (m->attrs.pos >= 0) {
-		glEnableVertexAttribArray(m->attrs.pos);
-		glBindBuffer(GL_ARRAY_BUFFER, m->vbos.pos);
-		glVertexAttribPointer(m->attrs.pos, 3, GL_FLOAT, GL_FALSE, 0,
-		                      0);
-	} else {
-		dwarnf("no position attribute");
-	}
-
-	if (m->attrs.color >= 0) {
-		glEnableVertexAttribArray(m->attrs.color);
-		glBindBuffer(GL_ARRAY_BUFFER, m->vbos.color);
-		glVertexAttribPointer(m->attrs.color, 4, GL_FLOAT, GL_FALSE, 0,
-		                      0);
-	} else {
-		dwarnf("no color attribute");
-	}
-
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m->vbos.index);
 	if (m->numFaces > 0)
 		glDrawElements(GL_TRIANGLES, m->numFaces * 3, GL_UNSIGNED_SHORT,
 		               0);
@@ -289,4 +276,6 @@ void MeshDraw(Entity e, mat4x4 mvp) {
 		glDrawArrays(GL_TRIANGLES, 0, m->numVertices);
 
 	glBindVertexArray(0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glUseProgram(0);
 }

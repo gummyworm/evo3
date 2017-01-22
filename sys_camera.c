@@ -70,6 +70,7 @@ void UpdateCameraSystem() {
 		if (!GetRot(cameras[i].e, &rot.x, &rot.y, &rot.z))
 			continue;
 
+		mat4x4_identity(translated);
 		mat4x4_translate(translated, pos.x, pos.y, pos.z);
 		mat4x4_rotate_X(xrotated, translated, rot.x);
 		mat4x4_rotate_Y(yrotated, xrotated, rot.y);
@@ -85,8 +86,6 @@ void UpdateCameraSystem() {
 			if (GetMesh(renders[i].e) != NULL) {
 				MeshDraw(renders[i].e, mvp);
 			}
-
-			// Rect(win, mvp, 0, 0, 1, 1, 0xff00ffff);
 		}
 	}
 	numUpdates = 0;

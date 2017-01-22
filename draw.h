@@ -12,6 +12,6 @@ void TexRect(GLFWwindow *, mat4x4, unsigned, unsigned, unsigned, unsigned,
              float, float, float, float, GLuint);
 GLuint GetTexture(const char *filename);
 
-static GLint makeProgram(GLchar const *, GLchar const *);
+GLint makeProgram(GLchar const *, GLchar const *);
 
 #endif

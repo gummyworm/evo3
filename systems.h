@@ -6,6 +6,7 @@
 #include "sys_camera.h"
 #include "sys_commander.h"
 #include "sys_fps_controller.h"
+#include "sys_gui.h"
 #include "sys_sprite.h"
 #include "sys_time.h"
 #include "sys_transform.h"

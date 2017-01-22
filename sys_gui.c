@@ -9,11 +9,11 @@
 #define NK_GLFW_GL3_IMPLEMENTATION
 
 #include "sys_gui.h"
-#include <stdio.h>
 #include "base.h"
 #include "third-party/include/nuklear.h"
 #include "third-party/include/nuklear_glfw_gl3.h"
 #include "third-party/include/uthash.h"
+#include <stdio.h>
 
 #define MAX_VERTEX_BUFFER 512 * 1024
 #define MAX_ELEMENT_BUFFER 128 * 1024
@@ -40,10 +40,12 @@ static void DrawWidget(struct Widget *);
 static struct Widget *getWidget(Entity e) {
 	struct entityToWidget *t;
 
-	if (entitiesToWidgets == NULL) return NULL;
+	if (entitiesToWidgets == NULL)
+		return NULL;
 
 	HASH_FIND_INT(entitiesToWidgets, &e, t);
-	if (t == NULL) return NULL;
+	if (t == NULL)
+		return NULL;
 
 	return t->widget;
 }
@@ -53,20 +55,36 @@ static void addUpdate(struct WidgetUpdate *u) { updates[numUpdates++] = *u; }
 
 /* InitWidgetSystem initializes the widget system. */
 void InitWidgetSystem(GLFWwindow *win) {
+	struct nk_font_atlas *atlas;
+	struct nk_font *c64;
+
 	ctx = nk_glfw3_init(win, NK_GLFW3_INSTALL_CALLBACKS);
+
+	nk_glfw3_font_stash_begin(&atlas);
+	c64 = nk_font_atlas_add_from_file(atlas, "C64.ttf", 12, 0);
+	nk_glfw3_font_stash_end();
+
+	/*nk_style_load_all_cursors(ctx, atlas->cursors);*/
+	nk_style_set_font(ctx, &c64->handle);
 }
 
 /* UpdateWidgetSystem updates all widgets that have been created. */
 void UpdateWidgetSystem() {
 	int i;
+
+	nk_glfw3_new_frame();
+
 	for (i = 0; i < numWidgets; ++i) {
 		struct Widget *w;
-
 		w = widgets + i;
 		DrawWidget(w);
 	}
+
+	DrawWidget(NULL);
+
 	nk_glfw3_render(NK_ANTI_ALIASING_ON, MAX_VERTEX_BUFFER,
-			MAX_ELEMENT_BUFFER);
+	                MAX_ELEMENT_BUFFER);
+
 	numUpdates = 0;
 }
 
@@ -74,7 +92,8 @@ void UpdateWidgetSystem() {
 void AddWidget(Entity e) {
 	struct entityToWidget *item;
 
-	if (getWidget(e) != NULL) return;
+	if (getWidget(e) != NULL)
+		return;
 	item = malloc(sizeof(struct entityToWidget));
 	item->widget = widgets + numWidgets;
 	item->e = e;
@@ -95,8 +114,8 @@ struct WidgetUpdate *GetWidgetUpdates(int *num) {
 static void DrawWidget(struct Widget *w) {
 	UNUSED(w);
 	if (nk_begin(ctx, "Demo", nk_rect(50, 50, 230, 250),
-		     NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE |
-			 NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE)) {
+	             NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE |
+	                 NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE)) {
 		enum { EASY, HARD };
 		static int op = EASY;
 		static int property = 20;
@@ -105,8 +124,10 @@ static void DrawWidget(struct Widget *w) {
 			fprintf(stdout, "button pressed\n");
 
 		nk_layout_row_dynamic(ctx, 30, 2);
-		if (nk_option_label(ctx, "easy", op == EASY)) op = EASY;
-		if (nk_option_label(ctx, "hard", op == HARD)) op = HARD;
+		if (nk_option_label(ctx, "easy", op == EASY))
+			op = EASY;
+		if (nk_option_label(ctx, "hard", op == HARD))
+			op = HARD;
 
 		nk_layout_row_dynamic(ctx, 25, 1);
 		nk_property_int(ctx, "Compression:", 0, &property, 100, 10, 1);
@@ -115,7 +136,7 @@ static void DrawWidget(struct Widget *w) {
 		nk_label(ctx, "background:", NK_TEXT_LEFT);
 		nk_layout_row_dynamic(ctx, 25, 1);
 		if (nk_combo_begin_color(ctx, background,
-					 nk_vec2(nk_widget_width(ctx), 400))) {
+		                         nk_vec2(nk_widget_width(ctx), 400))) {
 			nk_layout_row_dynamic(ctx, 120, 1);
 			background = nk_color_picker(ctx, background, NK_RGBA);
 			nk_layout_row_dynamic(ctx, 25, 1);

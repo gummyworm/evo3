@@ -23,14 +23,16 @@ static void onError(int error, const char *description) {
 /* init initializes the various systems used in the game. */
 static void init(GLFWwindow *win) {
 	DrawInit();
-	InitInput(win);
-	InitCameraSystem(win);
 	InitUnitSystem();
 	InitSpriteSystem();
 	InitTimeSystem();
 	InitTransformSystem();
 	InitCommanderSystem();
 	InitFPSControllerSystem();
+
+	InitCameraSystem(win);
+	// InitWidgetSystem(win);
+	InitInput(win);
 }
 
 /* update updates the game. */
@@ -38,8 +40,10 @@ static void update() {
 	UpdateInput();
 	UpdateTransformSystem();
 	UpdateSpriteSystem();
-	UpdateCameraSystem();
 	UpdateFPSControllerSystem();
+
+	// UpdateWidgetSystem();
+	UpdateCameraSystem();
 }
 
 /* test spawns test entities. */
@@ -62,7 +66,7 @@ int main() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	window = glfwCreateWindow(640, 480, "Simple example", NULL, NULL);
+	window = glfwCreateWindow(640, 480, "game", NULL, NULL);
 
 	if (!window) {
 		glfwTerminate();
@@ -75,7 +79,6 @@ int main() {
 
 	init(window);
 	test();
-	GLuint tex = GetTexture("test.png");
 
 	while (!glfwWindowShouldClose(window)) {
 		int width, height;
@@ -84,8 +87,11 @@ int main() {
 		glClearColor(1, 1, 1, 1);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		// Rect(window, NULL, 0, 0, 1, 1, 0xffffffff);
-		// TexRect(window, NULL, 0, 0, 1, 1, 0, 0, 1, 1, tex);
+		glDisable(GL_SCISSOR_TEST);
+		glDisable(GL_DEPTH_TEST);
+		glDisable(GL_CULL_FACE);
+		glDisable(GL_BLEND);
+
 		update();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
