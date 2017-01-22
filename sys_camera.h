@@ -3,15 +3,23 @@
 
 #include "entity.h"
 #include "third-party/include/linmath.h"
+#include <GLFW/glfw3.h>
 #include <stdint.h>
 
 enum { MAX_CAMERAS = 16,
        MAX_RENDERS = 1024,
+       TARGET_RES_X = 1024,
+       TARGET_RES_Y = 1024,
 };
 
 /* Camera is a struct the view through which the game is rendered. */
 struct Camera {
 	Entity e;
+
+	struct {
+		GLuint fbo;
+		GLuint color, depth;
+	} target;
 
 	enum { CAMERA_ORTHO,
 	       CAMERA_PERSPECTIVE,

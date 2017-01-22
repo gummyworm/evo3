@@ -1,6 +1,8 @@
-#include "sys_camera.h"
+#include <GL/glew.h>
+
 #include "debug.h"
 #include "draw.h"
+#include "sys_camera.h"
 #include "sys_mesh.h"
 #include "sys_transform.h"
 #include "third-party/include/linmath.h"
@@ -54,8 +56,10 @@ void InitCameraSystem(GLFWwindow *window) { win = window; }
 
 /* UpdateCameraSystem updates all cameras that have been created. */
 void UpdateCameraSystem() {
+	struct Camera *c;
 	int i, j;
 	for (i = 0; i < numCameras; ++i) {
+		GLint vp[4];
 		struct {
 			float x, y, z;
 		} pos;
@@ -65,10 +69,23 @@ void UpdateCameraSystem() {
 		mat4x4 m, v, mv, mvp;
 		mat4x4 translated, xrotated, yrotated;
 
+		c = cameras + i;
+
 		if (!GetPos(cameras[i].e, &pos.x, &pos.y, &pos.z))
 			continue;
 		if (!GetRot(cameras[i].e, &rot.x, &rot.y, &rot.z))
 			continue;
+
+		glBindFramebuffer(GL_FRAMEBUFFER, c->target.fbo);
+		glGetIntegerv(GL_VIEWPORT, vp);
+		glViewport(0, 0, TARGET_RES_X, TARGET_RES_Y);
+		glClearColor(1.0, 1.0, 1.0, 1.0);
+		glClearDepth(1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		glDisable(GL_BLEND);
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LEQUAL);
 
 		mat4x4_identity(translated);
 		mat4x4_translate(translated, pos.x, pos.y, pos.z);
@@ -87,6 +104,8 @@ void UpdateCameraSystem() {
 				MeshDraw(renders[i].e, mvp);
 			}
 		}
+
+		glViewport(vp[0], vp[1], vp[2], vp[3]);
 	}
 	numUpdates = 0;
 }
@@ -105,6 +124,37 @@ void AddCamera(Entity e, uint32_t layers) {
 
 	cameras[numCameras].e = e;
 	cameras[numCameras].layers = layers;
+
+	/* RGBA8 2D texture, 24 bit depth texture, 256x256 */
+	glGenTextures(1, &cameras[numCameras].target.color);
+	glBindTexture(GL_TEXTURE_2D, cameras[numCameras].target.color);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 256, 256, 0, GL_RGBA,
+	             GL_UNSIGNED_BYTE, NULL);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glGenRenderbuffers(1, &cameras[numCameras].target.depth);
+	glBindRenderbuffer(GL_RENDERBUFFER, cameras[numCameras].target.depth);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, 256, 256);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+	glGenBuffers(1, &cameras[numCameras].target.fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, cameras[numCameras].target.fbo);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+	                       GL_TEXTURE_2D, cameras[numCameras].target.color,
+	                       0);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+	                          GL_RENDERBUFFER,
+	                          cameras[numCameras].target.depth);
+
+	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (status != GL_FRAMEBUFFER_COMPLETE)
+		dwarnf("FBO setup failed");
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 	numCameras++;
 }
 
