@@ -140,8 +140,8 @@ static GLint getTextureProgram() {
 }
 
 /* Rect draws a w x h rectangle @ (x,y). */
-void Rect(GLFWwindow *window, mat4x4 mvp, unsigned x, unsigned y, unsigned w,
-          unsigned h, uint32_t rgba) {
+void Rect(mat4x4 mvp, unsigned x, unsigned y, unsigned w, unsigned h,
+          uint32_t rgba) {
 	GLint program;
 	static GLuint vao;
 	static struct { GLuint col, pos; } buffs;
@@ -208,9 +208,8 @@ void Rect(GLFWwindow *window, mat4x4 mvp, unsigned x, unsigned y, unsigned w,
 }
 
 /* TexRect draws a w x h rectangle @ (x,y). */
-void TexRect(GLFWwindow *window, mat4x4 mvp, unsigned x, unsigned y, unsigned w,
-             unsigned h, float clipx, float clipy, float clipw, float cliph,
-             GLuint tex) {
+void TexRect(mat4x4 mvp, unsigned x, unsigned y, unsigned w, unsigned h,
+             float clipx, float clipy, float clipw, float cliph, GLuint tex) {
 	GLint program;
 	static GLuint vao;
 	static struct { GLuint texco, pos; } buffs;
@@ -248,32 +247,19 @@ void TexRect(GLFWwindow *window, mat4x4 mvp, unsigned x, unsigned y, unsigned w,
 	}
 	glBindVertexArray(vao);
 
-	float ratio;
-	int width, height;
-	GLint tex_location, mvp_location;
-	if (mvp == NULL) {
-		mat4x4 m, p, mvp;
-		mat4x4_identity(m);
-		mat4x4_translate(m, 0.f, 0.f, -7.0f);
-		// mat4x4_rotate_Z(m, m, (float)glfwGetTime());
-		glfwGetFramebufferSize(window, &width, &height);
-		ratio = width / (float)height;
-		mat4x4_perspective(p, 45.0f, ratio, 0.0f, 100.0f);
-		// mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
-		mat4x4_mul(mvp, p, m);
+	{
+		GLint tex_location, mvp_location;
+
 		if ((mvp_location = glGetUniformLocation(program, "MVP")) < 0)
 			return;
 		glUniformMatrix4fv(mvp_location, 1, GL_FALSE,
 		                   (const GLfloat *)mvp);
-	} else {
-		if ((mvp_location = glGetUniformLocation(program, "MVP")) < 0)
+
+		if ((tex_location = glGetUniformLocation(program, "tex0")) < 0)
 			return;
-		glUniformMatrix4fv(mvp_location, 1, GL_FALSE,
-		                   (const GLfloat *)mvp);
+		glUniform1i(tex_location, 0);
 	}
 
-	if ((tex_location = glGetUniformLocation(program, "tex0")) < 0)
-		return;
 	glBindBuffer(GL_ARRAY_BUFFER, buffs.pos);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vd), vd, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, buffs.texco);
@@ -287,7 +273,6 @@ void TexRect(GLFWwindow *window, mat4x4 mvp, unsigned x, unsigned y, unsigned w,
 	glBindBuffer(GL_ARRAY_BUFFER, buffs.texco);
 	glVertexAttribPointer(attrs.texco, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
-	glUniform1i(tex_location, 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, tex);
 

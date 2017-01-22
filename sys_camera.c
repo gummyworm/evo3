@@ -34,6 +34,8 @@ static int numRenders;
 
 static GLFWwindow *win;
 
+static void drawPost(struct Camera *c);
+
 /* getCamera returns the camera attached to entity e (if there is one). */
 static struct Camera *getCamera(Entity e) {
 	struct entityToCamera *c;
@@ -92,6 +94,7 @@ void UpdateCameraSystem() {
 		mat4x4_rotate_X(xrotated, translated, rot.x);
 		mat4x4_rotate_Y(yrotated, xrotated, rot.y);
 		mat4x4_rotate_Z(v, yrotated, rot.z);
+
 		for (j = 0; j < numRenders; ++j) {
 			if (!GetPos(renders[i].e, &pos.x, &pos.y, &pos.z))
 				continue;
@@ -105,6 +108,8 @@ void UpdateCameraSystem() {
 			}
 		}
 
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		drawPost(cameras + i);
 		glViewport(vp[0], vp[1], vp[2], vp[3]);
 	}
 	numUpdates = 0;
@@ -139,7 +144,7 @@ void AddCamera(Entity e, uint32_t layers) {
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, 256, 256);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
-	glGenBuffers(1, &cameras[numCameras].target.fbo);
+	glGenFramebuffers(1, &cameras[numCameras].target.fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, cameras[numCameras].target.fbo);
 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
@@ -152,6 +157,8 @@ void AddCamera(Entity e, uint32_t layers) {
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (status != GL_FRAMEBUFFER_COMPLETE)
 		dwarnf("FBO setup failed");
+	else
+		dinfof("FBO setup complete");
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -237,4 +244,41 @@ void AddRender(Entity e, const char *filename) {
 
 	if (filename != NULL)
 		AddMesh(e, filename);
+}
+
+/* drawPost renders c's target texture to the display. */
+static void drawPost(struct Camera *c) {
+	const GLchar *vs = "#version 150\n"
+	                   "in vec3 pos;\n"
+	                   "in vec4 normal;\n"
+	                   "in vec4 color;\n"
+	                   "in vec2 texco;\n"
+	                   "out vec4 out_co;\n"
+	                   "uniform sampler2D tex;\n"
+	                   "uniform mat4 mv, proj;\n"
+	                   "void main()\n"
+	                   "{\n"
+	                   "  out_co = color;\n"
+	                   "  gl_Position = proj * mv * vec4(pos, 1.0);\n"
+	                   "}\n";
+	const GLchar *fs = "#version 150\n"
+	                   "in vec4 out_co;\n"
+	                   "out vec4 out_color;\n"
+	                   "void main()\n"
+	                   "{\n"
+	                   "  out_color = out_co;\n"
+	                   "}\n";
+	mat4x4 mvp;
+	int width, height;
+	float ratio;
+
+	if (c->postProgram == 0)
+		c->postProgram = makeProgram(vs, fs);
+	if (c->postProgram == 0)
+		return;
+
+	glfwGetFramebufferSize(win, &width, &height);
+	ratio = ((float)width) / height;
+	mat4x4_ortho(mvp, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
+	TexRect(mvp, 0, 0, width, height, 0, 0, 1, 1, c->target.color);
 }

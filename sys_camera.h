@@ -20,6 +20,7 @@ struct Camera {
 		GLuint fbo;
 		GLuint color, depth;
 	} target;
+	GLuint postProgram;
 
 	enum { CAMERA_ORTHO,
 	       CAMERA_PERSPECTIVE,

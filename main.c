@@ -1,4 +1,4 @@
-#include <glad/glad.h>
+#include <GL/glew.h>
 
 #include "linmath.h"
 #include <GLFW/glfw3.h>
@@ -74,7 +74,8 @@ int main() {
 	}
 
 	glfwMakeContextCurrent(window);
-	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+	glewExperimental = true;
+	glewInit();
 	glfwSwapInterval(1);
 
 	init(window);
