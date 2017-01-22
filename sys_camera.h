@@ -18,6 +18,7 @@ struct Camera {
 	Entity e;
 
 	struct {
+		int width, height;
 		GLuint fbo;
 		GLuint color, depth;
 

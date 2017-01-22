@@ -72,7 +72,6 @@ static void doPass(struct Camera *c, int pass) {
 void UpdateCameraSystem() {
 	struct Camera *c;
 	int i, j;
-	GLint vp[4];
 
 	struct {
 		float x, y, z;
@@ -93,8 +92,8 @@ void UpdateCameraSystem() {
 
 		if (c->numPasses > 0) {
 			glBindFramebuffer(GL_FRAMEBUFFER, c->passes[0].fbo);
-			glGetIntegerv(GL_VIEWPORT, vp);
-			glViewport(0, 0, TARGET_RES_X, TARGET_RES_Y);
+			glViewport(0, 0, c->passes[0].width,
+			           c->passes[0].height);
 		}
 
 		glClearColor(1.0, 1.0, 1.0, 1.0);
@@ -128,8 +127,8 @@ void UpdateCameraSystem() {
 			if (j < (c->numPasses - 1)) {
 				glBindFramebuffer(GL_FRAMEBUFFER,
 				                  c->passes[j + 1].fbo);
-				glGetIntegerv(GL_VIEWPORT, vp);
-				glViewport(0, 0, TARGET_RES_X, TARGET_RES_Y);
+				glViewport(0, 0, c->passes[j + 1].width,
+				           c->passes[j + 1].height);
 			} else {
 				int w, h;
 				glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -188,6 +187,8 @@ static void addPass(struct Camera *c, GLint program, int w, int h) {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	c->passes[p].program = program;
+	c->passes[p].width = w;
+	c->passes[p].height = h;
 
 	c->numPasses++;
 }
@@ -208,6 +209,9 @@ void AddCamera(Entity e, uint32_t layers) {
 	cameras[numCameras].layers = layers;
 	cameras[numCameras].numPasses = 0;
 
+	int w, h;
+	glfwGetFramebufferSize(win, &w, &h);
+	addPass(cameras + numCameras, getBayerProgram(), w, h);
 	addPass(cameras + numCameras, getBayerProgram(), 256, 256);
 
 	numCameras++;
