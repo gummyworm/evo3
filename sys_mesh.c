@@ -149,9 +149,9 @@ void MeshLoad(struct Mesh *m, const char *filename) {
 				*c++ = iMesh->mColors[i][0].b;
 				*c++ = iMesh->mColors[i][0].a;
 			} else {
-				*c++ = 0.0f;
-				*c++ = 1.0f;
-				*c++ = 0.0f;
+				*c++ = 0.8f;
+				*c++ = 0.4f;
+				*c++ = 0.41f;
 				*c++ = 1.0f;
 			}
 		}

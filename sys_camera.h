@@ -7,9 +7,10 @@
 #include <stdint.h>
 
 enum { MAX_CAMERAS = 16,
+       MAX_CAMERA_PASSES = 2,
        MAX_RENDERS = 1024,
-       TARGET_RES_X = 1024,
-       TARGET_RES_Y = 1024,
+       TARGET_RES_X = 256,
+       TARGET_RES_Y = 256,
 };
 
 /* Camera is a struct the view through which the game is rendered. */
@@ -21,8 +22,9 @@ struct Camera {
 		GLuint color, depth;
 
 		GLuint vao;
-	} target;
-	GLuint postProgram;
+		GLuint program;
+	} passes[MAX_CAMERA_PASSES];
+	int numPasses;
 
 	enum { CAMERA_ORTHO,
 	       CAMERA_PERSPECTIVE,

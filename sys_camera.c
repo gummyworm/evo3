@@ -56,30 +56,47 @@ static void addUpdate(struct CameraUpdate *u) { updates[numUpdates++] = *u; }
 /* InitCameraSystem initializes the camera system. */
 void InitCameraSystem(GLFWwindow *window) { win = window; }
 
+static void doPass(struct Camera *c, int pass) {
+	mat4x4 mvp;
+	int width, height;
+
+	glDisable(GL_DEPTH_TEST);
+
+	glfwGetFramebufferSize(win, &width, &height);
+	mat4x4_ortho(mvp, 0, width, height, 0, 1.f, -1.f);
+	TexRect(mvp, c->passes[pass].program, 0, 0, width, height, 0, 0, 1, 1,
+	        c->passes[pass].color);
+}
+
 /* UpdateCameraSystem updates all cameras that have been created. */
 void UpdateCameraSystem() {
 	struct Camera *c;
 	int i, j;
-	for (i = 0; i < numCameras; ++i) {
-		GLint vp[4];
-		struct {
-			float x, y, z;
-		} pos;
-		struct {
-			float x, y, z;
-		} rot;
-		mat4x4 m, v, mv, mvp;
-		mat4x4 translated, xrotated, yrotated;
+	GLint vp[4];
 
+	struct {
+		float x, y, z;
+	} pos;
+	struct {
+		float x, y, z;
+	} rot;
+
+	mat4x4 m, v, mv, mvp;
+	mat4x4 translated, xrotated, yrotated;
+
+	for (i = 0; i < numCameras; ++i) {
 		c = cameras + i;
 		if (!GetPos(c->e, &pos.x, &pos.y, &pos.z))
-			continue;
+			return;
 		if (!GetRot(c->e, &rot.x, &rot.y, &rot.z))
-			continue;
+			return;
 
-		glBindFramebuffer(GL_FRAMEBUFFER, c->target.fbo);
-		glGetIntegerv(GL_VIEWPORT, vp);
-		glViewport(0, 0, TARGET_RES_X, TARGET_RES_Y);
+		if (c->numPasses > 0) {
+			glBindFramebuffer(GL_FRAMEBUFFER, c->passes[0].fbo);
+			glGetIntegerv(GL_VIEWPORT, vp);
+			glViewport(0, 0, TARGET_RES_X, TARGET_RES_Y);
+		}
+
 		glClearColor(1.0, 1.0, 1.0, 1.0);
 		glClearDepth(1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -107,13 +124,72 @@ void UpdateCameraSystem() {
 			}
 		}
 
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glViewport(vp[0], vp[1], vp[2], vp[3]);
+		for (j = 0; j < c->numPasses; ++j) {
+			if (j < (c->numPasses - 1)) {
+				glBindFramebuffer(GL_FRAMEBUFFER,
+				                  c->passes[j + 1].fbo);
+				glGetIntegerv(GL_VIEWPORT, vp);
+				glViewport(0, 0, TARGET_RES_X, TARGET_RES_Y);
+			} else {
+				int w, h;
+				glBindFramebuffer(GL_FRAMEBUFFER, 0);
+				glfwGetFramebufferSize(win, &w, &h);
+				glViewport(0, 0, w, h);
+			}
 
-		glDisable(GL_DEPTH_TEST);
-		drawPost(cameras + i);
+			glClearColor(1.0, 1.0, 1.0, 1.0);
+			glClearDepth(1.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			doPass(c, j);
+		}
 	}
+
 	numUpdates = 0;
+}
+
+static void addPass(struct Camera *c, GLint program, int w, int h) {
+	int p = c->numPasses;
+
+	if (p > MAX_CAMERA_PASSES) {
+		dwarnf("maximum number of camera passes (%d) exceeded\n",
+		       MAX_CAMERA_PASSES);
+		return;
+	}
+
+	/* RGBA8 texture, 24 bit depth texture */
+	glGenTextures(1, &c->passes[p].color);
+	glBindTexture(GL_TEXTURE_2D, c->passes[p].color);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, GL_RGBA,
+	             GL_UNSIGNED_BYTE, NULL);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glGenRenderbuffers(1, &c->passes[p].depth);
+	glBindRenderbuffer(GL_RENDERBUFFER, c->passes[p].depth);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, w, h);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+	glGenFramebuffers(1, &c->passes[p].fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, c->passes[p].fbo);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+	                       GL_TEXTURE_2D, c->passes[p].color, 0);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+	                          GL_RENDERBUFFER, c->passes[p].depth);
+
+	{
+		GLenum status;
+		status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		if (status != GL_FRAMEBUFFER_COMPLETE)
+			dwarnf("FBO setup failed");
+	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	c->passes[p].program = program;
+
+	c->numPasses++;
 }
 
 /* AddCamera adds a camera component to the entity e. */
@@ -130,40 +206,9 @@ void AddCamera(Entity e, uint32_t layers) {
 
 	cameras[numCameras].e = e;
 	cameras[numCameras].layers = layers;
+	cameras[numCameras].numPasses = 0;
 
-	/* RGBA8 texture, 24 bit depth texture, TARGET_RES_X x TARGET_RES_Y */
-	glGenTextures(1, &cameras[numCameras].target.color);
-	glBindTexture(GL_TEXTURE_2D, cameras[numCameras].target.color);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, TARGET_RES_X, TARGET_RES_Y, 0,
-	             GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	glGenRenderbuffers(1, &cameras[numCameras].target.depth);
-	glBindRenderbuffer(GL_RENDERBUFFER, cameras[numCameras].target.depth);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, TARGET_RES_X,
-	                      TARGET_RES_Y);
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-	glGenFramebuffers(1, &cameras[numCameras].target.fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, cameras[numCameras].target.fbo);
-
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-	                       GL_TEXTURE_2D, cameras[numCameras].target.color,
-	                       0);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-	                          GL_RENDERBUFFER,
-	                          cameras[numCameras].target.depth);
-
-	{
-		GLenum status;
-		status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-		if (status != GL_FRAMEBUFFER_COMPLETE)
-			dwarnf("FBO setup failed");
-	}
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	addPass(cameras + numCameras, getBayerProgram(), 256, 256);
 
 	numCameras++;
 }
@@ -250,11 +295,4 @@ void AddRender(Entity e, const char *filename) {
 }
 
 /* drawPost renders c's target texture to the display. */
-static void drawPost(struct Camera *c) {
-	mat4x4 mvp;
-	int width, height;
-
-	glfwGetFramebufferSize(win, &width, &height);
-	mat4x4_ortho(mvp, 0, width, height, 0, 1.f, -1.f);
-	TexRect(mvp, 0, 0, width, height, 0, 0, 1, 1, c->target.color);
-}
+static void drawPost(struct Camera *c) {}
