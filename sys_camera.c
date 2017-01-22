@@ -34,8 +34,6 @@ static int numRenders;
 
 static GLFWwindow *win;
 
-static void drawPost(struct Camera *c);
-
 /* getCamera returns the camera attached to entity e (if there is one). */
 static struct Camera *getCamera(Entity e) {
 	struct entityToCamera *c;
@@ -104,7 +102,6 @@ void UpdateCameraSystem() {
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LEQUAL);
 
-		mat4x4_identity(translated);
 		mat4x4_translate(translated, pos.x, pos.y, pos.z);
 		mat4x4_rotate_X(xrotated, translated, rot.x);
 		mat4x4_rotate_Y(yrotated, xrotated, rot.y);
@@ -113,7 +110,6 @@ void UpdateCameraSystem() {
 		for (j = 0; j < numRenders; ++j) {
 			if (!GetPos(renders[i].e, &pos.x, &pos.y, &pos.z))
 				continue;
-			mat4x4_identity(m);
 			mat4x4_translate(m, pos.x, pos.y, pos.z);
 			mat4x4_mul(mv, v, m);
 			mat4x4_mul(mvp, cameras[i].projection, mv);
@@ -211,8 +207,8 @@ void AddCamera(Entity e, uint32_t layers) {
 
 	int w, h;
 	glfwGetFramebufferSize(win, &w, &h);
-	addPass(cameras + numCameras, getBayerProgram(), w, h);
 	addPass(cameras + numCameras, getBayerProgram(), 256, 256);
+	addPass(cameras + numCameras, getTextureProgram(), 256, 256);
 
 	numCameras++;
 }
@@ -297,6 +293,3 @@ void AddRender(Entity e, const char *filename) {
 	if (filename != NULL)
 		AddMesh(e, filename);
 }
-
-/* drawPost renders c's target texture to the display. */
-static void drawPost(struct Camera *c) {}

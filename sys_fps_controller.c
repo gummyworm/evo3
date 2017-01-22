@@ -34,12 +34,22 @@ static void key(int key, int scancode, int action, int mods) {
 		struct {
 			float x, y, z;
 		} drot = {};
+		vec3 pos, rot;
+		float xa, ya;
 
 		f = fpsControllers + i;
+
+		GetPos(f->e, &pos[0], &pos[1], &pos[2]);
+		GetRot(f->e, &rot[0], &rot[1], &rot[2]);
+		xa = cos(rot[1]) * dt;
+		ya = sin(rot[1]) * dt;
+
 		if (key == f->keyCodes.forward) {
-			dpos.z = f->speed * dt;
+			dpos.x = f->speed * ya;
+			dpos.z = f->speed * xa;
 		} else if (key == f->keyCodes.backward) {
-			dpos.z = -f->speed * dt;
+			dpos.x = -f->speed * ya;
+			dpos.z = -f->speed * xa;
 		} else if (key == f->keyCodes.left) {
 			dpos.x = -f->speed * dt;
 		} else if (key == f->keyCodes.right) {

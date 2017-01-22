@@ -12,6 +12,8 @@ void TexRect(mat4x4, GLint, unsigned, unsigned, unsigned, unsigned, float,
 GLuint GetTexture(const char *filename);
 
 GLint makeProgram(GLchar const *, GLchar const *);
+GLint getTextureProgram();
+GLint getColorProgram();
 GLint getBayerProgram();
 
 #endif

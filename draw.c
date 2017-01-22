@@ -166,7 +166,7 @@ GLint makeProgram(GLchar const *vertSource, GLchar const *fragSource) {
 }
 
 /* getColorProgram returns the color shader program. */
-static GLint getColorProgram() {
+GLint getColorProgram() {
 	static GLint program;
 	if (program != 0)
 		return program;
@@ -176,7 +176,7 @@ static GLint getColorProgram() {
 }
 
 /* getTextureProgram returns the texture shader program. */
-static GLint getTextureProgram() {
+GLint getTextureProgram() {
 	static GLint program;
 	if (program != 0)
 		return program;

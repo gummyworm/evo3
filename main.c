@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "debug.h"
 #include "draw.h"
 #include "sys_fps_controller.h"
 #include "systems.h"
@@ -56,6 +57,8 @@ static void test() {
 }
 
 int main() {
+	int frame;
+	float t;
 	GLFWwindow *window;
 	glfwSetErrorCallback(onError);
 
@@ -81,8 +84,16 @@ int main() {
 	init(window);
 	test();
 
+	t = GetTime();
 	while (!glfwWindowShouldClose(window)) {
 		int width, height;
+
+		if (GetTime() - t > 1.0f) {
+			dinfof("fps ~%d", frame);
+			frame = 0;
+			t = GetTime();
+		}
+
 		glfwGetFramebufferSize(window, &width, &height);
 		glViewport(0, 0, width, height);
 		glClearColor(1, 1, 1, 1);
@@ -96,6 +107,7 @@ int main() {
 		update();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+		frame++;
 	}
 
 	glfwDestroyWindow(window);
