@@ -72,10 +72,9 @@ void UpdateCameraSystem() {
 		mat4x4 translated, xrotated, yrotated;
 
 		c = cameras + i;
-
-		if (!GetPos(cameras[i].e, &pos.x, &pos.y, &pos.z))
+		if (!GetPos(c->e, &pos.x, &pos.y, &pos.z))
 			continue;
-		if (!GetRot(cameras[i].e, &rot.x, &rot.y, &rot.z))
+		if (!GetRot(c->e, &rot.x, &rot.y, &rot.z))
 			continue;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, c->target.fbo);
@@ -109,8 +108,10 @@ void UpdateCameraSystem() {
 		}
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		drawPost(cameras + i);
 		glViewport(vp[0], vp[1], vp[2], vp[3]);
+
+		glDisable(GL_DEPTH_TEST);
+		drawPost(cameras + i);
 	}
 	numUpdates = 0;
 }
@@ -130,18 +131,19 @@ void AddCamera(Entity e, uint32_t layers) {
 	cameras[numCameras].e = e;
 	cameras[numCameras].layers = layers;
 
-	/* RGBA8 2D texture, 24 bit depth texture, 256x256 */
+	/* RGBA8 texture, 24 bit depth texture, TARGET_RES_X x TARGET_RES_Y */
 	glGenTextures(1, &cameras[numCameras].target.color);
 	glBindTexture(GL_TEXTURE_2D, cameras[numCameras].target.color);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 256, 256, 0, GL_RGBA,
-	             GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, TARGET_RES_X, TARGET_RES_Y, 0,
+	             GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	glGenRenderbuffers(1, &cameras[numCameras].target.depth);
 	glBindRenderbuffer(GL_RENDERBUFFER, cameras[numCameras].target.depth);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, 256, 256);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, TARGET_RES_X,
+	                      TARGET_RES_Y);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
 	glGenFramebuffers(1, &cameras[numCameras].target.fbo);
@@ -154,11 +156,12 @@ void AddCamera(Entity e, uint32_t layers) {
 	                          GL_RENDERBUFFER,
 	                          cameras[numCameras].target.depth);
 
-	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	if (status != GL_FRAMEBUFFER_COMPLETE)
-		dwarnf("FBO setup failed");
-	else
-		dinfof("FBO setup complete");
+	{
+		GLenum status;
+		status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		if (status != GL_FRAMEBUFFER_COMPLETE)
+			dwarnf("FBO setup failed");
+	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -248,37 +251,10 @@ void AddRender(Entity e, const char *filename) {
 
 /* drawPost renders c's target texture to the display. */
 static void drawPost(struct Camera *c) {
-	const GLchar *vs = "#version 150\n"
-	                   "in vec3 pos;\n"
-	                   "in vec4 normal;\n"
-	                   "in vec4 color;\n"
-	                   "in vec2 texco;\n"
-	                   "out vec4 out_co;\n"
-	                   "uniform sampler2D tex;\n"
-	                   "uniform mat4 mv, proj;\n"
-	                   "void main()\n"
-	                   "{\n"
-	                   "  out_co = color;\n"
-	                   "  gl_Position = proj * mv * vec4(pos, 1.0);\n"
-	                   "}\n";
-	const GLchar *fs = "#version 150\n"
-	                   "in vec4 out_co;\n"
-	                   "out vec4 out_color;\n"
-	                   "void main()\n"
-	                   "{\n"
-	                   "  out_color = out_co;\n"
-	                   "}\n";
 	mat4x4 mvp;
 	int width, height;
-	float ratio;
-
-	if (c->postProgram == 0)
-		c->postProgram = makeProgram(vs, fs);
-	if (c->postProgram == 0)
-		return;
 
 	glfwGetFramebufferSize(win, &width, &height);
-	ratio = ((float)width) / height;
-	mat4x4_ortho(mvp, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
+	mat4x4_ortho(mvp, 0, width, height, 0, 1.f, -1.f);
 	TexRect(mvp, 0, 0, width, height, 0, 0, 1, 1, c->target.color);
 }

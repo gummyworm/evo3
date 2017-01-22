@@ -19,6 +19,8 @@ struct Camera {
 	struct {
 		GLuint fbo;
 		GLuint color, depth;
+
+		GLuint vao;
 	} target;
 	GLuint postProgram;
 

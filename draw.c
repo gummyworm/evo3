@@ -1,3 +1,4 @@
+#include "debug.h"
 #include "third-party/include/linmath.h"
 #include <GLFW/glfw3.h>
 #include <SOIL.h>
@@ -250,13 +251,18 @@ void TexRect(mat4x4 mvp, unsigned x, unsigned y, unsigned w, unsigned h,
 	{
 		GLint tex_location, mvp_location;
 
-		if ((mvp_location = glGetUniformLocation(program, "MVP")) < 0)
+		if ((mvp_location = glGetUniformLocation(program, "MVP")) < 0) {
+			dwarnf("No MVP uniform found");
 			return;
+		}
 		glUniformMatrix4fv(mvp_location, 1, GL_FALSE,
 		                   (const GLfloat *)mvp);
 
-		if ((tex_location = glGetUniformLocation(program, "tex0")) < 0)
+		if ((tex_location = glGetUniformLocation(program, "tex0")) <
+		    0) {
+			dwarnf("No tex0 uniform found");
 			return;
+		}
 		glUniform1i(tex_location, 0);
 	}
 
@@ -273,6 +279,7 @@ void TexRect(mat4x4 mvp, unsigned x, unsigned y, unsigned w, unsigned h,
 	glBindBuffer(GL_ARRAY_BUFFER, buffs.texco);
 	glVertexAttribPointer(attrs.texco, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
+	// glEnable(GL_TEXTURE_2D);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, tex);
 
@@ -286,11 +293,11 @@ GLuint GetTexture(const char *filename) {
 	int width, height;
 	GLuint tex;
 
-	glGenTextures(1, &tex);
-	glActiveTexture(GL_TEXTURE0);
-
 	unsigned char *image =
 	    SOIL_load_image(filename, &width, &height, 0, SOIL_LOAD_RGB);
+
+	glGenTextures(1, &tex);
+	glActiveTexture(GL_TEXTURE0);
 
 	glBindTexture(GL_TEXTURE_2D, tex);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
