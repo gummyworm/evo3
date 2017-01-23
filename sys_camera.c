@@ -102,16 +102,23 @@ void UpdateCameraSystem() {
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LEQUAL);
 
-		mat4x4_translate(translated, pos.x, pos.y, pos.z);
-		mat4x4_rotate_X(xrotated, translated, rot.x);
-		mat4x4_rotate_Y(yrotated, xrotated, rot.y);
-		mat4x4_rotate_Z(v, yrotated, rot.z);
+		{
+			vec3 eye, center, up;
+			GetPos(c->e, &eye[0], &eye[1], &eye[2]);
+			GetViewDir(c->e, &up[0], &up[1], &up[2]);
+			vec3_add(center, eye, up);
+			up[0] = 0;
+			up[1] = 1;
+			up[2] = 0;
+
+			mat4x4_look_at(v, eye, center, up);
+		}
 
 		for (j = 0; j < numRenders; ++j) {
 			if (!GetPos(renders[i].e, &pos.x, &pos.y, &pos.z))
 				continue;
 			mat4x4_translate(m, pos.x, pos.y, pos.z);
-			mat4x4_mul(mv, v, m);
+			mat4x4_mul(mv, m, v);
 			mat4x4_mul(mvp, cameras[i].projection, mv);
 
 			if (GetMesh(renders[i].e) != NULL) {
@@ -202,6 +209,9 @@ void AddCamera(Entity e, uint32_t layers) {
 	HASH_ADD_INT(entitiesToCameras, e, item);
 
 	cameras[numCameras].e = e;
+	cameras[numCameras].dir[0] = 0;
+	cameras[numCameras].dir[1] = 0;
+	cameras[numCameras].dir[2] = 1;
 	cameras[numCameras].layers = layers;
 	cameras[numCameras].numPasses = 0;
 
@@ -292,4 +302,29 @@ void AddRender(Entity e, const char *filename) {
 
 	if (filename != NULL)
 		AddMesh(e, filename);
+}
+
+/* GetViewDir returns the direction vector the camera is viewing. */
+bool GetViewDir(Entity e, float *x, float *y, float *z) {
+	struct Camera *c;
+
+	if ((c = getCamera(e)) == NULL)
+		return false;
+
+	*x = c->dir[0];
+	*y = c->dir[1];
+	*z = c->dir[2];
+	return true;
+}
+
+/* SetViewDir sets the view direction of e's camera to (x, y, z). */
+void SetViewDir(Entity e, float x, float y, float z) {
+	struct Camera *c;
+
+	if ((c = getCamera(e)) == NULL)
+		return;
+
+	c->dir[0] = x;
+	c->dir[1] = y;
+	c->dir[2] = z;
 }

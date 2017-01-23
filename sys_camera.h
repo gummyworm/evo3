@@ -4,6 +4,7 @@
 #include "entity.h"
 #include "third-party/include/linmath.h"
 #include <GLFW/glfw3.h>
+#include <stdbool.h>
 #include <stdint.h>
 
 enum { MAX_CAMERAS = 16,
@@ -16,6 +17,8 @@ enum { MAX_CAMERAS = 16,
 /* Camera is a struct the view through which the game is rendered. */
 struct Camera {
 	Entity e;
+
+	vec3 dir;
 
 	struct {
 		int width, height;
@@ -70,5 +73,7 @@ struct CameraUpdate *GetCameraUpdate(int *);
 void AddCamera(Entity, uint32_t);
 void CameraPerspective(Entity, float, float);
 void CameraOrtho(Entity, float, float, float, float, float);
+bool GetViewDir(Entity, float *, float *, float *);
+void SetViewDir(Entity, float, float, float);
 
 #endif

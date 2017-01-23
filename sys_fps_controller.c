@@ -1,6 +1,8 @@
 #include "sys_fps_controller.h"
 #include "base.h"
+#include "debug.h"
 #include "input.h"
+#include "sys_camera.h"
 #include "sys_time.h"
 #include "sys_transform.h"
 #include "third-party/include/uthash.h"
@@ -28,40 +30,78 @@ static void key(int key, int scancode, int action, int mods) {
 
 	for (i = 0; i < numFPSControllers; ++i) {
 		struct FPSController *f;
-		struct {
-			float x, y, z;
-		} dpos = {};
-		struct {
-			float x, y, z;
-		} drot = {};
-		vec3 pos, rot;
-		float xa, ya;
+		vec3 dpos, drot, dir;
+		float cosx, cosy, sinx, siny;
+		float pitchlim;
+		bool rotate, translate;
 
 		f = fpsControllers + i;
 
-		GetPos(f->e, &pos[0], &pos[1], &pos[2]);
-		GetRot(f->e, &rot[0], &rot[1], &rot[2]);
-		xa = cos(rot[1]) * dt;
-		ya = sin(rot[1]) * dt;
+		if (!GetViewDir(f->e, &dir[0], &dir[1], &dir[2]))
+			return;
 
+		cosx = cos(dir[0]);
+		cosy = cos(dir[0]);
+		sinx = sin(dir[1]);
+		siny = sin(dir[1]);
+		pitchlim = cosx;
+
+		rotate = false;
+		translate = false;
 		if (key == f->keyCodes.forward) {
-			dpos.x = f->speed * ya;
-			dpos.z = f->speed * xa;
+			dpos[0] = siny * pitchlim;
+			dpos[1] = -sinx;
+			dpos[2] = -cosy * pitchlim;
+			translate = true;
 		} else if (key == f->keyCodes.backward) {
-			dpos.x = -f->speed * ya;
-			dpos.z = -f->speed * xa;
+			dpos[0] = -siny * pitchlim;
+			dpos[1] = sinx;
+			dpos[2] = cosy * pitchlim;
+			translate = true;
 		} else if (key == f->keyCodes.left) {
-			dpos.x = -f->speed * dt;
+			dpos[0] = -cosy;
+			dpos[1] = -siny;
+			dpos[2] = 0;
+			translate = true;
 		} else if (key == f->keyCodes.right) {
-			dpos.x = f->speed * dt;
+			dpos[0] = cosy;
+			dpos[1] = siny;
+			dpos[2] = 0;
+			translate = true;
 		} else if (key == f->keyCodes.turnL) {
-			drot.y = f->turnSpeed * dt;
+			drot[0] = 0;
+			drot[1] = 1;
+			drot[2] = 0;
+			rotate = true;
 		} else if (key == f->keyCodes.turnR) {
-			drot.y = -f->turnSpeed * dt;
+			drot[0] = 0;
+			drot[1] = -1;
+			drot[2] = 0;
+			rotate = true;
 		}
 
-		TransformMove(f->e, dpos.x, dpos.y, dpos.z);
-		TransformRotate(f->e, drot.x, drot.y, drot.z);
+		if (translate) {
+			float tscale;
+			tscale = dt * f->speed;
+
+			vec3 dposn;
+			vec3_norm(dposn, dpos);
+			vec3_scale(dpos, dposn, tscale);
+			dinfof("%f %f %f", dpos[0], dpos[1], dpos[2]);
+			TransformMove(f->e, dpos[0], dpos[1], dpos[2]);
+		}
+
+		if (rotate) {
+			float rscale;
+			vec3 scaled, adjusted, set;
+			rscale = dt * f->turnSpeed;
+
+			vec3_scale(scaled, drot, rscale);
+			vec3_add(adjusted, dir, scaled);
+			vec3_norm(set, adjusted);
+
+			SetViewDir(f->e, set[0], set[1], set[2]);
+		}
 	}
 }
 
@@ -108,7 +148,7 @@ void AddFPSController(Entity e, float speed) {
 
 	fpsControllers[numFPSControllers].e = e;
 	fpsControllers[numFPSControllers].speed = speed;
-	fpsControllers[numFPSControllers].turnSpeed = 1.0f;
+	fpsControllers[numFPSControllers].turnSpeed = 10.0f;
 	fpsControllers[numFPSControllers].keyCodes.forward = GLFW_KEY_W;
 	fpsControllers[numFPSControllers].keyCodes.backward = GLFW_KEY_S;
 	fpsControllers[numFPSControllers].keyCodes.left = GLFW_KEY_A;
