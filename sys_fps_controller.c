@@ -30,20 +30,20 @@ static void key(int key, int scancode, int action, int mods) {
 
 	for (i = 0; i < numFPSControllers; ++i) {
 		struct FPSController *f;
-		vec3 dpos, drot, dir;
+		vec3 dpos, drot, dir, rot;
 		float cosx, cosy, sinx, siny;
 		float pitchlim;
 		bool rotate, translate;
 
 		f = fpsControllers + i;
 
-		if (!GetViewDir(f->e, &dir[0], &dir[1], &dir[2]))
+		if (!GetRot(f->e, &rot[0], &rot[1], &rot[2]))
 			return;
 
-		cosx = cos(dir[0]);
-		cosy = cos(dir[0]);
-		sinx = sin(dir[1]);
-		siny = sin(dir[1]);
+		cosx = cos(rot[0]);
+		cosy = cos(rot[0]);
+		sinx = sin(rot[1]);
+		siny = sin(rot[1]);
 		pitchlim = cosx;
 
 		rotate = false;
@@ -70,12 +70,12 @@ static void key(int key, int scancode, int action, int mods) {
 			translate = true;
 		} else if (key == f->keyCodes.turnL) {
 			drot[0] = 0;
-			drot[1] = 1;
+			drot[1] = .05f;
 			drot[2] = 0;
 			rotate = true;
 		} else if (key == f->keyCodes.turnR) {
 			drot[0] = 0;
-			drot[1] = -1;
+			drot[1] = -.05f;
 			drot[2] = 0;
 			rotate = true;
 		}
@@ -93,14 +93,15 @@ static void key(int key, int scancode, int action, int mods) {
 
 		if (rotate) {
 			float rscale;
-			vec3 scaled, adjusted, set;
+			vec3 rot, dir;
 			rscale = dt * f->turnSpeed;
 
-			vec3_scale(scaled, drot, rscale);
-			vec3_add(adjusted, dir, scaled);
-			vec3_norm(set, adjusted);
+			TransformRotate(f->e, drot[0], drot[1], drot[2]);
+			GetRot(f->e, &rot[0], &rot[1], &rot[2]);
+			dir[0] = sin(rot[1]);
+			dir[2] = -cos(rot[1]);
 
-			SetViewDir(f->e, set[0], set[1], set[2]);
+			SetViewDir(f->e, dir[0], dir[1], dir[2]);
 		}
 	}
 }

@@ -85,7 +85,7 @@ void UpdateCameraSystem() {
 		c = cameras + i;
 		if (!GetPos(c->e, &pos.x, &pos.y, &pos.z))
 			return;
-		if (!GetRot(c->e, &rot.x, &rot.y, &rot.z))
+		if (!GetViewDir(c->e, &rot.x, &rot.y, &rot.z))
 			return;
 
 		if (c->numPasses > 0) {
@@ -324,7 +324,9 @@ void SetViewDir(Entity e, float x, float y, float z) {
 	if ((c = getCamera(e)) == NULL)
 		return;
 
+	dinfof("%f %f %f", c->dir[0], c->dir[1], c->dir[2]);
 	c->dir[0] = x;
 	c->dir[1] = y;
 	c->dir[2] = z;
+	dinfof("%f %f %f\n", c->dir[0], c->dir[1], c->dir[2]);
 }
