@@ -1,7 +1,6 @@
-#include <GL/glew.h>
+#include "base.h"
 
 #include "linmath.h"
-#include <GLFW/glfw3.h>
 #include <SOIL.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -77,8 +76,9 @@ int main() {
 	}
 
 	glfwMakeContextCurrent(window);
-	glewExperimental = true;
-	glewInit();
+	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+	// glewExperimental = true;
+	// glewInit();
 	glfwSwapInterval(1);
 
 	init(window);

@@ -1,8 +1,9 @@
 #ifndef SYS_TRANSFORM_H
 #define SYS_TRANSFORM_H
 
+#include "base.h"
+
 #include "entity.h"
-#include <GLFW/glfw3.h>
 
 enum { MAX_WIDGETS = 8192,
 };

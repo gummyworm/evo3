@@ -10,6 +10,8 @@ struct FPSController {
 	Entity e;
 	float speed;
 	float turnSpeed;
+
+	float angle;
 	struct {
 		int forward;
 		int backward;

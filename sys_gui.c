@@ -8,8 +8,9 @@
 #define NK_IMPLEMENTATION
 #define NK_GLFW_GL3_IMPLEMENTATION
 
-#include "sys_gui.h"
 #include "base.h"
+
+#include "sys_gui.h"
 #include "third-party/include/nuklear.h"
 #include "third-party/include/nuklear_glfw_gl3.h"
 #include "third-party/include/uthash.h"

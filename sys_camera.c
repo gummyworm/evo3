@@ -1,4 +1,4 @@
-#include <GL/glew.h>
+#include "base.h"
 
 #include "debug.h"
 #include "draw.h"
@@ -328,5 +328,5 @@ void SetViewDir(Entity e, float x, float y, float z) {
 	c->dir[0] = x;
 	c->dir[1] = y;
 	c->dir[2] = z;
-	dinfof("%f %f %f\n", c->dir[0], c->dir[1], c->dir[2]);
+	dinfof("%f %f %f", c->dir[0], c->dir[1], c->dir[2]);
 }

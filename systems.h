@@ -1,6 +1,8 @@
 #ifndef SYSTEMS_H
 #define SYSTEMS_H
 
+#include "base.h"
+
 #include "input.h"
 
 #include "sys_camera.h"

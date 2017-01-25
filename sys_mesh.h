@@ -1,9 +1,10 @@
 #ifndef SYS_MESH_H
 #define SYS_MESH_H
 
+#include "base.h"
+
 #include "entity.h"
 #include "third-party/include/linmath.h"
-#include <GLFW/glfw3.h>
 
 enum { MAX_MESHES = 8192,
 };

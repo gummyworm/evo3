@@ -1,6 +1,7 @@
+#include "base.h"
+
 #include "debug.h"
 #include "third-party/include/linmath.h"
-#include <GLFW/glfw3.h>
 #include <SOIL.h>
 #include <stdio.h>
 #include <stdlib.h>

@@ -1,8 +1,9 @@
 #ifndef DRAW_H
 #define DRAW_H
 
+#include "base.h"
+
 #include "third-party/include/linmath.h"
-#include <GLFW/glfw3.h>
 #include <stdint.h>
 
 void DrawInit();

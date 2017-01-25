@@ -1,5 +1,6 @@
-#include "input.h"
 #include "base.h"
+
+#include "input.h"
 
 static bool mouseMoved;
 

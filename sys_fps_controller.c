@@ -30,77 +30,59 @@ static void key(int key, int scancode, int action, int mods) {
 
 	for (i = 0; i < numFPSControllers; ++i) {
 		struct FPSController *f;
-		vec3 dpos, drot, dir, rot;
-		float cosx, cosy, sinx, siny;
-		float pitchlim;
+		vec3 dpos;
+		float angle;
+		float cosa, sina;
 		bool rotate, translate;
 
 		f = fpsControllers + i;
+		angle = f->angle;
 
-		if (!GetRot(f->e, &rot[0], &rot[1], &rot[2]))
-			return;
-
-		cosx = cos(rot[0]);
-		cosy = cos(rot[0]);
-		sinx = sin(rot[1]);
-		siny = sin(rot[1]);
-		pitchlim = cosx;
+		cosa = cos(angle);
+		sina = sin(angle);
 
 		rotate = false;
 		translate = false;
 		if (key == f->keyCodes.forward) {
-			dpos[0] = siny * pitchlim;
-			dpos[1] = -sinx;
-			dpos[2] = -cosy * pitchlim;
+			dpos[0] = -sina;
+			dpos[1] = 0;
+			dpos[2] = -cosa;
 			translate = true;
 		} else if (key == f->keyCodes.backward) {
-			dpos[0] = -siny * pitchlim;
-			dpos[1] = sinx;
-			dpos[2] = cosy * pitchlim;
+			dpos[0] = -sina;
+			dpos[1] = 0;
+			dpos[2] = cosa;
 			translate = true;
 		} else if (key == f->keyCodes.left) {
-			dpos[0] = -cosy;
-			dpos[1] = -siny;
-			dpos[2] = 0;
+			dpos[0] = -cosa;
+			dpos[1] = 0;
+			dpos[2] = sina;
 			translate = true;
 		} else if (key == f->keyCodes.right) {
-			dpos[0] = cosy;
-			dpos[1] = siny;
-			dpos[2] = 0;
+			dpos[0] = cosa;
+			dpos[1] = 0;
+			dpos[2] = sina;
 			translate = true;
 		} else if (key == f->keyCodes.turnL) {
-			drot[0] = 0;
-			drot[1] = .05f;
-			drot[2] = 0;
+			f->angle -= .05f;
 			rotate = true;
 		} else if (key == f->keyCodes.turnR) {
-			drot[0] = 0;
-			drot[1] = -.05f;
-			drot[2] = 0;
+			f->angle += .05f;
 			rotate = true;
 		}
 
 		if (translate) {
-			float tscale;
-			tscale = dt * f->speed;
-
 			vec3 dposn;
+			float tscale = dt * f->speed;
 			vec3_norm(dposn, dpos);
 			vec3_scale(dpos, dposn, tscale);
 			dinfof("%f %f %f", dpos[0], dpos[1], dpos[2]);
 			TransformMove(f->e, dpos[0], dpos[1], dpos[2]);
 		}
 
-		if (rotate) {
-			float rscale;
-			vec3 rot, dir;
-			rscale = dt * f->turnSpeed;
-
-			TransformRotate(f->e, drot[0], drot[1], drot[2]);
-			GetRot(f->e, &rot[0], &rot[1], &rot[2]);
-			dir[0] = sin(rot[1]);
-			dir[2] = -cos(rot[1]);
-
+		{
+			float s = dt * f->turnSpeed;
+			vec3 dir = {s * sin(f->angle), 0, s * -cos(f->angle)};
 			SetViewDir(f->e, dir[0], dir[1], dir[2]);
 		}
 	}

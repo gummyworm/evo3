@@ -1,4 +1,4 @@
-#include <GLFW/glfw3.h>
+#include "base.h"
 
 /* InitTimeSystem begins the time system. */
 void InitTimeSystem() { glfwSetTime(0.0); }

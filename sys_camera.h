@@ -1,9 +1,10 @@
 #ifndef SYS_CAMERA_H
 #define SYS_CAMERA_H
 
+#include "base.h"
+
 #include "entity.h"
 #include "third-party/include/linmath.h"
-#include <GLFW/glfw3.h>
 #include <stdbool.h>
 #include <stdint.h>
 
