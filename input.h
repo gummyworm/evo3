@@ -7,6 +7,8 @@
 
 enum InputLayer {
 	INPUT_LAYER_DEFAULT = 1 << 0,
+	INPUT_LAYER_CONSOLE = 1 << 1,
+	INPUT_LAYER_WORLD = 1 << 2,
 };
 
 struct InputUpdate {

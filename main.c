@@ -1,14 +1,11 @@
 #include "base.h"
 
-#include "linmath.h"
+#include "debug.h"
+#include "draw.h"
+#include "systems.h"
 #include <SOIL.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#include "debug.h"
-#include "draw.h"
-#include "sys_fps_controller.h"
-#include "systems.h"
 
 enum testEntities {
 	E_PLAYER = 1,
@@ -42,8 +39,8 @@ static void update() {
 	UpdateSpriteSystem();
 	UpdateFPSControllerSystem();
 
-	// UpdateWidgetSystem();
 	UpdateCameraSystem();
+	// UpdateWidgetSystem();
 }
 
 /* test spawns test entities. */
@@ -53,6 +50,7 @@ static void test() {
 
 	AddTransform(E_APPLE, 0, 0, -7.0f);
 	AddRender(E_APPLE, "person.obj");
+	AddTextBox(E_APPLE, 50, 50, "apple");
 }
 
 int main() {
@@ -79,8 +77,6 @@ int main() {
 
 	glfwMakeContextCurrent(window);
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-	// glewExperimental = true;
-	// glewInit();
 	glfwSwapInterval(1);
 
 	init(window);
@@ -108,7 +104,7 @@ int main() {
 		glDisable(GL_BLEND);
 
 		update();
-		Text(proj, 0, 0, 32, "hello world");
+		// Text(proj, 0, 0, 32, "hello world");
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 		frame++;

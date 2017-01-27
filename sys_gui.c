@@ -1,19 +1,10 @@
-#define NK_INCLUDE_FIXED_TYPES
-#define NK_INCLUDE_STANDARD_IO
-#define NK_INCLUDE_STANDARD_VARARGS
-#define NK_INCLUDE_DEFAULT_ALLOCATOR
-#define NK_INCLUDE_VERTEX_BUFFER_OUTPUT
-#define NK_INCLUDE_FONT_BAKING
-#define NK_INCLUDE_DEFAULT_FONT
-#define NK_IMPLEMENTATION
-#define NK_GLFW_GL3_IMPLEMENTATION
-
 #include "base.h"
+#include <string.h>
+
+#include "draw.h"
 
 #include "sys_gui.h"
 #include "third-party/include/linmath.h"
-#include "third-party/include/nuklear.h"
-#include "third-party/include/nuklear_glfw_gl3.h"
 #include "third-party/include/uthash.h"
 #include <stdio.h>
 
@@ -37,12 +28,15 @@ static int numWidgets;
 static int numUpdates;
 static struct WidgetUpdate updates[MAX_WIDGETS];
 
-static struct nk_context *ctx;
-static struct nk_color background;
-
 static void DrawWidget(struct Widget *);
 
 static mat4x4 proj;
+
+/* drawTextbox renders the textbox w. */
+static void drawTextbox(struct Widget *w) {
+	mat4x4_identity(proj);
+	Text(proj, w->x, w->y, w->data.textbox.fontsize, w->data.textbox.text);
+}
 
 /* getWidget returns the widget attached to entity e (if there is one). */
 static struct Widget *getWidget(Entity e) {
@@ -74,10 +68,33 @@ void UpdateWidgetSystem() {
 	for (i = 0; i < numWidgets; ++i) {
 		struct Widget *w;
 		w = widgets + i;
-		DrawWidget(w);
+
+		switch (w->type) {
+		case TEXTBOX:
+			drawTextbox(w);
+		case NONE:
+		default:
+			break;
+		}
 	}
 
 	numUpdates = 0;
+}
+
+static void addWidget(Entity e, struct Widget *w) {
+	struct entityToWidget *item;
+
+	if (getWidget(e) != NULL)
+		return;
+	item = malloc(sizeof(struct entityToWidget));
+	item->widget = widgets + numWidgets;
+	item->e = e;
+
+	memcpy(widgets + numWidgets, w, sizeof(struct Widget));
+	widgets[numWidgets].e = e;
+
+	HASH_ADD_INT(entitiesToWidgets, e, item);
+	numWidgets++;
 }
 
 /* AddWidget adds a widget component to the entity e. */
@@ -106,4 +123,16 @@ struct WidgetUpdate *GetWidgetUpdates(int *num) {
 static void DrawWidget(struct Widget *w) {
 	UNUSED(w);
 	Rect(proj, w->x, w->y, w->width, w->height, w->color);
+}
+
+/* AddTextBox adds a TextBox widget to entity e. */
+void AddTextBox(Entity e, unsigned x, unsigned y, const char *text) {
+	struct Widget w = {.x = x,
+	                   .y = y,
+	                   .width = 100,
+	                   .height = 32,
+	                   .color = 0x00000000,
+	                   .type = TEXTBOX,
+	                   .data = {.textbox = {.text = text, .fontsize = 32}}};
+	addWidget(e, &w);
 }

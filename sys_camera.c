@@ -61,6 +61,7 @@ static void doPass(struct Camera *c, int pass) {
 	glDisable(GL_DEPTH_TEST);
 
 	glfwGetFramebufferSize(win, &width, &height);
+	mat4x4_identity(mvp);
 	mat4x4_ortho(mvp, 0, width, height, 0, 1.f, -1.f);
 	TexRect(mvp, c->passes[pass].program, 0, 0, width, height, 0, 0, 1, 1,
 	        c->passes[pass].color);
@@ -82,6 +83,8 @@ void UpdateCameraSystem() {
 	mat4x4 translated, xrotated, yrotated;
 
 	for (i = 0; i < numCameras; ++i) {
+		GLuint program;
+
 		c = cameras + i;
 		if (!GetPos(c->e, &pos.x, &pos.y, &pos.z))
 			return;
@@ -92,7 +95,11 @@ void UpdateCameraSystem() {
 			glBindFramebuffer(GL_FRAMEBUFFER, c->passes[0].fbo);
 			glViewport(0, 0, c->passes[0].width,
 			           c->passes[0].height);
+			program = c->passes[0].program;
+		} else {
+			program = getColorProgram();
 		}
+		glUseProgram(program);
 
 		glClearColor(1.0, 1.0, 1.0, 1.0);
 		glClearDepth(1.0f);

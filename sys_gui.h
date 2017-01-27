@@ -16,6 +16,16 @@ struct WidgetUpdate {
 struct Widget {
 	unsigned x, y, width, height;
 	uint32_t color;
+	enum { NONE,
+	       TEXTBOX,
+	} type;
+	union {
+		struct {
+			unsigned fontsize;
+			const char *text;
+		} textbox;
+
+	} data;
 	Entity e;
 };
 
@@ -27,5 +37,6 @@ struct WidgetWindow {
 void InitWidgetSystem(GLFWwindow *);
 void UpdateWidgetSystem();
 void AddWidget(Entity);
+void AddTextBox(Entity, unsigned, unsigned, const char *);
 
 #endif
