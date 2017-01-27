@@ -11,6 +11,7 @@
 #include "base.h"
 
 #include "sys_gui.h"
+#include "third-party/include/linmath.h"
 #include "third-party/include/nuklear.h"
 #include "third-party/include/nuklear_glfw_gl3.h"
 #include "third-party/include/uthash.h"
@@ -18,6 +19,10 @@
 
 #define MAX_VERTEX_BUFFER 512 * 1024
 #define MAX_ELEMENT_BUFFER 128 * 1024
+
+enum { GUI_WIDTH = 320,
+       GUI_HEIGHT = 200,
+};
 
 struct entityToWidget {
 	Entity e;
@@ -36,6 +41,8 @@ static struct nk_context *ctx;
 static struct nk_color background;
 
 static void DrawWidget(struct Widget *);
+
+static mat4x4 proj;
 
 /* getWidget returns the widget attached to entity e (if there is one). */
 static struct Widget *getWidget(Entity e) {
@@ -56,35 +63,19 @@ static void addUpdate(struct WidgetUpdate *u) { updates[numUpdates++] = *u; }
 
 /* InitWidgetSystem initializes the widget system. */
 void InitWidgetSystem(GLFWwindow *win) {
-	struct nk_font_atlas *atlas;
-	struct nk_font *c64;
-
-	ctx = nk_glfw3_init(win, NK_GLFW3_INSTALL_CALLBACKS);
-
-	nk_glfw3_font_stash_begin(&atlas);
-	c64 = nk_font_atlas_add_from_file(atlas, "C64.ttf", 12, 0);
-	nk_glfw3_font_stash_end();
-
-	/*nk_style_load_all_cursors(ctx, atlas->cursors);*/
-	nk_style_set_font(ctx, &c64->handle);
+	UNUSED(win);
+	mat4x4_ortho(proj, 0, GUI_WIDTH, GUI_HEIGHT, 0, 1.f, -1.f);
 }
 
 /* UpdateWidgetSystem updates all widgets that have been created. */
 void UpdateWidgetSystem() {
 	int i;
 
-	nk_glfw3_new_frame();
-
 	for (i = 0; i < numWidgets; ++i) {
 		struct Widget *w;
 		w = widgets + i;
 		DrawWidget(w);
 	}
-
-	DrawWidget(NULL);
-
-	nk_glfw3_render(NK_ANTI_ALIASING_ON, MAX_VERTEX_BUFFER,
-	                MAX_ELEMENT_BUFFER);
 
 	numUpdates = 0;
 }
@@ -114,43 +105,5 @@ struct WidgetUpdate *GetWidgetUpdates(int *num) {
 /* DrawWidget renders the widget w. */
 static void DrawWidget(struct Widget *w) {
 	UNUSED(w);
-	if (nk_begin(ctx, "Demo", nk_rect(50, 50, 230, 250),
-	             NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE |
-	                 NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE)) {
-		enum { EASY, HARD };
-		static int op = EASY;
-		static int property = 20;
-		nk_layout_row_static(ctx, 30, 80, 1);
-		if (nk_button_label(ctx, "button"))
-			fprintf(stdout, "button pressed\n");
-
-		nk_layout_row_dynamic(ctx, 30, 2);
-		if (nk_option_label(ctx, "easy", op == EASY))
-			op = EASY;
-		if (nk_option_label(ctx, "hard", op == HARD))
-			op = HARD;
-
-		nk_layout_row_dynamic(ctx, 25, 1);
-		nk_property_int(ctx, "Compression:", 0, &property, 100, 10, 1);
-
-		nk_layout_row_dynamic(ctx, 20, 1);
-		nk_label(ctx, "background:", NK_TEXT_LEFT);
-		nk_layout_row_dynamic(ctx, 25, 1);
-		if (nk_combo_begin_color(ctx, background,
-		                         nk_vec2(nk_widget_width(ctx), 400))) {
-			nk_layout_row_dynamic(ctx, 120, 1);
-			background = nk_color_picker(ctx, background, NK_RGBA);
-			nk_layout_row_dynamic(ctx, 25, 1);
-			background.r = (nk_byte)nk_propertyi(
-			    ctx, "#R:", 0, background.r, 255, 1, 1);
-			background.g = (nk_byte)nk_propertyi(
-			    ctx, "#G:", 0, background.g, 255, 1, 1);
-			background.b = (nk_byte)nk_propertyi(
-			    ctx, "#B:", 0, background.b, 255, 1, 1);
-			background.a = (nk_byte)nk_propertyi(
-			    ctx, "#A:", 0, background.a, 255, 1, 1);
-			nk_combo_end(ctx);
-		}
-	}
-	nk_end(ctx);
+	Rect(proj, w->x, w->y, w->width, w->height, w->color);
 }

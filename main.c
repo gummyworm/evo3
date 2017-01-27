@@ -59,6 +59,8 @@ int main() {
 	int frame;
 	float t;
 	GLFWwindow *window;
+	mat4x4 proj;
+
 	glfwSetErrorCallback(onError);
 
 	if (!glfwInit())
@@ -95,6 +97,7 @@ int main() {
 		}
 
 		glfwGetFramebufferSize(window, &width, &height);
+		mat4x4_ortho(proj, 0, width, height, 0, 1.f, -1.f);
 		glViewport(0, 0, width, height);
 		glClearColor(1, 1, 1, 1);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -105,6 +108,7 @@ int main() {
 		glDisable(GL_BLEND);
 
 		update();
+		Text(proj, 0, 0, 32, "hello world");
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 		frame++;

@@ -1,7 +1,5 @@
-#include "base.h"
-
+#include "draw.h"
 #include "debug.h"
-#include "third-party/include/linmath.h"
 #include <SOIL.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -278,8 +276,8 @@ void TexRect(mat4x4 mvp, GLint program, unsigned x, unsigned y, unsigned w,
 	uint16_t vd[] = {x, y, 1, 1, x + w, y,     1, 1, x + w, y + h, 1, 1,
 	                 x, y, 1, 1, x + w, y + h, 1, 1, x,     y + h, 1, 1};
 
-	float td[] = {u, v, u + clipw, v,         u + clipw, v - cliph,
-	              u, v, u + clipw, v - cliph, u,         v - cliph};
+	float td[] = {u, v, u + clipw, v,         u + clipw, v + cliph,
+	              u, v, u + clipw, v + cliph, u,         v + cliph};
 
 	if (program < 0) {
 		program = getTextureProgram();
@@ -345,6 +343,30 @@ void TexRect(mat4x4 mvp, GLint program, unsigned x, unsigned y, unsigned w,
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
+}
+
+/* Text renders msg at (x,y). */
+void Text(mat4x4 proj, unsigned x, unsigned y, unsigned sz, const char *msg) {
+	unsigned i;
+	unsigned cx, cy;
+	float clipx, clipy, clipw, cliph;
+	clipw = 1.f / 16.f;
+	cliph = 1.f / 16.f;
+	static GLuint fontTex;
+
+	if (fontTex == 0) {
+		fontTex = GetTexture("test.png");
+	}
+
+	cx = x;
+	cy = y;
+	for (i = 0; i < strlen(msg); ++i) {
+		clipx = (msg[i] % 16) / 16.f;
+		clipy = (msg[i] / 16) / 16.f;
+		TexRect(proj, getTextureProgram(), cx, cy, sz, sz, clipx, clipy,
+		        clipw, cliph, fontTex);
+		cx += sz;
+	}
 }
 
 /* GetTexture returns a handle to the texture stored in the given file.
