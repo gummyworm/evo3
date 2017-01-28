@@ -55,6 +55,23 @@ static struct Widget *getWidget(Entity e) {
 /* addUpdate adds a new update for this frame. */
 static void addUpdate(struct WidgetUpdate *u) { updates[numUpdates++] = *u; }
 
+/* addWidget is a helper function that copies w to the GUI system. */
+static void addWidget(Entity e, struct Widget *w) {
+	struct entityToWidget *item;
+
+	if (getWidget(e) != NULL)
+		return;
+	item = malloc(sizeof(struct entityToWidget));
+	item->widget = widgets + numWidgets;
+	item->e = e;
+
+	memcpy(widgets + numWidgets, w, sizeof(struct Widget));
+	widgets[numWidgets].e = e;
+
+	HASH_ADD_INT(entitiesToWidgets, e, item);
+	numWidgets++;
+}
+
 /* InitWidgetSystem initializes the widget system. */
 void InitWidgetSystem(GLFWwindow *win) { UNUSED(win); }
 
@@ -76,22 +93,6 @@ void UpdateWidgetSystem() {
 	}
 
 	numUpdates = 0;
-}
-
-static void addWidget(Entity e, struct Widget *w) {
-	struct entityToWidget *item;
-
-	if (getWidget(e) != NULL)
-		return;
-	item = malloc(sizeof(struct entityToWidget));
-	item->widget = widgets + numWidgets;
-	item->e = e;
-
-	memcpy(widgets + numWidgets, w, sizeof(struct Widget));
-	widgets[numWidgets].e = e;
-
-	HASH_ADD_INT(entitiesToWidgets, e, item);
-	numWidgets++;
 }
 
 /* AddWidget adds a widget component to the entity e. */
