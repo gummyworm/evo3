@@ -1,5 +1,5 @@
-#ifndef CONSOLE_H
-#define CONSOLE_H
+#ifndef SYS_CONSOLE_H
+#define SYS_CONSOLE_H
 
 #include "entity.h"
 #include <stdbool.h>
@@ -11,9 +11,9 @@ enum { MAX_CONSOLES = 1,
 };
 
 enum { CONSOLE_START_X = 0,
-       CONSOLE_START_Y = 320,
+       CONSOLE_START_Y = 120,
        CONSOLE_WIDTH = 640 - CONSOLE_START_X,
-       CONSOLE_HEIGHT = 480 - CONSOLE_START_Y,
+       CONSOLE_HEIGHT = 200 - CONSOLE_START_Y,
        CONSOLE_COLOR = 0x7f007fff,
 
        CONSOLE_FONT_WIDTH = 16,
@@ -41,9 +41,10 @@ struct Console {
 
 struct ConsoleUpdate {
 	Entity e;
-}
+};
 
 void InitConsoleSystem();
 void UpdateConsoleSystem();
+void AddConsole(Entity);
 
 #endif

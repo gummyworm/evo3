@@ -1,5 +1,5 @@
-#ifndef SYS_TRANSFORM_H
-#define SYS_TRANSFORM_H
+#ifndef SYS_GUI_H
+#define SYS_GUI_H
 
 #include "base.h"
 
@@ -7,6 +7,10 @@
 
 enum { MAX_WIDGETS = 8192,
        GUI_MAX_CHILDREN = 32,
+};
+
+enum { GUI_WIDTH = 320,
+       GUI_HEIGHT = 200,
 };
 
 struct WidgetUpdate {
@@ -38,5 +42,7 @@ void InitWidgetSystem(GLFWwindow *);
 void UpdateWidgetSystem();
 void AddWidget(Entity);
 void AddTextBox(Entity, unsigned, unsigned, const char *);
+
+void GuiProjection(mat4x4 *);
 
 #endif

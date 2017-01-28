@@ -20,26 +20,33 @@ static void onError(int error, const char *description) {
 /* init initializes the various systems used in the game. */
 static void init(GLFWwindow *win) {
 	DrawInit();
+	InitInput(win);
+
 	InitUnitSystem();
 	InitSpriteSystem();
 	InitTimeSystem();
 	InitTransformSystem();
 	InitCommanderSystem();
 	InitFPSControllerSystem();
+	InitConsoleSystem();
 
 	InitWidgetSystem(win);
 	InitCameraSystem(win);
-	InitInput(win);
 }
 
 /* update updates the game. */
 static void update() {
+	/* pre render updates */
 	UpdateInput();
 	UpdateTransformSystem();
 	UpdateSpriteSystem();
 	UpdateFPSControllerSystem();
 
+	/* render */
 	UpdateCameraSystem();
+
+	/* post main render updates */
+	UpdateConsoleSystem();
 	UpdateWidgetSystem();
 }
 
@@ -50,7 +57,7 @@ static void test() {
 
 	AddTransform(E_APPLE, 0, 0, -7.0f);
 	AddRender(E_APPLE, "person.obj");
-	AddTextBox(E_APPLE, 50, 50, "apple");
+	// AddTextBox(E_APPLE, 50, 50, "apple");
 }
 
 int main() {

@@ -11,10 +11,6 @@
 #define MAX_VERTEX_BUFFER 512 * 1024
 #define MAX_ELEMENT_BUFFER 128 * 1024
 
-enum { GUI_WIDTH = 320,
-       GUI_HEIGHT = 200,
-};
-
 struct entityToWidget {
 	Entity e;
 	struct Widget *widget;
@@ -136,4 +132,8 @@ void AddTextBox(Entity e, unsigned x, unsigned y, const char *text) {
 	                   .type = TEXTBOX,
 	                   .data = {.textbox = {.text = text, .fontsize = 32}}};
 	addWidget(e, &w);
+}
+
+void GuiProjection(mat4x4 *proj) {
+	mat4x4_ortho(*proj, 0, GUI_WIDTH, GUI_HEIGHT, 0, 1.f, -1.f);
 }

@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 #include <stdio.h>
 
+#include "debug.h"
 #include "systems.h"
 
 /* err prints the error msg to the console. */
@@ -125,46 +126,46 @@ static void exec(char *line) {
 		inventory();
 	} else if (strncmp(argv[0], CMD_DROP, sizeof(CMD_DROP)) == 0) {
 		if (argc != 2)
-			err_nargs(1, argc - 1);
+			;
 		else
 			drop(argv[1]);
 	} else if (strncmp(argv[0], CMD_LOOK, sizeof(CMD_LOOK)) == 0) {
 		if (argc != 2)
-			err_nargs(1, argc - 1);
+			;
 		else
 			look(argv[1]);
 	} else if (strncmp(argv[0], CMD_TAKE, sizeof(CMD_TAKE)) == 0) {
 		if (argc != 2)
-			err_nargs(1, argc - 1);
+			;
 		else
 			take(argv[1]);
 	} else if (strncmp(argv[0], CMD_MOVE, sizeof(CMD_MOVE)) == 0) {
 		if (argc != 2)
-			err_nargs(1, argc - 1);
+			;
 		else
 			move(argv[1]);
 	} else if (strncmp(argv[0], CMD_KILL, sizeof(CMD_KILL)) == 0) {
 		if (argc != 2)
-			err_nargs(1, argc - 1);
+			;
 		else
 			kill(argv[1]);
 	} else if (strncmp(argv[0], CMD_WIELD, sizeof(CMD_WIELD)) == 0) {
 		if (argc != 2)
-			err_nargs(1, argc - 1);
+			;
 		else
 			wield(argv[1]);
 	} else if (strncmp(argv[0], CMD_WEAR, sizeof(CMD_WEAR)) == 0) {
 		if (argc != 2)
-			err_nargs(1, argc - 1);
+			;
 		else
 			wear(argv[1]);
 	} else {
-		err_unknowncommand(argv[0]);
+		;
 	}
 }
 
 /* button is called when a button is pressed. */
-static void button(int button) {
+static void key(int key, int button, int action, int mods) {
 	unsigned c, r, l;
 	struct Console *console;
 	char ch;
@@ -180,7 +181,7 @@ static void button(int button) {
 	tmrstart = time(NULL);
 	console->blink = true;
 
-	switch (button) {
+	switch (key) {
 	case GLFW_KEY_UP:
 		if (console->scroll > 0) {
 			console->scroll--;
@@ -241,6 +242,7 @@ static void update(struct Console *console) {
 		console->blink = !console->blink;
 	}
 
+	GuiProjection(&mvp);
 	Rect(mvp, CONSOLE_START_X, CONSOLE_START_Y, CONSOLE_WIDTH,
 	     CONSOLE_HEIGHT, CONSOLE_COLOR);
 
@@ -289,8 +291,8 @@ static struct Console *getConsole(Entity e) {
 /* addUpdate adds a new update for this frame. */
 static void addUpdate(struct ConsoleUpdate *u) { updates[numUpdates++] = *u; }
 
-/* NewConsole adds a console component to the entity e. */
-void NewConsole(Entity e) {
+/* AddConsole adds a console component to the entity e. */
+void AddConsole(Entity e) {
 	struct entityToConsole *item;
 
 	if (getConsole(e) != NULL)
@@ -305,7 +307,7 @@ void NewConsole(Entity e) {
 }
 
 /* Initconsolesystem initializes the transform system. */
-void InitConsoleSystem() {}
+void InitConsoleSystem() { InputRegisterKeyEvent(INPUT_LAYER_CONSOLE, key); }
 
 /* Updateconsolesystem updates all consoles that have been created. */
 void UpdateConsoleSystem() {
