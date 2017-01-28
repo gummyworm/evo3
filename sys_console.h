@@ -39,6 +39,8 @@ struct Console {
 	bool blink;
 	time_t blinktmr;
 
+	bool acceptInput;
+
 	int lines[CONSOLE_MAX_LINES];
 	char text[CONSOLE_HISTORY_SIZE];
 };

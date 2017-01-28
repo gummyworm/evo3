@@ -11,7 +11,7 @@ static struct entityToTransform *entitiesToTransforms;
 static struct Transform transforms[MAX_TRANSFORMS];
 static int numTransforms;
 
-static int numUpdates;
+int numTransformUpdates;
 static struct TransformUpdate updates[MAX_TRANSFORMS];
 
 /* getTransform returns the transform attached to entity e (if there is one). */
@@ -29,7 +29,9 @@ static struct Transform *getTransform(Entity e) {
 }
 
 /* addUpdate adds a new update for this frame. */
-static void addUpdate(struct TransformUpdate *u) { updates[numUpdates++] = *u; }
+static void addUpdate(struct TransformUpdate *u) {
+	updates[numTransformUpdates++] = *u;
+}
 
 /* InitTransformSystem initializes the transform system. */
 void InitTransformSystem() {}
@@ -63,7 +65,7 @@ void AddTransform(Entity e, float x, float y, float z) {
 struct TransformUpdate *GetTransformUpdate(Entity e) {
 	int i;
 
-	for (i = 0; i < numUpdates; ++i) {
+	for (i = 0; i < numTransformUpdates; ++i) {
 		if (updates[i].e == e)
 			return updates + i;
 	}
@@ -73,7 +75,7 @@ struct TransformUpdate *GetTransformUpdate(Entity e) {
 
 /* GetTransformUpdates returns the transform updates this frame. */
 struct TransformUpdate *GetTransformUpdates(int *num) {
-	*num = numUpdates;
+	*num = numTransformUpdates;
 	return updates;
 }
 

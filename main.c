@@ -63,6 +63,9 @@ static void test() {
 	// AddTextBox(E_APPLE, 50, 50, "apple");
 }
 
+/* ClearUpdates resets all systems' updates. */
+void ClearUpdates() { numTransformUpdates = 0; }
+
 int main() {
 	int frame;
 	float t;
@@ -116,6 +119,8 @@ int main() {
 		update();
 		// Text(proj, 0, 0, 32, "hello world");
 		glfwSwapBuffers(window);
+
+		ClearUpdates();
 		glfwPollEvents();
 		frame++;
 	}

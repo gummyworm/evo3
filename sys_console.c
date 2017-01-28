@@ -239,6 +239,9 @@ static void key(int key, int button, int action, int mods) {
 		return;
 	console = consoles + 0;
 
+	if (!console->acceptInput)
+		return;
+
 	tmrstart = time(NULL);
 	console->blink = true;
 
@@ -344,6 +347,7 @@ void AddConsole(Entity e) {
 	       sizeof(consoles[numConsoles].text));
 	memset(consoles[numConsoles].lines, 0,
 	       sizeof(consoles[numConsoles].lines));
+	consoles[numConsoles].acceptInput = true;
 
 	HASH_ADD_INT(entitiesToConsoles, e, item);
 	numConsoles++;

@@ -27,6 +27,7 @@ struct TransformUpdate {
 void InitTransformSystem();
 void UpdateTransformSystem();
 void AddTransform(Entity, float, float, float);
+void TransformSystemClearUpdates();
 struct TransformUpdate *GetTransformUpdates(int *);
 struct TransformUpdate *GetTransformUpdate(Entity);
 
@@ -37,5 +38,7 @@ void TransformSetRotation(Entity, float, float, float);
 
 bool GetPos(Entity, float *, float *, float *);
 bool GetRot(Entity, float *, float *, float *);
+
+extern int numTransformUpdates;
 
 #endif
