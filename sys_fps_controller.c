@@ -64,10 +64,10 @@ static void key(int key, int scancode, int action, int mods) {
 			dpos[2] = -sina;
 			translate = true;
 		} else if (key == f->keyCodes.turnL) {
-			f->angle += .05f;
+			f->angle += f->turnSpeed * dt;
 			rotate = true;
 		} else if (key == f->keyCodes.turnR) {
-			f->angle -= .05f;
+			f->angle -= f->turnSpeed * dt;
 			rotate = true;
 		}
 
@@ -129,7 +129,8 @@ void AddFPSController(Entity e, float speed) {
 
 	fpsControllers[numFPSControllers].e = e;
 	fpsControllers[numFPSControllers].speed = speed;
-	fpsControllers[numFPSControllers].turnSpeed = 10.0f;
+	fpsControllers[numFPSControllers].turnSpeed = 3.0f;
+	;
 	fpsControllers[numFPSControllers].keyCodes.forward = GLFW_KEY_W;
 	fpsControllers[numFPSControllers].keyCodes.backward = GLFW_KEY_S;
 	fpsControllers[numFPSControllers].keyCodes.left = GLFW_KEY_A;
