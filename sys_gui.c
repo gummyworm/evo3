@@ -30,11 +30,11 @@ static struct WidgetUpdate updates[MAX_WIDGETS];
 
 static void DrawWidget(struct Widget *);
 
-static mat4x4 proj;
-
 /* drawTextbox renders the textbox w. */
 static void drawTextbox(struct Widget *w) {
+	mat4x4 proj;
 	mat4x4_identity(proj);
+	mat4x4_ortho(proj, 0, GUI_WIDTH, GUI_HEIGHT, 0, 1.f, -1.f);
 	Text(proj, w->x, w->y, w->data.textbox.fontsize, w->data.textbox.text);
 }
 
@@ -56,10 +56,7 @@ static struct Widget *getWidget(Entity e) {
 static void addUpdate(struct WidgetUpdate *u) { updates[numUpdates++] = *u; }
 
 /* InitWidgetSystem initializes the widget system. */
-void InitWidgetSystem(GLFWwindow *win) {
-	UNUSED(win);
-	mat4x4_ortho(proj, 0, GUI_WIDTH, GUI_HEIGHT, 0, 1.f, -1.f);
-}
+void InitWidgetSystem(GLFWwindow *win) { UNUSED(win); }
 
 /* UpdateWidgetSystem updates all widgets that have been created. */
 void UpdateWidgetSystem() {
@@ -121,7 +118,10 @@ struct WidgetUpdate *GetWidgetUpdates(int *num) {
 
 /* DrawWidget renders the widget w. */
 static void DrawWidget(struct Widget *w) {
-	UNUSED(w);
+	mat4x4 proj;
+	mat4x4_identity(proj);
+	mat4x4_ortho(proj, 0, GUI_WIDTH, GUI_HEIGHT, 0, 1.f, -1.f);
+
 	Rect(proj, w->x, w->y, w->width, w->height, w->color);
 }
 

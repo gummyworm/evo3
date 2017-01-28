@@ -27,8 +27,8 @@ static void init(GLFWwindow *win) {
 	InitCommanderSystem();
 	InitFPSControllerSystem();
 
+	InitWidgetSystem(win);
 	InitCameraSystem(win);
-	// InitWidgetSystem(win);
 	InitInput(win);
 }
 
@@ -40,7 +40,7 @@ static void update() {
 	UpdateFPSControllerSystem();
 
 	UpdateCameraSystem();
-	// UpdateWidgetSystem();
+	UpdateWidgetSystem();
 }
 
 /* test spawns test entities. */

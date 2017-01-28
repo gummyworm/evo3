@@ -14,6 +14,7 @@ struct entityToCamera {
 	struct Camera *camera;
 	UT_hash_handle hh;
 };
+static mat4x4 proj;
 
 static struct entityToCamera *entitiesToCameras;
 static struct Camera cameras[MAX_CAMERAS];
@@ -54,6 +55,7 @@ static void addUpdate(struct CameraUpdate *u) { updates[numUpdates++] = *u; }
 /* InitCameraSystem initializes the camera system. */
 void InitCameraSystem(GLFWwindow *window) { win = window; }
 
+/* doPass renders the given post-render pass for the camera c. */
 static void doPass(struct Camera *c, int pass) {
 	mat4x4 mvp;
 	int width, height;
@@ -256,6 +258,7 @@ void CameraPerspective(Entity e, float fov, float aspect) {
 	c->params.perspective.near = near;
 	c->params.perspective.far = far;
 
+	mat4x4_identity(c->projection);
 	mat4x4_perspective(c->projection, fov, aspect, near, far);
 }
 
@@ -274,6 +277,7 @@ void CameraOrtho(Entity e, float aspect, float left, float right, float top,
 	c->params.ortho.top = top;
 	c->params.ortho.bot = bot;
 
+	mat4x4_identity(c->projection);
 	mat4x4_ortho(c->projection, -aspect, aspect, left, right, top, bot);
 }
 
