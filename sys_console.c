@@ -2,6 +2,7 @@
 #include "third-party/include/uthash.h"
 #include <GLFW/glfw3.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "debug.h"
 #include "systems.h"
@@ -69,6 +70,67 @@ static int numConsoles;
 
 static int numUpdates;
 static struct ConsoleUpdate updates[MAX_CONSOLES];
+
+/* addChar adds the character ch to the console and updates the col/row etc.
+ * accordingly. */
+static void addChar(struct Console *console, int ch) {
+	int r, c, l;
+
+	c = console->col;
+	r = console->row;
+	l = console->numLines;
+
+	switch (ch) {
+	case GLFW_KEY_UP:
+		if (console->scroll > 0)
+			console->scroll--;
+		break;
+
+	case GLFW_KEY_DOWN:
+		if (console->scroll <= (console->numLines - CONSOLE_NUM_ROWS))
+			console->scroll++;
+		break;
+
+	case '\n':
+	case GLFW_KEY_ENTER:
+		console->lines[l + 1] = console->lines[l] + c;
+		console->numLines++;
+		console->col = 0;
+		if (r < (CONSOLE_NUM_ROWS - 1))
+			console->row++;
+		else
+			console->scroll++;
+		break;
+
+	case GLFW_KEY_BACKSPACE:
+		if (c > 0) {
+			*(console->text + console->lines[l] + c - 1) = '\0';
+			console->col--;
+		}
+		break;
+
+	default:
+		if (c < (CONSOLE_WIDTH / CONSOLE_FONT_WIDTH)) {
+			*(console->text + console->lines[l] + c) = ch;
+			*(console->text + console->lines[l] + c + 1) = '\0';
+			console->col++;
+		}
+		break;
+	}
+}
+
+/* addLine adds text to the console. */
+static void addLine(struct Console *console, char *text) {
+	char c, *pch;
+	int len;
+
+	len = strlen(text);
+
+	pch = text;
+	while ((c = *pch++))
+		addChar(console, *pch);
+	addChar(console, '\n');
+}
 
 /* getargs parses line, sets all the arguments found, and returns the number. */
 static int getargs(char *line, char **args) {
@@ -168,9 +230,7 @@ static void exec(char *line) {
 static void key(int key, int button, int action, int mods) {
 	UNUSED(mods);
 
-	unsigned c, r, l;
 	struct Console *console;
-	int ch;
 
 	if (action != GLFW_PRESS)
 		return;
@@ -179,56 +239,12 @@ static void key(int key, int button, int action, int mods) {
 		return;
 	console = consoles + 0;
 
-	c = console->col;
-	r = console->row;
-	l = console->numLines;
-
 	tmrstart = time(NULL);
 	console->blink = true;
 
-	switch (key) {
-	case GLFW_KEY_UP:
-		if (console->scroll > 0) {
-			console->scroll--;
-		}
-		break;
-
-	case GLFW_KEY_DOWN:
-		if (console->scroll <= (console->numLines - CONSOLE_NUM_ROWS)) {
-			console->scroll++;
-		}
-		break;
-
-	case GLFW_KEY_ENTER:
-		console->lines[l + 1] = console->lines[l] + c;
-		console->numLines++;
-		console->col = 0;
-		if (r < (CONSOLE_NUM_ROWS - 1))
-			console->row++;
-		else
-			console->scroll++;
-		if (c > 0)
-			exec(console->text + console->lines[l]);
-		break;
-
-	case GLFW_KEY_BACKSPACE:
-		if (c > 0) {
-			*(console->text + (console->lines[l] + c) - 1) = '\0';
-			console->col--;
-		}
-		break;
-
-	case GLFW_KEY_SPACE:
-		ch = ' ';
-
-	default:
-		ch = key;
-		if (c < (CONSOLE_WIDTH / CONSOLE_FONT_WIDTH)) {
-			*(console->text + (console->lines[l] + c)) = ch;
-			console->col++;
-		}
-		break;
-	}
+	addChar(console, key);
+	if (key == GLFW_KEY_DOWN)
+		exec(console->text + console->lines[console->numLines]);
 }
 
 /* update updates and draws the console window. */
@@ -240,6 +256,7 @@ static void update(struct Console *console) {
 	if (console == NULL)
 		return;
 
+	/* blink the cursor */
 	console->blinktmr = time(NULL);
 	if (difftime(console->blinktmr, tmrstart) > CONSOLE_BLINK_INTERVAL) {
 		console->blinktmr -= tmrstart;
@@ -247,6 +264,19 @@ static void update(struct Console *console) {
 		console->blink = !console->blink;
 	}
 
+	/* if we've moved to a new room, display its description */
+	if (GetTransformUpdate(console->e) != NULL) {
+		Entity room = GetRoom(console->e);
+		if (room != console->room) {
+			char *desc = (char *)GetDescription(room);
+			if (desc != NULL) {
+				addLine(console, desc);
+			}
+			console->room = room;
+		}
+	}
+
+	/* draw the console */
 	GuiProjection(&mvp);
 	Rect(mvp, CONSOLE_START_X, CONSOLE_START_Y, CONSOLE_WIDTH,
 	     CONSOLE_HEIGHT, CONSOLE_COLOR);
@@ -306,6 +336,14 @@ void AddConsole(Entity e) {
 	item = malloc(sizeof(struct entityToConsole));
 	item->console = consoles + numConsoles;
 	item->e = e;
+
+	consoles[numConsoles].e = e;
+	consoles[numConsoles].room = -1;
+	consoles[numConsoles].numLines = 0;
+	memset(consoles[numConsoles].text, '\0',
+	       sizeof(consoles[numConsoles].text));
+	memset(consoles[numConsoles].lines, 0,
+	       sizeof(consoles[numConsoles].lines));
 
 	HASH_ADD_INT(entitiesToConsoles, e, item);
 	numConsoles++;

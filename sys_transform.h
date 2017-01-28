@@ -21,16 +21,14 @@ struct Transform {
  * systems. */
 struct TransformUpdate {
 	Entity e;
-	float dx, dy, dz;
-	struct {
-		float x, y, z;
-	} dr;
+	float x, y, z;
 };
 
 void InitTransformSystem();
 void UpdateTransformSystem();
 void AddTransform(Entity, float, float, float);
 struct TransformUpdate *GetTransformUpdates(int *);
+struct TransformUpdate *GetTransformUpdate(Entity);
 
 void TransformMove(Entity, float, float, float);
 void TransformSet(Entity, float, float, float);

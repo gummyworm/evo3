@@ -1,6 +1,6 @@
-#include "third-party/include/uthash.h"
-
 #include "sys_room.h"
+#include "sys_transform.h"
+#include "third-party/include/uthash.h"
 
 struct entityToRoom {
 	Entity e;
@@ -39,7 +39,8 @@ void InitRoomSystem() {}
 void UpdateRoomSystem() { numUpdates = 0; }
 
 /* AddRoom adds a room component to the entity e. */
-void AddRoom(Entity e, const char *name) {
+void AddRoom(Entity e, const char *name, const char *desc, float x, float y,
+             float z, float w, float h, float d) {
 	struct entityToRoom *item;
 
 	if (getRoom(e) != NULL)
@@ -50,6 +51,13 @@ void AddRoom(Entity e, const char *name) {
 
 	rooms[numRooms].e = e;
 	rooms[numRooms].name = name;
+	rooms[numRooms].desc = desc;
+	rooms[numRooms].bounds.x = x;
+	rooms[numRooms].bounds.y = y;
+	rooms[numRooms].bounds.z = z;
+	rooms[numRooms].bounds.w = w;
+	rooms[numRooms].bounds.h = h;
+	rooms[numRooms].bounds.d = d;
 
 	HASH_ADD_INT(entitiesToRooms, e, item);
 	numRooms++;
@@ -67,4 +75,31 @@ bool RoomContains(Entity e, float x, float y, float z) {
 	    (y >= room->bounds.y && y <= (room->bounds.y + room->bounds.h)) &&
 	    (z >= room->bounds.z && z <= (room->bounds.z + room->bounds.d)))
 		return true;
+}
+
+/* GetRoom returns the room that contains e (or -1 if no room does). */
+Entity GetRoom(Entity e) {
+	int i;
+	float x, y, z;
+
+	if ((GetPos(e, &x, &y, &z) == false))
+		return -1;
+
+	for (i = 0; i < numRooms; ++i) {
+		if (RoomContains(rooms[i].e, x, y, z))
+			return rooms[i].e;
+	}
+
+	return -1;
+}
+
+/* GetDescription returns e's room's description. */
+const char *GetDescription(Entity e) {
+	struct Room *room;
+
+	room = getRoom(e);
+	if (room == NULL)
+		return NULL;
+
+	return room->desc;
 }

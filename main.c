@@ -10,6 +10,7 @@
 enum testEntities {
 	E_PLAYER = 1,
 	E_APPLE,
+	E_TEST_ROOM,
 };
 
 /* onError is the GLFW callback for error handling. */
@@ -37,8 +38,8 @@ static void init(GLFWwindow *win) {
 /* update updates the game. */
 static void update() {
 	/* pre render updates */
-	UpdateInput();
 	UpdateTransformSystem();
+	UpdateInput();
 	UpdateSpriteSystem();
 	UpdateFPSControllerSystem();
 
@@ -52,7 +53,9 @@ static void update() {
 
 /* test spawns test entities. */
 extern void Player(int);
+extern void TestRoom(int);
 static void test() {
+	TestRoom(E_TEST_ROOM);
 	Player(E_PLAYER);
 
 	AddTransform(E_APPLE, 0, 0, -7.0f);

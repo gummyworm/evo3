@@ -5,6 +5,9 @@
 
 #include "entity.h"
 
+enum { MAX_ROOMS = 8192,
+};
+
 /* Room defines a logical region of the world. */
 struct Room {
 	Entity e;
@@ -26,7 +29,10 @@ struct RoomUpdate {
 
 void InitRoomSystem();
 void UpdateRoomSystem();
-void AddRoom(Entity, const char *);
+void AddRoom(Entity, const char *, const char *, float, float, float, float,
+             float, float);
+Entity GetRoom(Entity);
 bool RoomContains(Entity, float, float, float);
+const char *GetDescription(Entity);
 
 #endif

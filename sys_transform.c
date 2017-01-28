@@ -35,7 +35,7 @@ static void addUpdate(struct TransformUpdate *u) { updates[numUpdates++] = *u; }
 void InitTransformSystem() {}
 
 /* UpdateTransformSystem updates all transforms that have been created. */
-void UpdateTransformSystem() { numUpdates = 0; }
+void UpdateTransformSystem() {}
 
 /* AddTransform adds a transform component to the entity e. */
 void AddTransform(Entity e, float x, float y, float z) {
@@ -59,6 +59,18 @@ void AddTransform(Entity e, float x, float y, float z) {
 	numTransforms++;
 }
 
+/* GetTransformUpdate returns any transform updates for the entity e. */
+struct TransformUpdate *GetTransformUpdate(Entity e) {
+	int i;
+
+	for (i = 0; i < numUpdates; ++i) {
+		if (updates[i].e == e)
+			return updates + i;
+	}
+
+	return NULL;
+}
+
 /* GetTransformUpdates returns the transform updates this frame. */
 struct TransformUpdate *GetTransformUpdates(int *num) {
 	*num = numUpdates;
@@ -76,6 +88,12 @@ void TransformMove(Entity e, float dx, float dy, float dz) {
 	t->x += dx;
 	t->y += dy;
 	t->z += dz;
+
+	{
+		struct TransformUpdate u = {
+		    .e = e, .x = t->x, .y = t->y, .z = t->z};
+		addUpdate(&u);
+	}
 }
 
 /* TransformSet sets the given entity to the position (x, y, z). */
@@ -88,7 +106,7 @@ void TransforSet(Entity e, float x, float y, float z) {
 
 	{
 		struct TransformUpdate u = {
-		    e, t->x - x, t->y - y, t->z - z, {}};
+		    .e = e, t->x - x, t->y - y, t->z - z};
 		addUpdate(&u);
 	}
 
@@ -105,18 +123,13 @@ void TransformRotate(Entity e, float dx, float dy, float dz) {
 	if (t == NULL)
 		return;
 
-	{
-		struct TransformUpdate u = {
-		    e, 0, 0, 0, {t->rot.x - dx, t->rot.y - dy, t->rot.z - dz}};
-		addUpdate(&u);
-	}
-
 	t->rot.x += dx;
 	t->rot.y += dy;
 	t->rot.z += dz;
 }
 
-/* TransformSetRotation sets the rotation of the transform attached to e to r
+/* TransformSetRotation sets the rotation of the transform attached to e
+ * to r
  * degrees. */
 void TransformSetRotation(Entity e, float x, float y, float z) {
 	struct Transform *t;
@@ -125,16 +138,13 @@ void TransformSetRotation(Entity e, float x, float y, float z) {
 	if (t == NULL)
 		return;
 
-	{
-		struct TransformUpdate u = {e, 0, 0, 0, {x, y, z}};
-		addUpdate(&u);
-	}
 	t->rot.x = x;
 	t->rot.y = y;
 	t->rot.z = z;
 }
 
-/* GetPos sets x, y, and z to the position of entity e and returns the success
+/* GetPos sets x, y, and z to the position of entity e and returns the
+ * success
  * of the operation. */
 bool GetPos(Entity e, float *x, float *y, float *z) {
 	struct Transform *t;
@@ -147,7 +157,8 @@ bool GetPos(Entity e, float *x, float *y, float *z) {
 	return true;
 }
 
-/* GetRot sets the x, y, and z rotation of entity e and returns the success. */
+/* GetRot sets the x, y, and z rotation of entity e and returns the
+ * success. */
 bool GetRot(Entity e, float *x, float *y, float *z) {
 	struct Transform *t;
 	if ((t = getTransform(e)) == NULL)
