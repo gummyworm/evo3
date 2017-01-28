@@ -127,7 +127,7 @@ void UpdateCameraSystem() {
 			if (!GetPos(renders[i].e, &pos.x, &pos.y, &pos.z))
 				continue;
 			mat4x4_translate(m, pos.x, pos.y, pos.z);
-			mat4x4_mul(mv, m, v);
+			mat4x4_mul(mv, v, m);
 			mat4x4_mul(mvp, cameras[i].projection, mv);
 
 			if (GetMesh(renders[i].e) != NULL) {

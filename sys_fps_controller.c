@@ -36,8 +36,8 @@ static void key(int key, int scancode, int action, int mods) {
 		bool rotate, translate;
 
 		f = fpsControllers + i;
-		angle = f->angle;
 
+		angle = f->angle;
 		cosa = cos(angle);
 		sina = sin(angle);
 
@@ -49,7 +49,7 @@ static void key(int key, int scancode, int action, int mods) {
 			dpos[2] = -cosa;
 			translate = true;
 		} else if (key == f->keyCodes.backward) {
-			dpos[0] = -sina;
+			dpos[0] = sina;
 			dpos[1] = 0;
 			dpos[2] = cosa;
 			translate = true;
@@ -61,13 +61,13 @@ static void key(int key, int scancode, int action, int mods) {
 		} else if (key == f->keyCodes.right) {
 			dpos[0] = cosa;
 			dpos[1] = 0;
-			dpos[2] = sina;
+			dpos[2] = -sina;
 			translate = true;
 		} else if (key == f->keyCodes.turnL) {
-			f->angle -= .05f;
+			f->angle += .05f;
 			rotate = true;
 		} else if (key == f->keyCodes.turnR) {
-			f->angle += .05f;
+			f->angle -= .05f;
 			rotate = true;
 		}
 
@@ -76,13 +76,11 @@ static void key(int key, int scancode, int action, int mods) {
 			float tscale = dt * f->speed;
 			vec3_norm(dposn, dpos);
 			vec3_scale(dpos, dposn, tscale);
-			dinfof("%f %f %f", dpos[0], dpos[1], dpos[2]);
 			TransformMove(f->e, dpos[0], dpos[1], dpos[2]);
 		}
 
-		{
-			float s = dt * f->turnSpeed;
-			vec3 dir = {s * sin(f->angle), 0, s * -cos(f->angle)};
+		if (rotate) {
+			vec3 dir = {-sin(f->angle), 0, -cos(f->angle)};
 			SetViewDir(f->e, dir[0], dir[1], dir[2]);
 		}
 	}
