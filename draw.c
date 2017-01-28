@@ -355,7 +355,7 @@ void Text(mat4x4 proj, unsigned x, unsigned y, unsigned sz, const char *msg) {
 	static GLuint fontTex;
 
 	if (fontTex == 0) {
-		fontTex = GetTexture("test.png");
+		fontTex = GetTexture("font.png");
 	}
 
 	cx = x;

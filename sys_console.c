@@ -116,10 +116,10 @@ static void wear(char *attire) {}
 /* exec executes line as a console command. */
 static void exec(char *line) {
 	int argc;
-	char *argv[CONSOLE_WIDTH];
+	char *argv[256];
 	char l[256];
 
-	strcpy(l, line);
+	strncpy(l, line, sizeof(l));
 	argc = getargs(l, argv);
 
 	if (strncmp(argv[0], CMD_LS, sizeof(CMD_LS)) == 0) {
@@ -166,9 +166,14 @@ static void exec(char *line) {
 
 /* button is called when a button is pressed. */
 static void key(int key, int button, int action, int mods) {
+	UNUSED(mods);
+
 	unsigned c, r, l;
 	struct Console *console;
-	char ch;
+	int ch;
+
+	if (action != GLFW_PRESS)
+		return;
 
 	if (numConsoles < 1)
 		return;
@@ -217,7 +222,7 @@ static void key(int key, int button, int action, int mods) {
 		ch = ' ';
 
 	default:
-		ch = button;
+		ch = key;
 		if (c < (CONSOLE_WIDTH / CONSOLE_FONT_WIDTH)) {
 			*(console->text + (console->lines[l] + c)) = ch;
 			console->col++;
