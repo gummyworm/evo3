@@ -33,7 +33,8 @@ void AddRoom(Entity, const char *, const char *, float, float, float, float,
              float, float);
 Entity GetRoom(Entity);
 bool RoomContains(Entity, float, float, float);
-const char *GetDescription(Entity);
+bool RoomContainsEntity(Entity, Entity);
+const char *GetRoomDescription(Entity);
 
 int ThingsInRoom(Entity, Entity *);
 

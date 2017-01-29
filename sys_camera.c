@@ -377,8 +377,10 @@ void WorldToScreen(Entity e, float x, float y, float z, int *sx, int *sy) {
 		getView(cam, &v);
 		mat4x4_mul(pv, v, cam->projection);
 		mat4x4_mul_vec4(projected, pv, pt);
+		/*
 		dinfof("%f %f %f %f", projected[0], projected[1], projected[2],
 		       projected[3]);
+		       */
 	}
 
 	/* test if point is visible. */

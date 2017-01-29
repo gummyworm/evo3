@@ -21,5 +21,6 @@ struct Label {
 
 void InitLabelSystem();
 void AddLabel(Entity, const char *);
+void UpdateLabelSystem();
 
 #endif

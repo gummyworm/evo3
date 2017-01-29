@@ -1,6 +1,8 @@
 #ifndef THING_H
 #define THING_H
 
+#include "third-party/include/uthash.h"
+
 #include "entity.h"
 #include <stdbool.h>
 
@@ -19,6 +21,16 @@ struct Thing {
 	int weight;
 
 	bool takeable;
+
+	struct ActionHandler *actions;
+};
+
+/* ActionHandler defines callbacks to be executed when a given action
+ * is performed on a Thing. */
+struct ActionHandler {
+	const char *action;
+	void (*handle)(struct Thing *self, char *out);
+	UT_hash_handle hh;
 };
 
 /* ThingUpdate defines an update message that can be polled by
@@ -29,7 +41,7 @@ struct ThingUpdate {
 
 void InitThingSystem();
 void UpdateThingSystem();
-void AddThing(Entity, const char *);
+void AddThing(Entity, const char *, const char *);
 Entity GetThing(const char *);
 struct Thing *GetThings(int *num);
 

@@ -1,5 +1,6 @@
 #include "third-party/include/uthash.h"
 
+#include "debug.h"
 #include "thing.h"
 
 struct entityToThing {
@@ -39,7 +40,7 @@ void InitThingSystem() {}
 void UpdateThingSystem() { numUpdates = 0; }
 
 /* AddThing adds a thing component to the entity e. */
-void AddThing(Entity e, const char *name) {
+void AddThing(Entity e, const char *name, const char *desc) {
 	struct entityToThing *item;
 
 	if (getThing(e) != NULL)
@@ -51,6 +52,8 @@ void AddThing(Entity e, const char *name) {
 	things[numThings].e = e;
 	things[numThings].owner = 0;
 	things[numThings].name = name;
+	things[numThings].desc = desc;
+	things[numThings].actions = NULL;
 
 	HASH_ADD_INT(entitiesToThings, e, item);
 	numThings++;
@@ -61,8 +64,12 @@ Entity GetThing(const char *name) {
 	int i;
 	int l;
 
-	l = strlen(name);
+	if (name == NULL)
+		return NULL;
+
+	l = strlen(name) + 1;
 	for (i = 0; i < numThings; ++i) {
+		dinfof(things[i].name);
 		if (strncmp(things[i].name, name, l) == 0)
 			return things[i].e;
 	}

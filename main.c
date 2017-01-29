@@ -58,6 +58,7 @@ static void test() {
 	AddTransform(E_APPLE, 0, 0, -7.0f);
 	AddRender(E_APPLE, "person.obj");
 	AddLabel(E_APPLE, "apple");
+	AddThing(E_APPLE, "APPLE", "It's a juicy red apple");
 	// AddTextBox(E_APPLE, 50, 50, "apple");
 }
 

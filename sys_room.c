@@ -80,6 +80,15 @@ bool RoomContains(Entity e, float x, float y, float z) {
 	return false;
 }
 
+/* RoomContainsEntity returns true if target's transform resides within the room
+ * attached to e. */
+bool RoomContainsEntity(Entity e, Entity target) {
+	float x, y, z;
+	if (!GetPos(target, &x, &y, &z))
+		return false;
+	return RoomContains(e, x, y, z);
+}
+
 /* GetRoom returns the room that contains e (or -1 if no room does). */
 Entity GetRoom(Entity e) {
 	int i;
@@ -96,8 +105,8 @@ Entity GetRoom(Entity e) {
 	return -1;
 }
 
-/* GetDescription returns e's room's description. */
-const char *GetDescription(Entity e) {
+/* GetRoomDescription returns e's room's description. */
+const char *GetRoomDescription(Entity e) {
 	struct Room *room;
 
 	room = getRoom(e);

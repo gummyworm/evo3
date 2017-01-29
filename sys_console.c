@@ -11,23 +11,23 @@
 
 /* err prints the error msg to the console. */
 #define err(msg, ...)                                                          \
-	{                                                                      \
+	do {                                                                   \
 		char buff[128];                                                \
 		if (console != NULL) {                                         \
 			sprintf(buff, msg, __VA_ARGS__);                       \
-			ConsoleAddLine(console, buff);                         \
+			addLine(console, buff);                                \
 		}                                                              \
-	}
+	} while (0)
 
 /* msg prints msg to the console. */
 #define msg(msg, ...)                                                          \
-	{                                                                      \
+	do {                                                                   \
 		char buff[128];                                                \
 		if (console != NULL) {                                         \
 			sprintf(buff, msg, __VA_ARGS__);                       \
-			ConsoleAddLine(console, buff);                         \
+			addLine(console, buff);                                \
 		}                                                              \
-	}
+	} while (0)
 
 /* error messages */
 #define ERR_UNKNOWN_COMMAND "unknown command: %s"
@@ -143,16 +143,40 @@ static int getargs(char *line, char **args) {
 	int count;
 
 	count = 0;
-	for (p = strtok(line, " \t"); p != NULL; p = strtok(NULL, " \t")) {
-		args[count] = p;
-		count++;
-	}
+	for (p = strtok(line, " \t"); p != NULL; p = strtok(NULL, " \t"))
+		args[count++] = p;
 
 	return count;
 }
 
-/* look examines target and displays its description if it has one. */
-static void look(char *name) {}
+/* look examines target from a viewpoint in room and displays its description
+ * if it has one. If target is NULL, it describes the room instead. */
+static void look(struct Console *console, Entity room, char *target) {
+	Entity e;
+	e = GetThing(target);
+
+	if (target == NULL) {
+		int i, numThings;
+		Entity things[MAX_THINGS];
+
+		const char *desc = GetRoomDescription(room);
+		if (desc != NULL) {
+			addLine(console, (char *)desc);
+		}
+		addLine(console, "You see the following:");
+		numThings = ThingsInRoom(room, things);
+		for (i = 0; i < numThings; ++i)
+			addLine(console, (char *)GetThingName(things[i]));
+		return;
+	} else if (RoomContainsEntity(room, e)) {
+		const char *desc = GetThingDescription(e);
+		if (desc != NULL) {
+			addLine(console, (char *)desc);
+			return;
+		}
+	}
+	err(ERR_ITEM_NOT_VISIBLE, target);
+}
 
 /* take adds name to the inventory (if it exists can be added). */
 static void take(char *name) {}
@@ -181,15 +205,18 @@ static void wield(char *weapon) {}
 static void wear(char *attire) {}
 
 /* exec executes line as a console command. */
-static void exec(char *line) {
+static void exec(struct Console *console, char *line) {
 	int argc;
 	char *argv[256];
 	char l[256];
-
-	return;
+	Entity room;
 
 	strncpy(l, line, sizeof(l));
 	argc = getargs(l, argv);
+	if (argc <= 0)
+		return;
+
+	room = GetRoom(console->e);
 
 	if (strncmp(argv[0], CMD_LS, sizeof(CMD_LS)) == 0) {
 		inventory();
@@ -199,10 +226,12 @@ static void exec(char *line) {
 		else
 			drop(argv[1]);
 	} else if (strncmp(argv[0], CMD_LOOK, sizeof(CMD_LOOK)) == 0) {
-		if (argc != 2)
-			;
+		if (argc == 1)
+			look(console, room, NULL);
+		else if (argc == 2)
+			look(console, room, argv[1]);
 		else
-			look(argv[1]);
+			err(ERR_NUM_ARGS, argc - 1, 2);
 	} else if (strncmp(argv[0], CMD_TAKE, sizeof(CMD_TAKE)) == 0) {
 		if (argc != 2)
 			;
@@ -235,6 +264,7 @@ static void exec(char *line) {
 
 /* button is called when a button is pressed. */
 static void key(int key, int button, int action, int mods) {
+	UNUSED(button);
 	UNUSED(mods);
 
 	struct Console *console;
@@ -254,39 +284,16 @@ static void key(int key, int button, int action, int mods) {
 
 	addChar(console, key);
 	if (key == GLFW_KEY_ENTER)
-		exec(console->text + console->lines[console->numLines]);
+		exec(console,
+		     console->text + console->lines[console->numLines - 1]);
 }
 
-/* update updates and draws the console window. */
-static void update(struct Console *console) {
+/* draw renders console as a GUI element. */
+static void draw(struct Console *console) {
 	unsigned i, y, scroll;
 	char buff[CONSOLE_WIDTH / CONSOLE_FONT_WIDTH + 2];
 	mat4x4 mvp;
 
-	if (console == NULL)
-		return;
-
-	/* blink the cursor */
-	console->blinktmr = time(NULL);
-	if (difftime(console->blinktmr, tmrstart) > CONSOLE_BLINK_INTERVAL) {
-		console->blinktmr -= tmrstart;
-		tmrstart = time(NULL);
-		console->blink = !console->blink;
-	}
-
-	/* if we've moved to a new room, display its description */
-	if (GetTransformUpdate(console->e) != NULL) {
-		Entity room = GetRoom(console->e);
-		if (room != console->room) {
-			char *desc = (char *)GetDescription(room);
-			if (desc != NULL) {
-				addLine(console, desc);
-			}
-			console->room = room;
-		}
-	}
-
-	/* draw the console */
 	GuiProjection(&mvp);
 	Rect(mvp, CONSOLE_START_X, CONSOLE_START_Y, CONSOLE_WIDTH,
 	     CONSOLE_HEIGHT, CONSOLE_COLOR);
@@ -319,7 +326,36 @@ static void update(struct Console *console) {
 	}
 }
 
-/* getConsole returns the console attached to entity e (if there is one). */
+/* update updates and draws the console window. */
+static void update(struct Console *console) {
+	if (console == NULL)
+		return;
+
+	/* blink the cursor */
+	console->blinktmr = time(NULL);
+	if (difftime(console->blinktmr, tmrstart) > CONSOLE_BLINK_INTERVAL) {
+		console->blinktmr -= tmrstart;
+		tmrstart = time(NULL);
+		console->blink = !console->blink;
+	}
+
+	/* if we've moved to a new room, display its description */
+	if (GetTransformUpdate(console->e) != NULL) {
+		Entity room = GetRoom(console->e);
+		if (room != console->room) {
+			char *desc = (char *)GetRoomDescription(room);
+			if (desc != NULL) {
+				addLine(console, desc);
+			}
+			console->room = room;
+		}
+	}
+
+	draw(console);
+}
+
+/* getConsole returns the console attached to entity e (if there is
+ * one). */
 static struct Console *getConsole(Entity e) {
 	struct entityToConsole *c;
 
