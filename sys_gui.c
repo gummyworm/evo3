@@ -26,6 +26,8 @@ static struct WidgetUpdate updates[MAX_WIDGETS];
 
 static void DrawWidget(struct Widget *);
 
+static GLFWwindow *win;
+
 /* drawTextbox renders the textbox w. */
 static void drawTextbox(struct Widget *w) {
 	mat4x4 proj;
@@ -69,7 +71,7 @@ static void addWidget(Entity e, struct Widget *w) {
 }
 
 /* InitWidgetSystem initializes the widget system. */
-void InitWidgetSystem(GLFWwindow *win) { UNUSED(win); }
+void InitWidgetSystem(GLFWwindow *w) { win = w; }
 
 /* UpdateWidgetSystem updates all widgets that have been created. */
 void UpdateWidgetSystem() {
@@ -134,6 +136,16 @@ void AddTextBox(Entity e, unsigned x, unsigned y, const char *text) {
 	addWidget(e, &w);
 }
 
+/* GuiProjection sets proj to the standard GUI projection matrix. */
 void GuiProjection(mat4x4 *proj) {
 	mat4x4_ortho(*proj, 0, GUI_WIDTH, GUI_HEIGHT, 0, 1.f, -1.f);
+}
+
+/* ScreenToGui sets (x, y) to the GUI coordinates that correspond to the given
+ * screen coordiantes (sx, sy). */
+void ScreenToGui(int sx, int sy, int *x, int *y) {
+	int w, h;
+	glfwGetFramebufferSize(win, &w, &h);
+	*x = (int)(sx * ((float)GUI_WIDTH / (float)w));
+	*y = (int)(sy * ((float)GUI_HEIGHT / (float)h));
 }

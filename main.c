@@ -44,6 +44,7 @@ static void update() {
 
 	/* post main render updates */
 	UpdateConsoleSystem();
+	UpdateLabelSystem();
 	UpdateWidgetSystem();
 }
 
@@ -56,6 +57,7 @@ static void test() {
 
 	AddTransform(E_APPLE, 0, 0, -7.0f);
 	AddRender(E_APPLE, "person.obj");
+	AddLabel(E_APPLE, "apple");
 	// AddTextBox(E_APPLE, 50, 50, "apple");
 }
 

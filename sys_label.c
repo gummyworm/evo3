@@ -51,9 +51,10 @@ void UpdateLabelSystem() {
 		WorldToScreen(E_PLAYER, x, y, z, &sx, &sy);
 		if (sx >= 0) {
 			mat4x4 mvp;
-			GetProjection(&mvp);
-			Text(labels[i].e, sx, sy, LABEL_FONT_SIZE,
-			     labels[i].text);
+			GetProjection(E_PLAYER, &mvp);
+
+			ScreenToGui(sx, sy, &sx, &sy);
+			Text(mvp, sx, sy, LABEL_FONT_SIZE, labels[i].text);
 		}
 	}
 }

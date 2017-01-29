@@ -2,6 +2,7 @@
 #define SYS_GUI_H
 
 #include "base.h"
+#include "third-party/include/linmath.h"
 
 #include "entity.h"
 
@@ -44,5 +45,6 @@ void AddWidget(Entity);
 void AddTextBox(Entity, unsigned, unsigned, const char *);
 
 void GuiProjection(mat4x4 *);
+void ScreenToGui(int sx, int sy, int *x, int *y);
 
 #endif

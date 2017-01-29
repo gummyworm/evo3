@@ -6,7 +6,6 @@
 
 enum { MAX_THINGS = 8192,
        MAX_THINGS_PER_ROOM = 128,
-       MAX_INVENTORY_SIZE = 1024,
 };
 
 /* Thing is a struct that represents an inanimate object's attributes. */
@@ -19,9 +18,6 @@ struct Thing {
 
 	bool takeable;
 };
-
-/* Inventory is an array of Things. */
-typedef Entity Inventory[MAX_INVENTORY_SIZE];
 
 /* ThingUpdate defines an update message that can be polled by
  * interested systems. */

@@ -99,7 +99,7 @@ void TransformMove(Entity e, float dx, float dy, float dz) {
 }
 
 /* TransformSet sets the given entity to the position (x, y, z). */
-void TransforSet(Entity e, float x, float y, float z) {
+void TransformSet(Entity e, float x, float y, float z) {
 	struct Transform *t;
 
 	t = getTransform(e);

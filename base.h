@@ -5,6 +5,8 @@
 
 #include <GLFW/glfw3.h>
 
+#include "debug.h"
+
 #define UNUSED(X) ((void)X)
 
 #endif

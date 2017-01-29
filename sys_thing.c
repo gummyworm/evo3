@@ -65,4 +65,5 @@ Entity GetThing(const char *name) {
 		if (strncmp(things[i].name, name, l) == 0)
 			return things[i].e;
 	}
+	return NULL;
 }

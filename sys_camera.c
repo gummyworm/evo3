@@ -49,6 +49,20 @@ static struct Camera *getCamera(Entity e) {
 	return c->camera;
 }
 
+/* getView sets the view matrix v appropriately. */
+static void getView(struct Camera *c, mat4x4 *v) {
+	vec3 eye, center, up;
+
+	GetPos(c->e, &eye[0], &eye[1], &eye[2]);
+	GetViewDir(c->e, &up[0], &up[1], &up[2]);
+	vec3_add(center, eye, up);
+	up[0] = 0;
+	up[1] = 1;
+	up[2] = 0;
+
+	mat4x4_look_at(*v, eye, center, up);
+}
+
 /* addUpdate adds a new update for this frame. */
 static void addUpdate(struct CameraUpdate *u) { updates[numUpdates++] = *u; }
 
@@ -348,8 +362,6 @@ void SetViewDir(Entity e, float x, float y, float z) {
 void WorldToScreen(Entity e, float x, float y, float z, int *sx, int *sy) {
 	vec4 projected;
 	struct Camera *cam;
-	vec4 pt = {x, y, z, 1};
-	int width, height;
 
 	*sx = -1;
 	*sy = -1;
@@ -358,15 +370,27 @@ void WorldToScreen(Entity e, float x, float y, float z, int *sx, int *sy) {
 	if (cam == NULL)
 		return;
 
-	mat4x4_mul_vec4(projected, cam->projection, pt);
+	{
+		mat4x4 v, pv;
+		vec4 pt = {x, y, z, 1};
+
+		getView(cam, &v);
+		mat4x4_mul(pv, v, cam->projection);
+		mat4x4_mul_vec4(projected, pv, pt);
+		dinfof("%f %f %f %f", projected[0], projected[1], projected[2],
+		       projected[3]);
+	}
 
 	/* test if point is visible. */
 	if (projected[3] < 0)
 		return;
 
-	glfwGetFramebufferSize(win, &width, &height);
-	*sx = ((projected[0] + 1.0f) / 2.f) * width;
-	*sy = ((projected[1] + 1.0f) / 2.f) * height;
+	{
+		int width, height;
+		glfwGetFramebufferSize(win, &width, &height);
+		*sx = (projected[0] + 1.f) / 2.f * (float)width;
+		*sy = (1.f - projected[1]) / 2.f * (float)height;
+	}
 }
 
 /* GetProjection sets projection to e's camera's projection matrix. */

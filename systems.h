@@ -11,6 +11,7 @@
 #include "sys_console.h"
 #include "sys_fps_controller.h"
 #include "sys_gui.h"
+#include "sys_label.h"
 #include "sys_room.h"
 #include "sys_sprite.h"
 #include "sys_time.h"
