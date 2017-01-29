@@ -1,5 +1,6 @@
 #include "sys_room.h"
 #include "sys_transform.h"
+#include "thing.h"
 #include "third-party/include/uthash.h"
 
 struct entityToRoom {
@@ -75,6 +76,8 @@ bool RoomContains(Entity e, float x, float y, float z) {
 	    (y >= room->bounds.y && y <= (room->bounds.y + room->bounds.h)) &&
 	    (z >= room->bounds.z && z <= (room->bounds.z + room->bounds.d)))
 		return true;
+
+	return false;
 }
 
 /* GetRoom returns the room that contains e (or -1 if no room does). */
@@ -102,4 +105,20 @@ const char *GetDescription(Entity e) {
 		return NULL;
 
 	return room->desc;
+}
+
+/* ThingsInRoom returns all the Things in the room attached to e and returns
+ * the number found. */
+int ThingsInRoom(Entity e, Entity *found) {
+	struct Thing *things;
+	int i, num, count;
+
+	things = GetThings(&num);
+	for (i = 0, count = 0; i < num; ++i) {
+		float x, y, z;
+
+		if (GetPos(things[i].e, &x, &y, &z) && RoomContains(e, x, y, z))
+			found[count++] = things[i].e;
+	}
+	return count;
 }

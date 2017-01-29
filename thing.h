@@ -31,5 +31,9 @@ void InitThingSystem();
 void UpdateThingSystem();
 void AddThing(Entity, const char *);
 Entity GetThing(const char *);
+struct Thing *GetThings(int *num);
+
+const char *GetThingName(Entity e);
+const char *GetThingDescription(Entity e);
 
 #endif

@@ -35,4 +35,6 @@ Entity GetRoom(Entity);
 bool RoomContains(Entity, float, float, float);
 const char *GetDescription(Entity);
 
+int ThingsInRoom(Entity, Entity *);
+
 #endif

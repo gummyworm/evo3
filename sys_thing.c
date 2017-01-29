@@ -66,5 +66,24 @@ Entity GetThing(const char *name) {
 		if (strncmp(things[i].name, name, l) == 0)
 			return things[i].e;
 	}
-	return NULL;
+	return -1;
+}
+
+struct Thing *GetThings(int *num) {
+	*num = numThings;
+	return things;
+}
+
+const char *GetThingName(Entity e) {
+	struct Thing *t;
+	if ((t = getThing(e)) == NULL)
+		return NULL;
+	return t->name;
+}
+
+const char *GetThingDescription(Entity e) {
+	struct Thing *t;
+	if ((t = getThing(e)) == NULL)
+		return NULL;
+	return t->desc;
 }
