@@ -115,7 +115,6 @@ int main() {
 		glDisable(GL_BLEND);
 
 		update();
-		// Text(proj, 0, 0, 32, "hello world");
 		glfwSwapBuffers(window);
 
 		ClearUpdates();

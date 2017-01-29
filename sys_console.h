@@ -8,6 +8,7 @@
 #include "sys_gui.h"
 
 #define CONSOLE_BLINK_INTERVAL 0.10 /* seconds */
+#define CONSOLE_PRINT_INTERVAL 0.05 /* seconds */
 
 enum { MAX_CONSOLES = 1,
 };
@@ -37,9 +38,13 @@ struct Console {
 	Entity room;
 
 	bool blink;
-	time_t blinktmr;
+	double blinktmr;
 
 	bool acceptInput;
+	double addtmr_interval;
+	double addtmr_start;
+	double addtmr;
+	char addBuff[256];
 
 	int lines[CONSOLE_MAX_LINES];
 	char text[CONSOLE_HISTORY_SIZE];

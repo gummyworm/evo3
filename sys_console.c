@@ -58,7 +58,7 @@ const char CMD_WEAR[] = "WEAR";
 const char DIRECTION_NORTH[] = "NORTH";
 const char DIRECTION_SOUTH[] = "SOUTH";
 
-static time_t tmrstart;
+static double tmrstart;
 
 struct entityToConsole {
 	Entity e;
@@ -137,6 +137,21 @@ static void addLine(struct Console *console, char *text) {
 	addChar(console, '\n');
 }
 
+/* addLineOverTime slowly prints text (at a rate of 1 character/tstep). */
+static void addLineOverTime(struct Console *console, char *text, float tstep) {
+	int i;
+
+	console->acceptInput = false;
+	console->addtmr_start = glfwGetTime();
+	console->addtmr_interval = tstep;
+
+	i = strlen(console->addBuff);
+
+	strncpy(console->addBuff + i, text, sizeof(console->addBuff));
+	console->addBuff[i + strlen(text)] = '\n';
+	console->addBuff[i + strlen(text) + 1] = '\0';
+}
+
 /* getargs parses line, sets all the arguments found, and returns the number. */
 static int getargs(char *line, char **args) {
 	char *p;
@@ -161,17 +176,22 @@ static void look(struct Console *console, Entity room, char *target) {
 
 		const char *desc = GetRoomDescription(room);
 		if (desc != NULL) {
-			addLine(console, (char *)desc);
+			addLineOverTime(console, (char *)desc,
+			                CONSOLE_PRINT_INTERVAL);
 		}
-		addLine(console, "You see the following:");
+		addLineOverTime(console, "You see the following:",
+		                CONSOLE_PRINT_INTERVAL);
 		numThings = ThingsInRoom(room, things);
 		for (i = 0; i < numThings; ++i)
-			addLine(console, (char *)GetThingName(things[i]));
+			addLineOverTime(console,
+			                (char *)GetThingName(things[i]),
+			                CONSOLE_PRINT_INTERVAL);
 		return;
 	} else if (RoomContainsEntity(room, e)) {
 		const char *desc = GetThingDescription(e);
 		if (desc != NULL) {
-			addLine(console, (char *)desc);
+			addLineOverTime(console, (char *)desc,
+			                CONSOLE_PRINT_INTERVAL);
 			return;
 		}
 	}
@@ -279,7 +299,7 @@ static void key(int key, int button, int action, int mods) {
 	if (!console->acceptInput)
 		return;
 
-	tmrstart = time(NULL);
+	tmrstart = glfwGetTime();
 	console->blink = true;
 
 	addChar(console, key);
@@ -331,11 +351,28 @@ static void update(struct Console *console) {
 	if (console == NULL)
 		return;
 
+	draw(console);
+
+	/* if we're adding a line over time, update it. */
+	if (console->addBuff[0]) {
+		console->addtmr = glfwGetTime();
+		if ((console->addtmr - console->addtmr_start) >
+		    console->addtmr_interval) {
+			console->addtmr_start += console->addtmr_interval;
+			addChar(console, console->addBuff[0]);
+			memmove(console->addBuff, console->addBuff + 1,
+			        strlen(console->addBuff));
+		}
+		return;
+	} else {
+		console->acceptInput = true;
+	}
+
 	/* blink the cursor */
-	console->blinktmr = time(NULL);
-	if (difftime(console->blinktmr, tmrstart) > CONSOLE_BLINK_INTERVAL) {
+	console->blinktmr = glfwGetTime();
+	if ((console->blinktmr - tmrstart) > CONSOLE_BLINK_INTERVAL) {
 		console->blinktmr -= tmrstart;
-		tmrstart = time(NULL);
+		tmrstart = glfwGetTime();
 		console->blink = !console->blink;
 	}
 
@@ -345,13 +382,12 @@ static void update(struct Console *console) {
 		if (room != console->room) {
 			char *desc = (char *)GetRoomDescription(room);
 			if (desc != NULL) {
-				addLine(console, desc);
+				addLineOverTime(console, desc,
+				                CONSOLE_PRINT_INTERVAL);
 			}
 			console->room = room;
 		}
 	}
-
-	draw(console);
 }
 
 /* getConsole returns the console attached to entity e (if there is
@@ -392,6 +428,7 @@ void AddConsole(Entity e) {
 	memset(consoles[numConsoles].lines, 0,
 	       sizeof(consoles[numConsoles].lines));
 	consoles[numConsoles].acceptInput = true;
+	consoles[numConsoles].addBuff[0] = '\0';
 
 	HASH_ADD_INT(entitiesToConsoles, e, item);
 	numConsoles++;
