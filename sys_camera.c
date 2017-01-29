@@ -341,3 +341,41 @@ void SetViewDir(Entity e, float x, float y, float z) {
 	c->dir[2] = z;
 	dinfof("%f %f %f", c->dir[0], c->dir[1], c->dir[2]);
 }
+
+/* WorldToScreen sets (sx, sy) to the screen coordiantes of the given (x, y, z)
+ * world point as seen by the camera attached to e. If sx and sy are negative
+ * the call either failed, or the point is not visible to the camera. */
+void WorldToScreen(Entity e, float x, float y, float z, int *sx, int *sy) {
+	vec4 projected;
+	struct Camera *cam;
+	vec4 pt = {x, y, z, 1};
+	int width, height;
+
+	*sx = -1;
+	*sy = -1;
+
+	cam = getCamera(e);
+	if (cam == NULL)
+		return;
+
+	mat4x4_mul_vec4(projected, cam->projection, pt);
+
+	/* test if point is visible. */
+	if (projected[3] < 0)
+		return;
+
+	glfwGetFramebufferSize(win, &width, &height);
+	*sx = ((projected[0] + 1.0f) / 2.f) * width;
+	*sy = ((projected[1] + 1.0f) / 2.f) * height;
+}
+
+/* GetProjection sets projection to e's camera's projection matrix. */
+void GetProjection(Entity e, mat4x4 *projection) {
+	struct Camera *c;
+
+	c = getCamera(e);
+	if (c == NULL)
+		return;
+
+	memcpy(*projection, c->projection, sizeof(projection));
+}

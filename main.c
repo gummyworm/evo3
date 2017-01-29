@@ -7,11 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-enum testEntities {
-	E_PLAYER = 1,
-	E_APPLE,
-	E_TEST_ROOM,
-};
+#include "entities.h"
 
 /* onError is the GLFW callback for error handling. */
 static void onError(int error, const char *description) {

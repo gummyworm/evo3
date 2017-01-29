@@ -77,4 +77,7 @@ void CameraOrtho(Entity, float, float, float, float, float);
 bool GetViewDir(Entity, float *, float *, float *);
 void SetViewDir(Entity, float, float, float);
 
+void WorldToScreen(Entity, float, float, float, int *, int *);
+void GetProjection(Entity, mat4x4 *);
+
 #endif
