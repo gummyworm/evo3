@@ -49,6 +49,7 @@ void AddThing(Entity e, const char *name) {
 	item->e = e;
 
 	things[numThings].e = e;
+	things[numThings].owner = 0;
 	things[numThings].name = name;
 
 	HASH_ADD_INT(entitiesToThings, e, item);

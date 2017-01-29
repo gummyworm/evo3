@@ -11,6 +11,8 @@ enum { MAX_THINGS = 8192,
 /* Thing is a struct that represents an inanimate object's attributes. */
 struct Thing {
 	Entity e;
+	Entity owner;
+
 	const char *name;
 	const char *brief;
 	const char *desc;
