@@ -133,7 +133,7 @@ static void addLine(struct Console *console, char *text) {
 
 	pch = text;
 	while ((c = *pch++))
-		addChar(console, *pch);
+		addChar(console, c);
 	addChar(console, '\n');
 }
 

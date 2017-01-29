@@ -76,11 +76,13 @@ Entity GetThing(const char *name) {
 	return -1;
 }
 
+/* GetThings returns all the Things and sets num to the number of them. */
 struct Thing *GetThings(int *num) {
 	*num = numThings;
 	return things;
 }
 
+/* GetThingName returns the name of the thing attached to e. */
 const char *GetThingName(Entity e) {
 	struct Thing *t;
 	if ((t = getThing(e)) == NULL)
@@ -88,6 +90,7 @@ const char *GetThingName(Entity e) {
 	return t->name;
 }
 
+/* GetThingName returns the description of the thing attached to e. */
 const char *GetThingDescription(Entity e) {
 	struct Thing *t;
 	if ((t = getThing(e)) == NULL)
