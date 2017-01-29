@@ -44,8 +44,8 @@ static void update() {
 
 	/* post main render updates */
 	UpdateConsoleSystem();
-	UpdateLabelSystem();
 	UpdateWidgetSystem();
+	UpdateLabelSystem();
 }
 
 /* test spawns test entities. */

@@ -61,15 +61,13 @@ void AddThing(Entity e, const char *name, const char *desc) {
 
 /* GetThing returns the entity that contains the Thing named name. */
 Entity GetThing(const char *name) {
-	int i;
-	int l;
+	int i, l;
 
 	if (name == NULL)
-		return NULL;
+		return -1;
 
-	l = strlen(name) + 1;
+	l = strlen(name);
 	for (i = 0; i < numThings; ++i) {
-		dinfof(things[i].name);
 		if (strncmp(things[i].name, name, l) == 0)
 			return things[i].e;
 	}
