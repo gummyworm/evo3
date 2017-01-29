@@ -1,8 +1,10 @@
+#include <ctype.h>
+#include <stdio.h>
+#include <string.h>
+
 #include "draw.h"
 #include "third-party/include/uthash.h"
 #include <GLFW/glfw3.h>
-#include <stdio.h>
-#include <string.h>
 
 #include "debug.h"
 #include "systems.h"
@@ -110,6 +112,9 @@ static void addChar(struct Console *console, int ch) {
 		break;
 
 	default:
+		if (!isprint(ch))
+			break;
+
 		if (c < (CONSOLE_WIDTH / CONSOLE_FONT_WIDTH)) {
 			*(console->text + console->lines[l] + c) = ch;
 			*(console->text + console->lines[l] + c + 1) = '\0';
@@ -181,6 +186,8 @@ static void exec(char *line) {
 	char *argv[256];
 	char l[256];
 
+	return;
+
 	strncpy(l, line, sizeof(l));
 	argc = getargs(l, argv);
 
@@ -246,7 +253,7 @@ static void key(int key, int button, int action, int mods) {
 	console->blink = true;
 
 	addChar(console, key);
-	if (key == GLFW_KEY_DOWN)
+	if (key == GLFW_KEY_ENTER)
 		exec(console->text + console->lines[console->numLines]);
 }
 
@@ -343,6 +350,7 @@ void AddConsole(Entity e) {
 	consoles[numConsoles].e = e;
 	consoles[numConsoles].room = -1;
 	consoles[numConsoles].numLines = 0;
+	consoles[numConsoles].scroll = 0;
 	memset(consoles[numConsoles].text, '\0',
 	       sizeof(consoles[numConsoles].text));
 	memset(consoles[numConsoles].lines, 0,
