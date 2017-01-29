@@ -16,11 +16,12 @@ struct LabelUpdate {
 /* Label is a component that is used to label objects in the world. */
 struct Label {
 	Entity e;
+	float offset;
 	const char *text;
 };
 
 void InitLabelSystem();
-void AddLabel(Entity, const char *);
+void AddLabel(Entity, const char *, float);
 void UpdateLabelSystem();
 
 #endif

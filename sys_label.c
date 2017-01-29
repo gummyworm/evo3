@@ -48,11 +48,12 @@ void UpdateLabelSystem() {
 		if (!GetPos(labels[i].e, &x, &y, &z))
 			continue;
 
+		y += labels[i].offset;
+
 		WorldToScreen(E_PLAYER, x, y, z, &sx, &sy);
 		if (sx >= 0) {
 			mat4x4 proj;
 			ScreenToGui(sx, sy, &sx, &sy);
-			dinfof("%d %d %s", sx, sy, labels[i].text);
 			GuiProjection(&proj);
 			Text(proj, sx, sy, LABEL_FONT_SIZE, labels[i].text);
 		}
@@ -60,7 +61,7 @@ void UpdateLabelSystem() {
 }
 
 /* AddLabel adds a label component to the entity e. */
-void AddLabel(Entity e, const char *text) {
+void AddLabel(Entity e, const char *text, float offset) {
 	struct entityToLabel *item;
 
 	if (getLabel(e) != NULL)
@@ -71,6 +72,7 @@ void AddLabel(Entity e, const char *text) {
 
 	labels[numLabels].e = e;
 	labels[numLabels].text = text;
+	labels[numLabels].offset = offset;
 
 	HASH_ADD_INT(entitiesToLabels, e, item);
 	numLabels++;

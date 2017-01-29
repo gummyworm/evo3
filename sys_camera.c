@@ -349,11 +349,9 @@ void SetViewDir(Entity e, float x, float y, float z) {
 	if ((c = getCamera(e)) == NULL)
 		return;
 
-	dinfof("%f %f %f", c->dir[0], c->dir[1], c->dir[2]);
 	c->dir[0] = x;
 	c->dir[1] = y;
 	c->dir[2] = z;
-	dinfof("%f %f %f", c->dir[0], c->dir[1], c->dir[2]);
 }
 
 /* WorldToScreen sets (sx, sy) to the screen coordiantes of the given (x, y, z)
