@@ -44,10 +44,10 @@ struct Console {
 	double addtmr_interval;
 	double addtmr_start;
 	double addtmr;
-	char addBuff[256];
 
 	int lines[CONSOLE_MAX_LINES];
 	char text[CONSOLE_HISTORY_SIZE];
+	char addBuff[1024];
 };
 
 struct ConsoleUpdate {

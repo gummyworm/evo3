@@ -146,6 +146,10 @@ static void addLineOverTime(struct Console *console, char *text, float tstep) {
 	console->addtmr_interval = tstep;
 
 	i = strlen(console->addBuff);
+	if (i + strlen(text) > sizeof(console->addBuff)) {
+		dwarnf("addbuffer overflow");
+		return;
+	}
 
 	strncpy(console->addBuff + i, text, sizeof(console->addBuff));
 	console->addBuff[i + strlen(text)] = '\n';
