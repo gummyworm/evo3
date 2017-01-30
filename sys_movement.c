@@ -19,10 +19,12 @@ static struct MovementUpdate updates[MAX_MOVEMENTS];
 static struct Movement *getMovement(Entity e) {
 	struct entityToMovement *m;
 
-	if (entitiesToMovements == NULL) return NULL;
+	if (entitiesToMovements == NULL)
+		return NULL;
 
 	HASH_FIND_INT(entitiesToMovements, &e, m);
-	if (m == NULL) return NULL;
+	if (m == NULL)
+		return NULL;
 
 	return m->movement;
 }
@@ -40,7 +42,8 @@ void UpdateMovementSystem() { numUpdates = 0; }
 void AddMovement(Entity e, float speed) {
 	struct entityToMovement *item;
 
-	if (getMovement(e) != NULL) return;
+	if (getMovement(e) != NULL)
+		return;
 
 	item = malloc(sizeof(struct entityToMovement));
 	item->movement = movements + numMovements;
@@ -50,6 +53,23 @@ void AddMovement(Entity e, float speed) {
 
 	HASH_ADD_INT(entitiesToMovements, e, item);
 	numMovements++;
+}
+
+/* RemoveMovement removes the movement attached to e from the Movement system.
+ */
+void RemoveMovement(Entity e) {
+	struct entityToMovement *c;
+
+	if (entitiesToMovements == NULL)
+		return;
+
+	HASH_FIND_INT(entitiesToMovements, &e, c);
+	if (c != NULL) {
+		struct Movement *sys = c->movement;
+		int sz = (movements + numMovements) - sys;
+		memmove(sys, sys + 1, sz);
+		HASH_DEL(entitiesToMovements, c);
+	}
 }
 
 /* GetMovementUpdates returns the movement updates this frame. */
@@ -63,7 +83,8 @@ void MovementMoveTo(Entity e, float x, float y, float z) {
 	struct Movement *m;
 	m = getMovement(e);
 
-	if (m == NULL) return;
+	if (m == NULL)
+		return;
 
 	m->dest.x = x;
 	m->dest.y = y;

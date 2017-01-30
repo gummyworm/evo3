@@ -65,6 +65,7 @@ struct CameraUpdate {
 };
 
 void AddRender(Entity, const char *);
+void RemoveRender(Entity);
 
 void InitCameraSystem();
 void UpdateCameraSystem();
@@ -72,6 +73,7 @@ void AddCamera(Entity, uint32_t);
 struct CameraUpdate *GetCameraUpdate(int *);
 
 void AddCamera(Entity, uint32_t);
+void RemoveCamera(Entity);
 void CameraPerspective(Entity, float, float);
 void CameraOrtho(Entity, float, float, float, float, float);
 bool GetViewDir(Entity, float *, float *, float *);

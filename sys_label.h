@@ -22,6 +22,7 @@ struct Label {
 
 void InitLabelSystem();
 void AddLabel(Entity, const char *, float);
+void RemoveLabel(Entity);
 void UpdateLabelSystem();
 
 #endif

@@ -29,6 +29,7 @@ struct ActorUpdate {
 void InitActorSystem();
 void UpdateActorSystem();
 void AddActor(Entity, const char *);
+void RemoveActor(Entity);
 void InventoryAdd(Entity, Entity);
 
 #endif

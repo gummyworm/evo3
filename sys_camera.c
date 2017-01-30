@@ -246,6 +246,22 @@ void AddCamera(Entity e, uint32_t layers) {
 	numCameras++;
 }
 
+/* Remove camera removes the camera attached to e from the Camera system. */
+void RemoveCamera(Entity e) {
+	struct entityToCamera *c;
+
+	if (entitiesToCameras == NULL)
+		return;
+
+	HASH_FIND_INT(entitiesToCameras, &e, c);
+	if (c != NULL) {
+		struct Camera *sys = c->camera;
+		int sz = (cameras + numCameras) - sys;
+		memmove(sys, sys + 1, sz);
+		HASH_DEL(entitiesToCameras, c);
+	}
+}
+
 /* GetCameraUpdates returns the camera updates this frame. */
 struct CameraUpdate *GetCameraUpdates(int *num) {
 	*num = numUpdates;
@@ -327,6 +343,22 @@ void AddRender(Entity e, const char *filename) {
 
 	if (filename != NULL)
 		AddMesh(e, filename);
+}
+
+/* RemoveRender removes the render attached to e from the Render system. */
+void RemoveRender(Entity e) {
+	struct entityToRender *c;
+
+	if (entitiesToRenders == NULL)
+		return;
+
+	HASH_FIND_INT(entitiesToRenders, &e, c);
+	if (c != NULL) {
+		struct Render *sys = c->render;
+		int sz = (renders + numRenders) - sys;
+		memmove(sys, sys + 1, sz);
+		HASH_DEL(entitiesToRenders, c);
+	}
 }
 
 /* GetViewDir returns the direction vector the camera is viewing. */

@@ -143,6 +143,23 @@ void AddFPSController(Entity e, float speed) {
 	numFPSControllers++;
 }
 
+/* RemoveFPSController removes the fpsController attached to e from the
+ * FPSController system. */
+void RemoveFPSController(Entity e) {
+	struct entityToFPSController *c;
+
+	if (entitiesToFPSControllers == NULL)
+		return;
+
+	HASH_FIND_INT(entitiesToFPSControllers, &e, c);
+	if (c != NULL) {
+		struct FPSController *sys = c->fpsController;
+		int sz = (fpsControllers + numFPSControllers) - sys;
+		memmove(sys, sys + 1, sz);
+		HASH_DEL(entitiesToFPSControllers, c);
+	}
+}
+
 /* GetFPSControllerUpdates returns the fpsController updates this frame. */
 struct FPSControllerUpdate *GetFPSControllerUpdates(int *num) {
 	*num = numUpdates;

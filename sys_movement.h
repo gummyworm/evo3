@@ -23,7 +23,8 @@ struct MovementUpdate {
 
 void InitMovementSystem();
 void UpdateMovementSystem();
-void AddMovement(Entity, float speed);
+void AddMovement(Entity, float);
+void RemoveMovement(Entity);
 struct MovementUpdate *GetMovementUpdates(int *);
 void MovementMoveTo(Entity, float, float, float);
 

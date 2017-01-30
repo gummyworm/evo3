@@ -77,3 +77,19 @@ void AddLabel(Entity e, const char *text, float offset) {
 	HASH_ADD_INT(entitiesToLabels, e, item);
 	numLabels++;
 }
+
+/* RemoveLabel removes the label attached to e from the Label system. */
+void RemoveLabel(Entity e) {
+	struct entityToLabel *c;
+
+	if (entitiesToLabels == NULL)
+		return;
+
+	HASH_FIND_INT(entitiesToLabels, &e, c);
+	if (c != NULL) {
+		struct Label *sys = c->label;
+		int sz = (labels + numLabels) - sys;
+		memmove(sys, sys + 1, sz);
+		HASH_DEL(entitiesToLabels, c);
+	}
+}

@@ -61,6 +61,23 @@ void AddTransform(Entity e, float x, float y, float z) {
 	numTransforms++;
 }
 
+/* RemoveTransform removes the transform attached to e from the Transform
+ * system. */
+void RemoveTransform(Entity e) {
+	struct entityToTransform *c;
+
+	if (entitiesToTransforms == NULL)
+		return;
+
+	HASH_FIND_INT(entitiesToTransforms, &e, c);
+	if (c != NULL) {
+		struct Transform *sys = c->transform;
+		int sz = (transforms + numTransforms) - sys;
+		memmove(sys, sys + 1, sz);
+		HASH_DEL(entitiesToTransforms, c);
+	}
+}
+
 /* GetTransformUpdate returns any transform updates for the entity e. */
 struct TransformUpdate *GetTransformUpdate(Entity e) {
 	int i;

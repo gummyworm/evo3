@@ -453,6 +453,22 @@ void AddConsole(Entity e) {
 	numConsoles++;
 }
 
+/* RemoveConsole removes the console attached to e from the Console system. */
+void RemoveConsole(Entity e) {
+	struct entityToConsole *c;
+
+	if (entitiesToConsoles == NULL)
+		return;
+
+	HASH_FIND_INT(entitiesToConsoles, &e, c);
+	if (c != NULL) {
+		struct Console *sys = c->console;
+		int sz = (consoles + numConsoles) - sys;
+		memmove(sys, sys + 1, sz);
+		HASH_DEL(entitiesToConsoles, c);
+	}
+}
+
 /* Initconsolesystem initializes the transform system. */
 void InitConsoleSystem() { InputRegisterKeyEvent(INPUT_LAYER_CONSOLE, key); }
 

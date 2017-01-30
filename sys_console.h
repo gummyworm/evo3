@@ -64,5 +64,6 @@ struct ConsoleUpdate {
 void InitConsoleSystem();
 void UpdateConsoleSystem();
 void AddConsole(Entity);
+void RemoveConsole(Entity);
 
 #endif

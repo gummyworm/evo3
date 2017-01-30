@@ -31,6 +31,7 @@ void InitRoomSystem();
 void UpdateRoomSystem();
 void AddRoom(Entity, const char *, const char *, float, float, float, float,
              float, float);
+void RemoveRoom(Entity);
 Entity GetRoom(Entity);
 bool RoomContains(Entity, float, float, float);
 bool RoomContainsEntity(Entity, Entity);

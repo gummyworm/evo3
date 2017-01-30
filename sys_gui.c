@@ -70,6 +70,22 @@ static void addWidget(Entity e, struct Widget *w) {
 	numWidgets++;
 }
 
+/* RemoveWidget removes the widget attached to e from the Widget system. */
+void RemoveWidget(Entity e) {
+	struct entityToWidget *c;
+
+	if (entitiesToWidgets == NULL)
+		return;
+
+	HASH_FIND_INT(entitiesToWidgets, &e, c);
+	if (c != NULL) {
+		struct Widget *sys = c->widget;
+		int sz = (widgets + numWidgets) - sys;
+		memmove(sys, sys + 1, sz);
+		HASH_DEL(entitiesToWidgets, c);
+	}
+}
+
 /* InitWidgetSystem initializes the widget system. */
 void InitWidgetSystem(GLFWwindow *w) { win = w; }
 

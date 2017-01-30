@@ -64,6 +64,22 @@ void AddRoom(Entity e, const char *name, const char *desc, float x, float y,
 	numRooms++;
 }
 
+/* RemoveRoom removes the room attached to e from the Room system. */
+void RemoveRoom(Entity e) {
+	struct entityToRoom *c;
+
+	if (entitiesToRooms == NULL)
+		return;
+
+	HASH_FIND_INT(entitiesToRooms, &e, c);
+	if (c != NULL) {
+		struct Room *sys = c->room;
+		int sz = (rooms + numRooms) - sys;
+		memmove(sys, sys + 1, sz);
+		HASH_DEL(entitiesToRooms, c);
+	}
+}
+
 /* RoomContains returns true if (x, y, z) exists within e's room. */
 bool RoomContains(Entity e, float x, float y, float z) {
 	struct Room *room;

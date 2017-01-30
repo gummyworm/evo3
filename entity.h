@@ -5,4 +5,6 @@
 
 typedef int Entity;
 
+void RemoveEntity(Entity);
+
 #endif

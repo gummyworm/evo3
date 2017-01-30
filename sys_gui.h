@@ -42,6 +42,7 @@ struct WidgetWindow {
 void InitWidgetSystem(GLFWwindow *);
 void UpdateWidgetSystem();
 void AddWidget(Entity);
+void RemoveWidget(Entity);
 void AddTextBox(Entity, unsigned, unsigned, const char *);
 
 void GuiProjection(mat4x4 *);

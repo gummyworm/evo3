@@ -65,6 +65,22 @@ void AddThing(Entity e, const char *name, const char *desc) {
 	numThings++;
 }
 
+/* RemoveThing removes the thing attached to e from the Thing system. */
+void RemoveThing(Entity e) {
+	struct entityToThing *c;
+
+	if (entitiesToThings == NULL)
+		return;
+
+	HASH_FIND_INT(entitiesToThings, &e, c);
+	if (c != NULL) {
+		struct Thing *sys = c->thing;
+		int sz = (things + numThings) - sys;
+		memmove(sys, sys + 1, sz);
+		HASH_DEL(entitiesToThings, c);
+	}
+}
+
 /* GetThing returns the entity that contains the Thing named name. */
 Entity GetThing(const char *name) {
 	int i, l;

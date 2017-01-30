@@ -17,5 +17,6 @@
 #include "sys_time.h"
 #include "sys_transform.h"
 #include "sys_unit.h"
+#include "thing.h"
 
 #endif

@@ -23,8 +23,9 @@ struct Mesh {
 	unsigned numVertices, numFaces;
 };
 
-void AddMesh(Entity e, const char *);
+void AddMesh(Entity, const char *);
+void RemoveMesh(Entity);
 void MeshDraw(Entity, mat4x4);
-struct Mesh *GetMesh(Entity e);
+struct Mesh *GetMesh(Entity);
 
 #endif

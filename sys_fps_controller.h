@@ -27,5 +27,6 @@ struct FPSControllerUpdate {};
 void InitFPSControllerSystem();
 void UpdateFPSControllerSystem();
 void AddFPSController(Entity, float);
+void RemoveFPSController(Entity);
 
 #endif

@@ -27,6 +27,7 @@ struct TransformUpdate {
 void InitTransformSystem();
 void UpdateTransformSystem();
 void AddTransform(Entity, float, float, float);
+void RemoveTransform(Entity);
 void TransformSystemClearUpdates();
 struct TransformUpdate *GetTransformUpdates(int *);
 struct TransformUpdate *GetTransformUpdate(Entity);

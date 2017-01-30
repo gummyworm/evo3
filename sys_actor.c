@@ -57,6 +57,22 @@ void AddActor(Entity e, const char *name) {
 	numActors++;
 }
 
+/* RemoveActor removes the actor attached to e from the Actor system. */
+void RemoveActor(Entity e) {
+	struct entityToActor *c;
+
+	if (entitiesToActors == NULL)
+		return;
+
+	HASH_FIND_INT(entitiesToActors, &e, c);
+	if (c != NULL) {
+		struct Actor *sys = c->actor;
+		int sz = (actors + numActors) - sys;
+		memmove(sys, sys + 1, sz);
+		HASH_DEL(entitiesToActors, c);
+	}
+}
+
 /* InventoryAdd gives taker the thing attached to the entity e. */
 void InventoryAdd(Entity taker, Entity e) {
 	struct Actor *a;

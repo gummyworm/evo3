@@ -73,6 +73,22 @@ void AddMesh(Entity e, const char *filename) {
 	numMeshes++;
 }
 
+/* RemoveMesh removes the mesh attached to e from the Mesh system. */
+void RemoveMesh(Entity e) {
+	struct entityToMesh *c;
+
+	if (entitiesToMeshes == NULL)
+		return;
+
+	HASH_FIND_INT(entitiesToMeshes, &e, c);
+	if (c != NULL) {
+		struct Mesh *sys = c->mesh;
+		int sz = (meshes + numMeshes) - sys;
+		memmove(sys, sys + 1, sz);
+		HASH_DEL(entitiesToMeshes, c);
+	}
+}
+
 /* MeshLoad loads m with the mesh described by filename. */
 void MeshLoad(struct Mesh *m, const char *filename) {
 	unsigned i, j;
