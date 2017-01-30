@@ -319,8 +319,8 @@ static void draw(struct Console *console) {
 	mat4x4 mvp;
 
 	GuiProjection(&mvp);
-	Rect(mvp, CONSOLE_START_X, CONSOLE_START_Y, CONSOLE_WIDTH,
-	     CONSOLE_HEIGHT, CONSOLE_COLOR);
+	Rect(mvp, CONSOLE_BSTART_X, CONSOLE_BSTART_Y, CONSOLE_BWIDTH,
+	     CONSOLE_BHEIGHT, CONSOLE_COLOR);
 
 	y = CONSOLE_START_Y;
 	scroll = console->scroll;
@@ -348,6 +348,12 @@ static void draw(struct Console *console) {
 		Text(mvp, CONSOLE_START_X, y, CONSOLE_FONT_WIDTH, buff);
 		y += CONSOLE_FONT_HEIGHT;
 	}
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	TexRect(mvp, getTextureProgram(), CONSOLE_BSTART_X, CONSOLE_BSTART_Y,
+	        CONSOLE_BWIDTH, CONSOLE_BHEIGHT, 0, 0, 1, 1,
+	        console->overlayTex);
 }
 
 /* update updates and draws the console window. */
@@ -433,6 +439,7 @@ void AddConsole(Entity e) {
 	       sizeof(consoles[numConsoles].lines));
 	consoles[numConsoles].acceptInput = true;
 	consoles[numConsoles].addBuff[0] = '\0';
+	consoles[numConsoles].overlayTex = GetTexture("consoleoverlay.png");
 
 	HASH_ADD_INT(entitiesToConsoles, e, item);
 	numConsoles++;

@@ -95,3 +95,31 @@ const char *GetThingDescription(Entity e) {
 		return NULL;
 	return t->desc;
 }
+
+/* AddActionHandler adds a handler to respond to action. */
+void AddActionHandler(Entity e, const char *action,
+                      void (*handler)(struct Thing *, char *)) {
+	struct ActionHandler *h;
+	struct Thing *t;
+	if ((t = getThing(e)) == NULL)
+		return;
+
+	h = malloc(sizeof(struct ActionHandler));
+	h->action = action;
+	h->handler = handler;
+	HASH_ADD_STR(t->actions, action, h);
+}
+
+/* HandleAction delivers the given action to the thing attached to e and
+ * responds accordingly (if a handler for such action exists). */
+void HandleAction(Entity e, char *action) {
+	struct ActionHandler *h;
+	struct Thing *t;
+	char outBuff[256];
+	if ((t = getThing(e)) == NULL)
+		return;
+
+	HASH_FIND_STR(t->actions, action, h);
+	if (h != NULL)
+		h->handler(t, outBuff);
+}

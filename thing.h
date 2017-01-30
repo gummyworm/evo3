@@ -29,7 +29,7 @@ struct Thing {
  * is performed on a Thing. */
 struct ActionHandler {
 	const char *action;
-	void (*handle)(struct Thing *self, char *out);
+	void (*handler)(struct Thing *self, char *out);
 	UT_hash_handle hh;
 };
 
@@ -47,5 +47,8 @@ struct Thing *GetThings(int *num);
 
 const char *GetThingName(Entity e);
 const char *GetThingDescription(Entity e);
+
+void AddActionHandler(Entity, const char *, void (*)(struct Thing *, char *));
+void HandleAction(Entity, char *);
 
 #endif
