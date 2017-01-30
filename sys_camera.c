@@ -259,6 +259,7 @@ void RemoveCamera(Entity e) {
 		int sz = (cameras + numCameras) - sys;
 		memmove(sys, sys + 1, sz);
 		HASH_DEL(entitiesToCameras, c);
+		free(c);
 	}
 }
 
@@ -358,6 +359,7 @@ void RemoveRender(Entity e) {
 		int sz = (renders + numRenders) - sys;
 		memmove(sys, sys + 1, sz);
 		HASH_DEL(entitiesToRenders, c);
+		free(c);
 	}
 }
 

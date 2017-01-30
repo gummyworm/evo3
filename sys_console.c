@@ -466,6 +466,7 @@ void RemoveConsole(Entity e) {
 		int sz = (consoles + numConsoles) - sys;
 		memmove(sys, sys + 1, sz);
 		HASH_DEL(entitiesToConsoles, c);
+		free(c);
 	}
 }
 

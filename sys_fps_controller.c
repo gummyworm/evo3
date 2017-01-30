@@ -157,6 +157,7 @@ void RemoveFPSController(Entity e) {
 		int sz = (fpsControllers + numFPSControllers) - sys;
 		memmove(sys, sys + 1, sz);
 		HASH_DEL(entitiesToFPSControllers, c);
+		free(c);
 	}
 }
 

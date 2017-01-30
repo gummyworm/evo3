@@ -91,5 +91,6 @@ void RemoveLabel(Entity e) {
 		int sz = (labels + numLabels) - sys;
 		memmove(sys, sys + 1, sz);
 		HASH_DEL(entitiesToLabels, c);
+		free(c);
 	}
 }

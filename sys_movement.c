@@ -69,6 +69,7 @@ void RemoveMovement(Entity e) {
 		int sz = (movements + numMovements) - sys;
 		memmove(sys, sys + 1, sz);
 		HASH_DEL(entitiesToMovements, c);
+		free(c);
 	}
 }
 

@@ -77,6 +77,7 @@ void RemoveRoom(Entity e) {
 		int sz = (rooms + numRooms) - sys;
 		memmove(sys, sys + 1, sz);
 		HASH_DEL(entitiesToRooms, c);
+		free(c);
 	}
 }
 

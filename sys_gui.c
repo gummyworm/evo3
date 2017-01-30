@@ -83,6 +83,7 @@ void RemoveWidget(Entity e) {
 		int sz = (widgets + numWidgets) - sys;
 		memmove(sys, sys + 1, sz);
 		HASH_DEL(entitiesToWidgets, c);
+		free(c);
 	}
 }
 

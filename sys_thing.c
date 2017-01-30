@@ -78,6 +78,7 @@ void RemoveThing(Entity e) {
 		int sz = (things + numThings) - sys;
 		memmove(sys, sys + 1, sz);
 		HASH_DEL(entitiesToThings, c);
+		free(c);
 	}
 }
 

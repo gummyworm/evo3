@@ -86,6 +86,7 @@ void RemoveMesh(Entity e) {
 		int sz = (meshes + numMeshes) - sys;
 		memmove(sys, sys + 1, sz);
 		HASH_DEL(entitiesToMeshes, c);
+		free(c);
 	}
 }
 

@@ -48,6 +48,7 @@ struct ThingUpdate {
 void InitThingSystem();
 void UpdateThingSystem();
 void AddThing(Entity, const char *, const char *);
+void RemoveThing(Entity);
 Entity GetThing(const char *);
 struct Thing *GetThings(int *num);
 

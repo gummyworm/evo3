@@ -75,6 +75,7 @@ void RemoveTransform(Entity e) {
 		int sz = (transforms + numTransforms) - sys;
 		memmove(sys, sys + 1, sz);
 		HASH_DEL(entitiesToTransforms, c);
+		free(c);
 	}
 }
 

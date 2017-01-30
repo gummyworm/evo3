@@ -70,6 +70,7 @@ void RemoveActor(Entity e) {
 		int sz = (actors + numActors) - sys;
 		memmove(sys, sys + 1, sz);
 		HASH_DEL(entitiesToActors, c);
+		free(c);
 	}
 }
 
