@@ -58,7 +58,7 @@ static void test() {
 	AddTransform(E_APPLE, 0, 0, -7.0f);
 	AddRender(E_APPLE, "person.obj");
 	AddLabel(E_APPLE, "apple", 1.0f);
-	AddThing(E_APPLE, "APPLE", "It's a juicy red apple");
+	AddItem(E_APPLE, "APPLE", "It's a juicy red apple");
 }
 
 /* ClearUpdates resets all systems' updates. */

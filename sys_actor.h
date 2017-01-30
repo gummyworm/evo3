@@ -1,6 +1,8 @@
 #ifndef ACTOR_H
 #define ACTOR_H
 
+#include "base.h"
+
 #include "entity.h"
 #include <stdbool.h>
 

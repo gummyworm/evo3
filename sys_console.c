@@ -242,6 +242,12 @@ static void exec(struct Console *console, char *line) {
 
 	room = GetRoom(console->e);
 
+	if (argc > 1 &&
+	    HandleAction(GetThing(argv[1]), console->e, argv[0], l)) {
+		addLine(console, l);
+		return;
+	}
+
 	if (strncmp(argv[0], CMD_LS, sizeof(CMD_LS)) == 0) {
 		inventory();
 	} else if (strncmp(argv[0], CMD_DROP, sizeof(CMD_DROP)) == 0) {
@@ -348,6 +354,8 @@ static void draw(struct Console *console) {
 		Text(mvp, CONSOLE_START_X, y, CONSOLE_FONT_WIDTH, buff);
 		y += CONSOLE_FONT_HEIGHT;
 	}
+
+	return; // TODO:
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

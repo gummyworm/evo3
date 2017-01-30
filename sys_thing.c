@@ -1,7 +1,13 @@
+#include <stdio.h>
+#include <string.h>
+
 #include "third-party/include/uthash.h"
 
 #include "debug.h"
+#include "sys_actor.h"
 #include "thing.h"
+
+const char *ACTION_TAKE = "TAKE";
 
 struct entityToThing {
 	Entity e;
@@ -97,8 +103,7 @@ const char *GetThingDescription(Entity e) {
 }
 
 /* AddActionHandler adds a handler to respond to action. */
-void AddActionHandler(Entity e, const char *action,
-                      void (*handler)(struct Thing *, char *)) {
+void AddActionHandler(Entity e, const char *action, Action handler) {
 	struct ActionHandler *h;
 	struct Thing *t;
 	if ((t = getThing(e)) == NULL)
@@ -112,14 +117,33 @@ void AddActionHandler(Entity e, const char *action,
 
 /* HandleAction delivers the given action to the thing attached to e and
  * responds accordingly (if a handler for such action exists). */
-void HandleAction(Entity e, char *action) {
+bool HandleAction(Entity e, Entity actor, char *action, char *outBuff) {
 	struct ActionHandler *h;
 	struct Thing *t;
-	char outBuff[256];
 	if ((t = getThing(e)) == NULL)
-		return;
+		return false;
 
 	HASH_FIND_STR(t->actions, action, h);
 	if (h != NULL)
-		h->handler(t, outBuff);
+		return h->handler(e, actor, outBuff);
+	return false;
+}
+
+/* handleTake provides default behavior for the TAKE action. */
+static bool handleTake(Entity self, Entity actor, char *out) {
+	struct Thing *t;
+
+	if ((t = getThing(self)) == NULL)
+		return false;
+
+	sprintf(out, "You take the %s", t->name);
+	InventoryAdd(actor, self);
+	t->owner = actor;
+	return true;
+}
+
+/* AddItem creates a new Thing that responds to being TAKEn. */
+void AddItem(Entity e, const char *name, const char *desc) {
+	AddThing(e, name, desc);
+	AddActionHandler(e, ACTION_TAKE, handleTake);
 }

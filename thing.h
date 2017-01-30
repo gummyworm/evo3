@@ -6,6 +6,8 @@
 #include "entity.h"
 #include <stdbool.h>
 
+extern const char *ACTION_TAKE;
+
 enum { MAX_THINGS = 8192,
        MAX_THINGS_PER_ROOM = 128,
 };
@@ -25,11 +27,15 @@ struct Thing {
 	struct ActionHandler *actions;
 };
 
+/* Action returns true if self successfully handles the act associated with
+ * this handler. out is written with any messages to be conveyed to the user. */
+typedef bool (*Action)(Entity self, Entity actor, char *out);
+
 /* ActionHandler defines callbacks to be executed when a given action
  * is performed on a Thing. */
 struct ActionHandler {
 	const char *action;
-	void (*handler)(struct Thing *self, char *out);
+	Action handler;
 	UT_hash_handle hh;
 };
 
@@ -48,7 +54,9 @@ struct Thing *GetThings(int *num);
 const char *GetThingName(Entity e);
 const char *GetThingDescription(Entity e);
 
-void AddActionHandler(Entity, const char *, void (*)(struct Thing *, char *));
-void HandleAction(Entity, char *);
+void AddActionHandler(Entity, const char *, Action handler);
+bool HandleAction(Entity, Entity, char *, char *);
+
+void AddItem(Entity, const char *, const char *);
 
 #endif
