@@ -206,7 +206,19 @@ static void look(struct Console *console, Entity room, char *target) {
 static void take(char *name) {}
 
 /* inventory displays the contents of the inventory in console. */
-static void inventory() {}
+static void inventory(struct Console *console) {
+	int i;
+	Entity *inv;
+
+	addLineOverTime(console, "You have the following:",
+	                CONSOLE_PRINT_INTERVAL);
+	for (i = 0; i < GetInventory(console->e, &inv); ++i) {
+		const char *name = GetThingName(inv[i]);
+		if (name != NULL)
+			addLineOverTime(console, (char *)name,
+			                CONSOLE_PRINT_INTERVAL);
+	}
+}
 
 /* move moves the player to the exit matching dir. */
 static void move(char *dir) {
@@ -249,7 +261,7 @@ static void exec(struct Console *console, char *line) {
 	}
 
 	if (strncmp(argv[0], CMD_LS, sizeof(CMD_LS)) == 0) {
-		inventory();
+		inventory(console);
 	} else if (strncmp(argv[0], CMD_DROP, sizeof(CMD_DROP)) == 0) {
 		if (argc != 2)
 			;

@@ -83,3 +83,32 @@ void InventoryAdd(Entity taker, Entity e) {
 
 	a->inventory[a->numItems++] = e;
 }
+
+/* InventoryRemove removes e from actor's inventory. */
+void InventoryRemove(Entity actor, Entity e) {
+	int i;
+	struct Actor *a;
+
+	if ((a = getActor(actor)) == NULL)
+		return;
+	for (i = 0; i < a->numItems; ++i) {
+		if (a->inventory[i] == e) {
+			memmove(a->inventory + i, a->inventory + i + 1,
+			        a->numItems - i);
+			a->numItems--;
+			break;
+		}
+	}
+}
+
+/* GetInventory returns the number of items in the invetory attached to e and
+ * sets inv to the contents.*/
+int GetInventory(Entity e, Entity **inv) {
+	struct Actor *a;
+
+	if ((a = getActor(e)) == NULL)
+		return 0;
+
+	*inv = a->inventory;
+	return a->numItems;
+}

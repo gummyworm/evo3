@@ -30,6 +30,8 @@ void InitActorSystem();
 void UpdateActorSystem();
 void AddActor(Entity, const char *);
 void RemoveActor(Entity);
+void InventoryRemove(Entity, Entity);
 void InventoryAdd(Entity, Entity);
+int GetInventory(Entity, Entity **);
 
 #endif

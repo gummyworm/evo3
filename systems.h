@@ -5,6 +5,7 @@
 
 #include "input.h"
 
+#include "sys_actor.h"
 #include "sys_camera.h"
 #include "sys_commander.h"
 #include "sys_console.h"
