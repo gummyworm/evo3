@@ -102,6 +102,9 @@ void UpdateCameraSystem() {
 		GLuint program;
 
 		c = cameras + i;
+		if (!Enabled(c->e))
+			continue;
+
 		if (!GetPos(c->e, &pos.x, &pos.y, &pos.z))
 			return;
 		if (!GetViewDir(c->e, &rot.x, &rot.y, &rot.z))

@@ -368,6 +368,8 @@ static void draw(struct Console *console) {
 static void update(struct Console *console) {
 	if (console == NULL)
 		return;
+	if (!Enabled(console->e))
+		return;
 
 	draw(console);
 

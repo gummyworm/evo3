@@ -98,6 +98,9 @@ void UpdateWidgetSystem() {
 		struct Widget *w;
 		w = widgets + i;
 
+		if (!Enabled(w->e))
+			continue;
+
 		switch (w->type) {
 		case TEXTBOX:
 			drawTextbox(w);

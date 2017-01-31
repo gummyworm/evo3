@@ -156,6 +156,7 @@ static bool handleTake(Entity self, Entity actor, char *out) {
 	sprintf(out, "You take the %s", t->name);
 	InventoryAdd(actor, self);
 	t->owner = actor;
+	DisableEntity(self);
 	return true;
 }
 

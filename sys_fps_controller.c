@@ -36,6 +36,8 @@ static void key(int key, int scancode, int action, int mods) {
 		bool rotate, translate;
 
 		f = fpsControllers + i;
+		if (!Enabled(f->e))
+			continue;
 
 		angle = f->angle;
 		cosa = cos(angle);

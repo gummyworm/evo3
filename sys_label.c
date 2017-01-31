@@ -45,6 +45,10 @@ void UpdateLabelSystem() {
 	int sx, sy;
 	for (i = 0; i < numLabels; ++i) {
 		float x, y, z;
+
+		if (!Enabled(labels[i].e))
+			continue;
+
 		if (!GetPos(labels[i].e, &x, &y, &z))
 			continue;
 
