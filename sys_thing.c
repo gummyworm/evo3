@@ -11,6 +11,7 @@ const char *ACTION_TAKE = "TAKE";
 const char *ACTION_DROP = "DROP";
 const char *ACTION_LOOK = "LOOK";
 const char *ACTION_OPEN = "OPEN";
+const char *ACTION_CLOSE = "CLOSE";
 const char *ACTION_EMPTY = "EMPTY";
 
 struct entityToThing {
@@ -203,6 +204,32 @@ static bool handleOpenBox(Entity self, Entity prop, Entity actor, char *out) {
 	return true;
 }
 
+/* handleCloseBox provides default behavior for the CLOSE action for containers.
+ */
+static bool handleCloseBox(Entity self, Entity prop, Entity actor, char *out) {
+	UNUSED(actor);
+	UNUSED(prop);
+	struct Thing *t;
+	int *p;
+
+	if ((t = getThing(self)) == NULL)
+		return false;
+
+	if (!t->properties.container.open) {
+		sprintf(out, "The %s is already closed", t->name);
+		return true;
+	}
+
+	for (p = (int *)utarray_front(t->contents); p != NULL;
+	     p = (int *)utarray_next(t->contents, p)) {
+		DisableEntity(*p);
+	}
+
+	t->properties.container.open = false;
+	sprintf(out, "The %s is now closed", t->name);
+	return true;
+}
+
 /* handleEmptyBox provides default behavior for the EMPTY action for containers.
  */
 static bool handleEmptyBox(Entity self, Entity prop, Entity actor, char *out) {
@@ -224,8 +251,12 @@ static bool handleEmptyBox(Entity self, Entity prop, Entity actor, char *out) {
 
 	for (p = (int *)utarray_front(t->contents); p != NULL;
 	     p = (int *)utarray_next(t->contents, p)) {
-		printf("%s\n", GetThingName(*p));
+		struct Thing *c;
 		EnableEntity(*p);
+		c = getThing(*p);
+		if (c != NULL)
+			c->owner = -1;
+		utarray_erase(t->contents, utarray_eltidx(t->contents, p), 1);
 	}
 	return true;
 }
@@ -275,6 +306,7 @@ void AddContainer(Entity e, const char *name, const char *desc) {
 		return;
 	AddActionHandler(e, ACTION_LOOK, handleLookBox);
 	AddActionHandler(e, ACTION_OPEN, handleOpenBox);
+	AddActionHandler(e, ACTION_CLOSE, handleCloseBox);
 	AddActionHandler(e, ACTION_EMPTY, handleEmptyBox);
 
 	utarray_new(t->contents, &ut_int_icd);

@@ -108,15 +108,13 @@ void drawRender(mat4x4 v, mat4x4 p, int i) {
 void UpdateCameraSystem() {
 	struct Camera *c;
 	int i, j;
-
+	mat4x4 v;
 	struct {
 		float x, y, z;
 	} pos;
 	struct {
 		float x, y, z;
 	} rot;
-
-	mat4x4 v;
 
 	for (i = 0; i < numCameras; ++i) {
 		GLuint program;
