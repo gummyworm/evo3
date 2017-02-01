@@ -9,6 +9,9 @@
 
 const char *ACTION_TAKE = "TAKE";
 const char *ACTION_DROP = "DROP";
+const char *ACTION_LOOK = "LOOK";
+const char *ACTION_OPEN = "OPEN";
+const char *ACTION_EMPTY = "EMPTY";
 
 struct entityToThing {
 	Entity e;
@@ -180,6 +183,83 @@ static bool handleTake(Entity self, Entity prop, Entity actor, char *out) {
 	return true;
 }
 
+/* handleOpenBox provides default behavior for the OPEN action for containers.
+ */
+static bool handleOpenBox(Entity self, Entity prop, Entity actor, char *out) {
+	UNUSED(actor);
+	UNUSED(prop);
+	struct Thing *t;
+
+	if ((t = getThing(self)) == NULL)
+		return false;
+
+	if (t->properties.container.open) {
+		sprintf(out, "The %s is already open", t->name);
+		return true;
+	}
+
+	t->properties.container.open = true;
+	sprintf(out, "The %s is now open", t->name);
+	return true;
+}
+
+/* handleEmptyBox provides default behavior for the EMPTY action for containers.
+ */
+static bool handleEmptyBox(Entity self, Entity prop, Entity actor, char *out) {
+	UNUSED(actor);
+	UNUSED(prop);
+	struct Thing *t;
+	int *p;
+
+	if ((t = getThing(self)) == NULL)
+		return false;
+
+	if (!t->properties.container.open) {
+		sprintf(out, "It is closed");
+		return true;
+	}
+
+	t->properties.container.open = true;
+	sprintf(out, "You empty the %s", t->name);
+
+	for (p = (int *)utarray_front(t->contents); p != NULL;
+	     p = (int *)utarray_next(t->contents, p)) {
+		printf("%s\n", GetThingName(*p));
+		EnableEntity(*p);
+	}
+	return true;
+}
+
+/* handleLookBox provides default behavior for the LOOK action for containers.
+ */
+static bool handleLookBox(Entity self, Entity prop, Entity actor, char *out) {
+	UNUSED(actor);
+	UNUSED(prop);
+	struct Thing *t;
+	int *p;
+
+	if ((t = getThing(self)) == NULL)
+		return false;
+
+	if (!t->properties.container.open) {
+		sprintf(out, "%s\nIt is closed", t->desc);
+		return true;
+	}
+
+	t->properties.container.open = true;
+	sprintf(out, "The %s contains the following:\n", t->name);
+
+	for (p = (int *)utarray_front(t->contents); p != NULL;
+	     p = (int *)utarray_next(t->contents, p)) {
+		const char *name = GetThingName(*p);
+		if (name != NULL) {
+			out += strlen(out);
+			sprintf(out, "%s\n", name);
+		}
+	}
+	return true;
+}
+
 /* AddItem creates a new Thing that responds to being TAKEn. */
 void AddItem(Entity e, const char *name, const char *desc) {
 	AddThing(e, name, desc);
@@ -190,20 +270,50 @@ void AddItem(Entity e, const char *name, const char *desc) {
 /* AddContainer creates a new Thing that may hold other things. */
 void AddContainer(Entity e, const char *name, const char *desc) {
 	struct Thing *t;
-	AddThing(e, name, desc);
+	AddItem(e, name, desc);
 	if ((t = getThing(e)) == NULL)
 		return;
+	AddActionHandler(e, ACTION_LOOK, handleLookBox);
+	AddActionHandler(e, ACTION_OPEN, handleOpenBox);
+	AddActionHandler(e, ACTION_EMPTY, handleEmptyBox);
 
 	utarray_new(t->contents, &ut_int_icd);
 }
 
 /* AddToContainer adds item to e's contents. */
 void AddToContainer(Entity e, Entity item) {
-	struct Thing *t;
+	struct Thing *box, *t;
 
 	if ((t = getThing(e)) == NULL)
 		return;
+	if ((box = getThing(e)) == NULL)
+		return;
 
-	if (t->contents != NULL)
-		utarray_push_back(t->contents, &item);
+	if (box->contents != NULL)
+		utarray_push_back(box->contents, &item);
+	t->owner = e;
+	DisableEntity(item);
+}
+
+/* GetFromContainer returns true if item was successfully removed from e. */
+bool GetFromContainer(Entity e, Entity item) {
+	struct Thing *t;
+	int *p;
+
+	if ((t = getThing(e)) == NULL)
+		return false;
+
+	if (t->contents == NULL)
+		return false;
+
+	for (p = (int *)utarray_front(t->contents); p != NULL;
+	     p = (int *)utarray_next(t->contents, p)) {
+		if (*p == item) {
+			utarray_erase(t->contents,
+			              utarray_eltidx(t->contents, p), 1);
+			return true;
+		}
+	}
+
+	return false;
 }

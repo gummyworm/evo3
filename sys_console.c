@@ -264,7 +264,7 @@ static void exec(struct Console *console, char *line) {
 	}
 
 	if (argc > 1 && HandleAction(target, prop, console->e, argv[0], l)) {
-		addLine(console, l);
+		addLineOverTime(console, l, CONSOLE_PRINT_INTERVAL);
 		return;
 	}
 
@@ -376,8 +376,6 @@ static void draw(struct Console *console) {
 		Text(mvp, CONSOLE_START_X, y, CONSOLE_FONT_WIDTH, buff);
 		y += CONSOLE_FONT_HEIGHT;
 	}
-
-	return; // TODO:
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

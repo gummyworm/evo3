@@ -58,7 +58,13 @@ static void test() {
 	AddTransform(E_APPLE, 0, 0, -7.0f);
 	AddRender(E_APPLE, "person.obj");
 	AddLabel(E_APPLE, "apple", 1.0f);
-	AddItem(E_APPLE, "APPLE", "It's a juicy red apple");
+	AddContainer(E_APPLE, "APPLE", "It's a juicy red apple");
+
+	AddTransform(E_ORANGE, 1, 0, -6.0f);
+	AddThing(E_ORANGE, "ORANGE", "It's a bright citrus fruit");
+	AddRender(E_ORANGE, "person.obj");
+	AddLabel(E_ORANGE, "orange", 1.0f);
+	AddToContainer(E_APPLE, E_ORANGE);
 }
 
 /* ClearUpdates resets all systems' updates. */

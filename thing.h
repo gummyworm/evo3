@@ -26,6 +26,15 @@ struct Thing {
 	bool takeable;
 
 	UT_array *contents;
+	union {
+		struct {
+			bool open;
+		} container;
+		struct {
+			bool open;
+		} door;
+	} properties;
+
 	struct ActionHandler *actions;
 };
 
@@ -63,5 +72,6 @@ bool HandleAction(Entity, Entity, Entity, char *, char *);
 void AddItem(Entity, const char *, const char *);
 void AddContainer(Entity, const char *, const char *);
 void AddToContainer(Entity, Entity);
+bool GetFromContainer(Entity e, Entity item);
 
 #endif

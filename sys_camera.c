@@ -5,6 +5,7 @@
 #include "sys_camera.h"
 #include "sys_mesh.h"
 #include "sys_transform.h"
+#include "thing.h"
 #include "third-party/include/linmath.h"
 #include "third-party/include/uthash.h"
 #include <stdio.h>
@@ -83,6 +84,26 @@ static void doPass(struct Camera *c, int pass) {
 	        c->passes[pass].color);
 }
 
+/* drawRender renders the given render entity using the given view/projection
+ * matrices. */
+void drawRender(mat4x4 v, mat4x4 p, int i) {
+	mat4x4 m, mv, mvp;
+	float x, y, z;
+	if (!Enabled(renders[i].e))
+		return;
+	if (!GetPos(renders[i].e, &x, &y, &z))
+		return;
+
+	mat4x4_identity(m);
+	mat4x4_translate(m, x, y, z);
+	mat4x4_mul(mv, v, m);
+	mat4x4_mul(mvp, p, mv);
+
+	if (GetMesh(renders[i].e) != NULL) {
+		MeshDraw(renders[i].e, mvp);
+	}
+}
+
 /* UpdateCameraSystem updates all cameras that have been created. */
 void UpdateCameraSystem() {
 	struct Camera *c;
@@ -95,8 +116,7 @@ void UpdateCameraSystem() {
 		float x, y, z;
 	} rot;
 
-	mat4x4 m, v, mv, mvp;
-	mat4x4 translated, xrotated, yrotated;
+	mat4x4 v;
 
 	for (i = 0; i < numCameras; ++i) {
 		GLuint program;
@@ -104,7 +124,6 @@ void UpdateCameraSystem() {
 		c = cameras + i;
 		if (!Enabled(c->e))
 			continue;
-
 		if (!GetPos(c->e, &pos.x, &pos.y, &pos.z))
 			return;
 		if (!GetViewDir(c->e, &rot.x, &rot.y, &rot.z))
@@ -136,21 +155,11 @@ void UpdateCameraSystem() {
 			up[0] = 0;
 			up[1] = 1;
 			up[2] = 0;
-
 			mat4x4_look_at(v, eye, center, up);
 		}
 
-		for (j = 0; j < numRenders; ++j) {
-			if (!GetPos(renders[i].e, &pos.x, &pos.y, &pos.z))
-				continue;
-			mat4x4_translate(m, pos.x, pos.y, pos.z);
-			mat4x4_mul(mv, v, m);
-			mat4x4_mul(mvp, cameras[i].projection, mv);
-
-			if (GetMesh(renders[i].e) != NULL) {
-				MeshDraw(renders[i].e, mvp);
-			}
-		}
+		for (j = 0; j < numRenders; ++j)
+			drawRender(v, cameras[i].projection, j);
 
 		for (j = 0; j < c->numPasses; ++j) {
 			if (j < (c->numPasses - 1)) {
