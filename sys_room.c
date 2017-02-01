@@ -1,4 +1,5 @@
 #include "sys_room.h"
+#include "entities.h"
 #include "sys_transform.h"
 #include "thing.h"
 #include "third-party/include/uthash.h"
@@ -8,6 +9,8 @@ struct entityToRoom {
 	struct Room *room;
 	UT_hash_handle hh;
 };
+
+extern int Berry(int e, float x, float y, float z);
 
 static struct entityToRoom *entitiesToRooms;
 static struct Room rooms[MAX_ROOMS];
@@ -147,4 +150,28 @@ int ThingsInRoom(Entity e, Entity *found) {
 			found[count++] = things[i].e;
 	}
 	return count;
+}
+
+/* GenerateRoom creates a new room and attaches it to e.  It then adds a number
+ * of additional entities (influenced by the given room type). */
+void GenerateRoom(Entity e, enum RoomType type) {
+	int i;
+
+	AddRoom(e, "GENERATED ROOM", "This test room was generated", -50, -50,
+	        -50, 100, 100, 100);
+
+	switch (type) {
+	case FLOOR:
+		break;
+	case CANOPY:
+		break;
+	}
+
+	for (i = 0; i < 90; ++i) {
+		float x = rand() % 100 - 50;
+		float y = 0;
+		float z = rand() % 100 - 50;
+
+		Berry(E_ROOM + i, x, y, z);
+	}
 }

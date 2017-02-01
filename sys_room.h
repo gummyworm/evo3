@@ -8,6 +8,11 @@
 enum { MAX_ROOMS = 8192,
 };
 
+enum RoomType {
+	FLOOR,
+	CANOPY,
+};
+
 /* Room defines a logical region of the world. */
 struct Room {
 	Entity e;
@@ -38,5 +43,6 @@ bool RoomContainsEntity(Entity, Entity);
 const char *GetRoomDescription(Entity);
 
 int ThingsInRoom(Entity, Entity *);
+void GenerateRoom(Entity, enum RoomType);
 
 #endif

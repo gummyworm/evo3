@@ -16,6 +16,8 @@ static void onError(int error, const char *description) {
 
 /* init initializes the various systems used in the game. */
 static void init(GLFWwindow *win) {
+	srand(time(NULL));
+
 	DrawInit();
 	InitInput(win);
 
@@ -52,7 +54,8 @@ static void update() {
 extern void Player(int);
 extern void TestRoom(int);
 static void test() {
-	TestRoom(E_TEST_ROOM);
+	// TestRoom(E_TEST_ROOM);
+	GenerateRoom(E_TEST_ROOM, CANOPY);
 	Player(E_PLAYER);
 
 	AddTransform(E_APPLE, 0, 0, -7.0f);
