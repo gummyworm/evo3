@@ -1,6 +1,7 @@
 #ifndef THING_H
 #define THING_H
 
+#include "third-party/include/utarray.h"
 #include "third-party/include/uthash.h"
 
 #include "entity.h"
@@ -24,12 +25,13 @@ struct Thing {
 
 	bool takeable;
 
+	UT_array *contents;
 	struct ActionHandler *actions;
 };
 
 /* Action returns true if self successfully handles the act associated with
  * this handler. out is written with any messages to be conveyed to the user. */
-typedef bool (*Action)(Entity self, Entity actor, char *out);
+typedef bool (*Action)(Entity self, Entity prop, Entity actor, char *out);
 
 /* ActionHandler defines callbacks to be executed when a given action
  * is performed on a Thing. */
@@ -56,8 +58,10 @@ const char *GetThingName(Entity e);
 const char *GetThingDescription(Entity e);
 
 void AddActionHandler(Entity, const char *, Action handler);
-bool HandleAction(Entity, Entity, char *, char *);
+bool HandleAction(Entity, Entity, Entity, char *, char *);
 
 void AddItem(Entity, const char *, const char *);
+void AddContainer(Entity, const char *, const char *);
+void AddToContainer(Entity, Entity);
 
 #endif

@@ -246,6 +246,7 @@ static void exec(struct Console *console, char *line) {
 	char *argv[256];
 	char l[256];
 	Entity room;
+	Entity target, prop;
 
 	strncpy(l, line, sizeof(l));
 	argc = getargs(l, argv);
@@ -254,11 +255,20 @@ static void exec(struct Console *console, char *line) {
 
 	room = GetRoom(console->e);
 
-	if (argc > 1 &&
-	    HandleAction(GetThing(argv[1]), console->e, argv[0], l)) {
+	if (argc > 2) {
+		target = GetThing(argv[2]);
+		prop = GetThing(argv[1]);
+	} else {
+		target = GetThing(argv[1]);
+		prop = -1;
+	}
+
+	if (argc > 1 && HandleAction(target, prop, console->e, argv[0], l)) {
 		addLine(console, l);
 		return;
 	}
+
+	addLine(console, l);
 
 	if (strncmp(argv[0], CMD_LS, sizeof(CMD_LS)) == 0) {
 		inventory(console);
@@ -467,7 +477,8 @@ void AddConsole(Entity e) {
 	numConsoles++;
 }
 
-/* RemoveConsole removes the console attached to e from the Console system. */
+/* RemoveConsole removes the console attached to e from the Console
+ * system. */
 void RemoveConsole(Entity e) {
 	struct entityToConsole *c;
 

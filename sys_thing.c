@@ -135,7 +135,8 @@ void AddActionHandler(Entity e, const char *action, Action handler) {
 
 /* HandleAction delivers the given action to the thing attached to e and
  * responds accordingly (if a handler for such action exists). */
-bool HandleAction(Entity e, Entity actor, char *action, char *outBuff) {
+bool HandleAction(Entity e, Entity prop, Entity actor, char *action,
+                  char *outBuff) {
 	struct ActionHandler *h;
 	struct Thing *t;
 	if ((t = getThing(e)) == NULL)
@@ -143,12 +144,13 @@ bool HandleAction(Entity e, Entity actor, char *action, char *outBuff) {
 
 	HASH_FIND_STR(t->actions, action, h);
 	if (h != NULL)
-		return h->handler(e, actor, outBuff);
+		return h->handler(e, prop, actor, outBuff);
 	return false;
 }
 
 /* handleDrop provides default behavior for the DROP action. */
-static bool handleDrop(Entity self, Entity actor, char *out) {
+static bool handleDrop(Entity self, Entity prop, Entity actor, char *out) {
+	UNUSED(prop);
 	struct Thing *t;
 
 	if ((t = getThing(self)) == NULL)
@@ -164,7 +166,8 @@ static bool handleDrop(Entity self, Entity actor, char *out) {
 }
 
 /* handleTake provides default behavior for the TAKE action. */
-static bool handleTake(Entity self, Entity actor, char *out) {
+static bool handleTake(Entity self, Entity prop, Entity actor, char *out) {
+	UNUSED(prop);
 	struct Thing *t;
 
 	if ((t = getThing(self)) == NULL)
@@ -182,4 +185,25 @@ void AddItem(Entity e, const char *name, const char *desc) {
 	AddThing(e, name, desc);
 	AddActionHandler(e, ACTION_TAKE, handleTake);
 	AddActionHandler(e, ACTION_DROP, handleDrop);
+}
+
+/* AddContainer creates a new Thing that may hold other things. */
+void AddContainer(Entity e, const char *name, const char *desc) {
+	struct Thing *t;
+	AddThing(e, name, desc);
+	if ((t = getThing(e)) == NULL)
+		return;
+
+	utarray_new(t->contents, &ut_int_icd);
+}
+
+/* AddToContainer adds item to e's contents. */
+void AddToContainer(Entity e, Entity item) {
+	struct Thing *t;
+
+	if ((t = getThing(e)) == NULL)
+		return;
+
+	if (t->contents != NULL)
+		utarray_push_back(t->contents, &item);
 }
