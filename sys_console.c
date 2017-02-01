@@ -366,16 +366,18 @@ static void draw(struct Console *console) {
 
 		memcpy(buff, console->text + offset, len);
 
-		if (console->row == i && console->blink) {
+		if (console->row == i && console->blink)
 			buff[len] = CONSOLE_CURSOR;
-		} else {
+		else
 			buff[len] = '\0';
-		}
+
 		buff[len + 1] = '\0';
 
 		Text(mvp, CONSOLE_START_X, y, CONSOLE_FONT_WIDTH, buff);
 		y += CONSOLE_FONT_HEIGHT;
 	}
+
+	return;
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

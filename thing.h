@@ -8,6 +8,11 @@
 #include <stdbool.h>
 
 extern const char *ACTION_TAKE;
+extern const char *ACTION_DROP;
+extern const char *ACTION_LOOK;
+extern const char *ACTION_OPEN;
+extern const char *ACTION_CLOSE;
+extern const char *ACTION_EMPTY;
 
 enum { MAX_THINGS = 8192,
        MAX_THINGS_PER_ROOM = 128,
@@ -26,10 +31,11 @@ struct Thing {
 	bool takeable;
 
 	UT_array *contents;
+	enum { THING_BOX } type;
 	union {
 		struct {
 			bool open;
-		} container;
+		} box;
 		struct {
 			bool open;
 		} door;
