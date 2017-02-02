@@ -155,10 +155,11 @@ int ThingsInRoom(Entity e, Entity *found) {
 /* GenerateRoom creates a new room and attaches it to e.  It then adds a number
  * of additional entities (influenced by the given room type). */
 void GenerateRoom(Entity e, enum RoomType type) {
+	const int size = 10;
 	int i;
 
-	AddRoom(e, "GENERATED ROOM", "This test room was generated", -50, -50,
-	        -50, 100, 100, 100);
+	AddRoom(e, "GENERATED ROOM", "This test room was generated", -size,
+	        -size, -size, size * 2, size * 2, size * 2);
 
 	switch (type) {
 	case FLOOR:
@@ -167,10 +168,10 @@ void GenerateRoom(Entity e, enum RoomType type) {
 		break;
 	}
 
-	for (i = 0; i < 90; ++i) {
-		float x = rand() % 100 - 50;
+	for (i = 0; i < 10; ++i) {
+		float x = rand() % (size * 2) - size;
 		float y = 0;
-		float z = rand() % 100 - 50;
+		float z = rand() % (size * 2) - size;
 
 		Berry(E_ROOM + i, x, y, z);
 	}

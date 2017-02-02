@@ -436,6 +436,45 @@ void WorldToScreen(Entity e, float x, float y, float z, int *sx, int *sy) {
 	}
 }
 
+/* Raycast casts a ray from the camera at the given screen coordinates. */
+void Raycast(Entity e, int x, int y, vec3 start, vec3 stop) {
+	struct Camera *c;
+	int width, height;
+	mat4x4 v, pv, invPV;
+
+	if ((c = getCamera(e)) == NULL)
+		return;
+
+	glfwGetFramebufferSize(win, &width, &height);
+	mat4x4_mul(pv, c->projection, v);
+	mat4x4_invert(invPV, pv);
+
+	{
+		vec4 res;
+		float z = 0.f;
+		vec4 in = {(float)x / width * 2.f - 1.f,
+		           (float)y / height * 2.f - 1.f, 2.f * z - 1.f, 1.f};
+		mat4x4_mul_vec4(res, invPV, in);
+		if (res[3] == 0.f)
+			return;
+		start[0] = res[0];
+		start[1] = res[1];
+		start[2] = res[2];
+	}
+	{
+		vec4 res;
+		float z = 1.f;
+		vec4 in = {(float)x / width * 2.f - 1.f,
+		           (float)y / height * 2.f - 1.f, 2.f * z - 1.f, 1.f};
+		mat4x4_mul_vec4(res, invPV, in);
+		if (res[3] == 0.f)
+			return;
+		stop[0] = res[0];
+		stop[1] = res[1];
+		stop[2] = res[2];
+	}
+}
+
 /* GetProjection sets projection to e's camera's projection matrix. */
 void GetProjection(Entity e, mat4x4 *projection) {
 	struct Camera *c;

@@ -42,24 +42,32 @@ void InitLabelSystem() {}
 /* UpdateLabelSystem updates all labels that have been created. */
 void UpdateLabelSystem() {
 	int i;
-	int sx, sy;
 	for (i = 0; i < numLabels; ++i) {
-		float x, y, z;
+		int sx, sy;
+		int size;
+		vec3 lpos;
+		vec3 ppos;
+		vec3 dist;
 
 		if (!Enabled(labels[i].e))
 			continue;
 
-		if (!GetPos(labels[i].e, &x, &y, &z))
+		if (!GetPos(labels[i].e, &lpos[0], &lpos[1], &lpos[2]))
 			continue;
 
-		y += labels[i].offset;
+		lpos[1] += labels[i].offset;
 
-		WorldToScreen(E_PLAYER, x, y, z, &sx, &sy);
+		WorldToScreen(E_PLAYER, lpos[0], lpos[1], lpos[2], &sx, &sy);
+
+		GetPos(E_PLAYER, &ppos[0], &ppos[1], &ppos[2]);
+		vec3_sub(dist, lpos, ppos);
+		size = 10.f / vec3_len(dist) * LABEL_FONT_SIZE;
+
 		if (sx >= 0) {
 			mat4x4 proj;
 			ScreenToGui(sx, sy, &sx, &sy);
 			GuiProjection(&proj);
-			Text(proj, sx, sy, LABEL_FONT_SIZE, labels[i].text);
+			Text(proj, sx, sy, size, labels[i].text);
 		}
 	}
 }

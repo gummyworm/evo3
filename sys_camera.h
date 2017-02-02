@@ -81,5 +81,6 @@ void SetViewDir(Entity, float, float, float);
 
 void WorldToScreen(Entity, float, float, float, int *, int *);
 void GetProjection(Entity, mat4x4 *);
+void Raycast(Entity, int, int, vec3, vec3);
 
 #endif
