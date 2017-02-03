@@ -38,8 +38,6 @@ static struct entityToMesh *entitiesToMeshes;
 static struct Mesh meshes[MAX_MESHES];
 static int numMeshes;
 
-static void MeshLoad(struct Mesh *, const char *);
-
 /* GetMesh returns the mesh attached to entity e (if there is one). */
 struct Mesh *GetMesh(Entity e) {
 	struct entityToMesh *m;
@@ -73,6 +71,27 @@ void AddMesh(Entity e, const char *filename) {
 	numMeshes++;
 }
 
+/* AddColorMesh adds a mesh component to the entity e and colors it (r,g,b,a).
+ */
+void AddColorMesh(Entity e, const char *filename, float r, float g, float b,
+                  float a) {
+	struct entityToMesh *item;
+
+	if (GetMesh(e) != NULL)
+		return;
+
+	item = malloc(sizeof(struct entityToMesh));
+	item->mesh = meshes + numMeshes;
+	item->e = e;
+	HASH_ADD_INT(entitiesToMeshes, e, item);
+
+	meshes[numMeshes].e = e;
+
+	MeshLoadAndColor(meshes + numMeshes, filename, r, g, b, a);
+	dinfof("loaded mesh %s", filename);
+	numMeshes++;
+}
+
 /* RemoveMesh removes the mesh attached to e from the Mesh system. */
 void RemoveMesh(Entity e) {
 	struct entityToMesh *c;
@@ -92,6 +111,14 @@ void RemoveMesh(Entity e) {
 
 /* MeshLoad loads m with the mesh described by filename. */
 void MeshLoad(struct Mesh *m, const char *filename) {
+	MeshLoadAndColor(m, filename, 0.f, 0.f, 0.f, 1.f);
+}
+
+/* MeshLoad loads m with the mesh described by filename and colors it
+ * (r,g,b,a). */
+void MeshLoadAndColor(struct Mesh *m, const char *filename, float r, float g,
+                      float b, float a) {
+
 	unsigned i, j;
 	struct aiMesh *iMesh;
 	const struct aiScene *scene = aiImportFile(
@@ -166,10 +193,10 @@ void MeshLoad(struct Mesh *m, const char *filename) {
 				*c++ = iMesh->mColors[i][0].b;
 				*c++ = iMesh->mColors[i][0].a;
 			} else {
-				*c++ = 0.8f;
-				*c++ = 0.4f;
-				*c++ = 0.41f;
-				*c++ = 1.0f;
+				*c++ = r;
+				*c++ = g;
+				*c++ = b;
+				*c++ = a;
 			}
 		}
 

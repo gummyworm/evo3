@@ -87,15 +87,20 @@ static void doPass(struct Camera *c, int pass) {
 /* drawRender renders the given render entity using the given view/projection
  * matrices. */
 void drawRender(mat4x4 v, mat4x4 p, int i) {
-	mat4x4 m, mv, mvp;
+	mat4x4 m, mv, mvp, tmp;
 	float x, y, z;
+	float sx, sy, sz;
+
 	if (!Enabled(renders[i].e))
 		return;
 	if (!GetPos(renders[i].e, &x, &y, &z))
 		return;
+	if (!GetScale(renders[i].e, &sx, &sy, &sz))
+		return;
 
 	mat4x4_identity(m);
-	mat4x4_translate(m, x, y, z);
+	mat4x4_translate(tmp, x, y, z);
+	mat4x4_scale_aniso(m, tmp, sx, sy, sz);
 	mat4x4_mul(mv, v, m);
 	mat4x4_mul(mvp, p, mv);
 
@@ -354,6 +359,26 @@ void AddRender(Entity e, const char *filename) {
 
 	if (filename != NULL)
 		AddMesh(e, filename);
+}
+
+/* AddColorRender adds a mesh loaded from filename and colors it (r,g,b,a,). */
+void AddColorRender(Entity e, const char *filename, float r, float g, float b,
+                    float a) {
+	struct entityToRender *item;
+
+	if (getRender(e) != NULL)
+		return;
+
+	item = malloc(sizeof(struct entityToRender));
+	item->render = renders + numRenders;
+	item->e = e;
+	HASH_ADD_INT(entitiesToRenders, e, item);
+
+	renders[numRenders].e = e;
+	numRenders++;
+
+	if (filename != NULL)
+		AddColorMesh(e, filename, r, g, b, a);
 }
 
 /* RemoveRender removes the render attached to e from the Render system. */

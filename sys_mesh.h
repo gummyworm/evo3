@@ -24,8 +24,11 @@ struct Mesh {
 };
 
 void AddMesh(Entity, const char *);
+void AddColorMesh(Entity, const char *, float, float, float, float);
 void RemoveMesh(Entity);
 void MeshDraw(Entity, mat4x4);
 struct Mesh *GetMesh(Entity);
+void MeshLoad(struct Mesh *m, const char *);
+void MeshLoadAndColor(struct Mesh *, const char *, float, float, float, float);
 
 #endif

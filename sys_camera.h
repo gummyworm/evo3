@@ -65,6 +65,7 @@ struct CameraUpdate {
 };
 
 void AddRender(Entity, const char *);
+void AddColorRender(Entity, const char *, float, float, float, float);
 void RemoveRender(Entity);
 
 void InitCameraSystem();

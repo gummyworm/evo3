@@ -152,6 +152,8 @@ int ThingsInRoom(Entity e, Entity *found) {
 	return count;
 }
 
+extern void genFloor(Entity e);
+
 /* GenerateRoom creates a new room and attaches it to e.  It then adds a number
  * of additional entities (influenced by the given room type). */
 void GenerateRoom(Entity e, enum RoomType type) {
@@ -168,11 +170,13 @@ void GenerateRoom(Entity e, enum RoomType type) {
 		break;
 	}
 
-	for (i = 0; i < 10; ++i) {
+	genFloor(E_ROOM);
+	for (i = 1; i < 10; i += 2) {
 		float x = rand() % (size * 2) - size;
 		float y = 0;
 		float z = rand() % (size * 2) - size;
 
-		Berry(E_ROOM + i, x, y, z);
+		Tree1(E_ROOM + i, x + .5f, y, z + .1f);
+		Berry(E_ROOM + i + 1, x, y, z);
 	}
 }

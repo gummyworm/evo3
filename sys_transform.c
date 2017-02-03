@@ -56,6 +56,9 @@ void AddTransform(Entity e, float x, float y, float z) {
 	transforms[numTransforms].rot.x = 0;
 	transforms[numTransforms].rot.y = 0;
 	transforms[numTransforms].rot.z = 0;
+	transforms[numTransforms].scale.x = 1;
+	transforms[numTransforms].scale.y = 1;
+	transforms[numTransforms].scale.z = 1;
 
 	HASH_ADD_INT(entitiesToTransforms, e, item);
 	numTransforms++;
@@ -188,4 +191,29 @@ bool GetRot(Entity e, float *x, float *y, float *z) {
 	*y = t->rot.y;
 	*z = t->rot.z;
 	return true;
+}
+
+/* GetScale sets the x, y, and z scale of entity e and returns the
+ * success. */
+bool GetScale(Entity e, float *x, float *y, float *z) {
+	struct Transform *t;
+	if ((t = getTransform(e)) == NULL)
+		return false;
+
+	*x = t->scale.x;
+	*y = t->scale.y;
+	*z = t->scale.z;
+	return true;
+}
+
+/* SetScale sets the transform attached to e's scale to {x, y, z}. */
+void SetScale(Entity e, float x, float y, float z) {
+	struct Transform *t;
+
+	if ((t = getTransform(e)) == NULL)
+		return;
+
+	t->scale.x = x;
+	t->scale.y = y;
+	t->scale.z = z;
 }

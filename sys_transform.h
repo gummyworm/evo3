@@ -15,6 +15,9 @@ struct Transform {
 	struct {
 		float x, y, z;
 	} rot;
+	struct {
+		float x, y, z;
+	} scale;
 };
 
 /* TransformUpdate defines an update message that can be polled by interested
@@ -37,8 +40,11 @@ void TransformSet(Entity, float, float, float);
 void TransformRotate(Entity, float, float, float);
 void TransformSetRotation(Entity, float, float, float);
 
+void SetScale(Entity, float, float, float);
+
 bool GetPos(Entity, float *, float *, float *);
 bool GetRot(Entity, float *, float *, float *);
+bool GetScale(Entity, float *, float *, float *);
 
 extern int numTransformUpdates;
 

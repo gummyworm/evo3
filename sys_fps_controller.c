@@ -133,8 +133,8 @@ void AddFPSController(Entity e, float speed) {
 	fpsControllers[numFPSControllers].speed = speed;
 	fpsControllers[numFPSControllers].turnSpeed = 3.0f;
 	;
-	fpsControllers[numFPSControllers].keyCodes.forward = GLFW_KEY_W;
-	fpsControllers[numFPSControllers].keyCodes.backward = GLFW_KEY_S;
+	fpsControllers[numFPSControllers].keyCodes.forward = GLFW_KEY_UP;
+	fpsControllers[numFPSControllers].keyCodes.backward = GLFW_KEY_DOWN;
 	fpsControllers[numFPSControllers].keyCodes.left = GLFW_KEY_A;
 	fpsControllers[numFPSControllers].keyCodes.right = GLFW_KEY_D;
 	fpsControllers[numFPSControllers].keyCodes.turnL = GLFW_KEY_LEFT;
