@@ -83,16 +83,6 @@ static void addChar(struct Console *console, int ch) {
 	l = console->numLines;
 
 	switch (ch) {
-	case GLFW_KEY_UP:
-		if (console->scroll > 0)
-			console->scroll--;
-		break;
-
-	case GLFW_KEY_DOWN:
-		if (console->scroll <= (console->numLines - CONSOLE_NUM_ROWS))
-			console->scroll++;
-		break;
-
 	case '\n':
 	case GLFW_KEY_ENTER:
 		console->lines[l + 1] = console->lines[l] + c;
