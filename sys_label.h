@@ -5,7 +5,7 @@
 #include "thing.h"
 
 enum { MAX_LABELS = 8192,
-       LABEL_FONT_SIZE = 16,
+       LABEL_MAX_FONT_SIZE = 16,
 };
 
 /* LabelUpdate describes updates to labels. */

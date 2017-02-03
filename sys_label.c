@@ -61,7 +61,10 @@ void UpdateLabelSystem() {
 
 		GetPos(E_PLAYER, &ppos[0], &ppos[1], &ppos[2]);
 		vec3_sub(dist, lpos, ppos);
-		size = 10.f / vec3_len(dist) * LABEL_FONT_SIZE;
+
+		size = 10.f / vec3_len(dist) * LABEL_MAX_FONT_SIZE;
+		if (size > LABEL_MAX_FONT_SIZE)
+			size = LABEL_MAX_FONT_SIZE;
 
 		if (sx >= 0) {
 			mat4x4 proj;
