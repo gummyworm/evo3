@@ -1,5 +1,6 @@
 #include "sys_room.h"
 #include "entities.h"
+#include "prefabs.h"
 #include "sys_transform.h"
 #include "thing.h"
 #include "third-party/include/uthash.h"
@@ -173,7 +174,7 @@ void GenerateRoom(Entity e, enum RoomType type) {
 	genFloor(E_ROOM);
 	for (i = 1; i < 10; i += 2) {
 		float x = rand() % (size * 2) - size;
-		float y = 0;
+		float y = -1;
 		float z = rand() % (size * 2) - size;
 
 		Tree1(E_ROOM + i, x + .5f, y, z + .1f);

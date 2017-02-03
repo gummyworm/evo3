@@ -258,7 +258,7 @@ static void exec(struct Console *console, char *line) {
 	if (argc > 2) {
 		target = GetThing(argv[2]);
 		prop = GetThing(argv[1]);
-	} else {
+	} else if (argc > 1) {
 		target = GetThing(argv[1]);
 		prop = -1;
 	}
@@ -267,8 +267,6 @@ static void exec(struct Console *console, char *line) {
 		addLineOverTime(console, l, CONSOLE_PRINT_INTERVAL);
 		return;
 	}
-
-	addLine(console, l);
 
 	if (strncmp(argv[0], CMD_LS, sizeof(CMD_LS)) == 0) {
 		inventory(console);
