@@ -173,3 +173,12 @@ void ScreenToGui(int sx, int sy, int *x, int *y) {
 	*x = (int)(sx * ((float)GUI_WIDTH / (float)w));
 	*y = (int)(sy * ((float)GUI_HEIGHT / (float)h));
 }
+
+/* WindowToGui sets (x, y) to the GUI coordinates that correspond to the given
+ * window coordiantes (sx, sy). */
+void WindowToGui(int sx, int sy, int *x, int *y) {
+	int w, h;
+	glfwGetWindowSize(win, &w, &h);
+	*x = (int)(sx * ((float)GUI_WIDTH / (float)w));
+	*y = (int)(sy * ((float)GUI_HEIGHT / (float)h));
+}

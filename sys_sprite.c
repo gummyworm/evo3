@@ -66,7 +66,7 @@ bool GetSpriteBounds(Entity e, int *x, int *y, float *z, int *w, int *h) {
 		*y -= *h;
 		return true;
 	}
-	return true;
+	return false;
 }
 
 /* UpdateSpriteSystem updates all sprites that have been created. */
@@ -129,14 +129,13 @@ Entity SpritePick(Entity e, int px, int py) {
 	for (i = 0; i < numSprites; ++i) {
 		int x, y, w, h;
 		float z;
-		GetSpriteBounds(sprites[i].e, &x, &y, &z, &w, &h);
-		if ((px > x) && (px < (x + w))) {
-			if ((py > y) && (py < (y + h))) {
-				if (picked == 0 || z < pickedZ) {
-					if (GetThingName(sprites[i].e)) {
-						pickedZ = z;
-						picked = sprites[i].e;
-					}
+		if (!GetSpriteBounds(sprites[i].e, &x, &y, &z, &w, &h))
+			continue;
+		if ((px > x) && (px < (x + w)) && (py > y) && (py < (y + h))) {
+			if (picked == 0 || z < pickedZ) {
+				if (GetThingName(sprites[i].e)) {
+					pickedZ = z;
+					picked = sprites[i].e;
 				}
 			}
 		}

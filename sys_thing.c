@@ -156,7 +156,7 @@ bool HandleAction(Entity e, Entity prop, Entity actor, char *action,
 int GetType(Entity e) {
 	struct Thing *t;
 	if ((t = getThing(e)) == NULL)
-		return 0;
+		return THING_NOTHING;
 
 	return t->type;
 }

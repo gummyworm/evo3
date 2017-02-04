@@ -345,9 +345,10 @@ void lmouse(int action) {
 		int gx, gy;
 
 		glfwGetCursorPos(win, &x, &y);
-		ScreenToGui(x, y, &gx, &gy);
+		WindowToGui(x, y, &gx, &gy);
 		e = SpritePick(0, gx, gy);
 
+		l[0] = '\0';
 		switch (GetType(e)) {
 		case THING_ITEM:
 			HandleAction(e, 0, c->e, (char *)ACTION_TAKE, l);
@@ -359,7 +360,9 @@ void lmouse(int action) {
 		default:
 			break;
 		}
-		addLineOverTime(consoles + 0, l, CONSOLE_PRINT_INTERVAL);
+		if (strlen(l) > 0)
+			addLineOverTime(consoles + 0, l,
+			                CONSOLE_PRINT_INTERVAL);
 	}
 }
 
@@ -386,7 +389,6 @@ static void draw(struct Console *console) {
 			len = console->col;
 		else
 			len = console->lines[i + scroll + 1] - offset;
-
 		memcpy(buff, console->text + offset, len);
 
 		if (console->row == i && console->blink)
