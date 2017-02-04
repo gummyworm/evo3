@@ -161,7 +161,7 @@ extern void genWalls(Entity n, Entity s, Entity e, Entity w);
  * of additional entities (influenced by the given room type). */
 void GenerateRoom(Entity e, enum RoomType type) {
 	const int size = 6;
-	int i, j;
+	int i;
 
 	AddRoom(e, "GENERATED ROOM", "This test room was generated", -size,
 	        -size, -size, size * 2, size * 2, size * 2);
@@ -205,5 +205,14 @@ void GenerateRoom(Entity e, enum RoomType type) {
 			Berry(berries + i, x, y, z);
 		else
 			Banana(berries + i, x, y, z);
+	}
+
+	/* add treasure */
+	int treasure = berries + i;
+	for (i = 0; i < 1; i++) {
+		float x = rand() % (size * 2) - size;
+		float y = -1;
+		float z = rand() % (size * 2) - size;
+		Chest(treasure + i, x, y, z);
 	}
 }

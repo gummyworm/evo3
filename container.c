@@ -125,6 +125,7 @@ void AddContainer(Entity e, const char *name, const char *desc) {
 	AddActionHandler(e, ACTION_CLOSE, handleCloseBox);
 	AddActionHandler(e, ACTION_EMPTY, handleEmptyBox);
 
+	SetType(e, THING_BOX);
 	utarray_new(t->contents, &ut_int_icd);
 }
 

@@ -1,13 +1,16 @@
 #ifndef PREFABS_H
 #define PREFABS_H
 
-int Berry(int, float, float, float);
-int Banana(int, float, float, float);
-int Grass1(int, float, float, float);
-int Tree1(int, float, float, float);
-int Floor1(int, float, float, float);
-int Floor2(int, float, float, float);
-int WallEW(int, float, float, float);
-int WallNS(int, float, float, float);
+#include "entity.h"
+
+int Berry(Entity, float, float, float);
+int Banana(Entity, float, float, float);
+int Grass1(Entity, float, float, float);
+int Tree1(Entity, float, float, float);
+int Floor1(Entity, float, float, float);
+int Floor2(Entity, float, float, float);
+int WallEW(Entity, float, float, float);
+int WallNS(Entity, float, float, float);
+void Chest(Entity, float, float, float);
 
 #endif
