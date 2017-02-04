@@ -42,6 +42,7 @@ void InitLabelSystem() {}
 /* UpdateLabelSystem updates all labels that have been created. */
 void UpdateLabelSystem() {
 	int i;
+
 	for (i = 0; i < numLabels; ++i) {
 		int sx, sy;
 		int size;

@@ -21,6 +21,7 @@ struct Camera {
 
 	vec3 dir;
 
+	bool doPost;
 	struct {
 		int width, height;
 		GLuint fbo;

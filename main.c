@@ -42,9 +42,11 @@ static void update() {
 	UpdateFPSControllerSystem();
 
 	/* render */
+	glEnable(GL_DEPTH_TEST);
 	UpdateCameraSystem();
 
 	/* post main render updates */
+	glDisable(GL_DEPTH_TEST);
 	UpdateConsoleSystem();
 	UpdateWidgetSystem();
 	UpdateLabelSystem();
@@ -117,11 +119,6 @@ int main() {
 		glViewport(0, 0, width, height);
 		glClearColor(1, 1, 1, 1);
 		glClear(GL_COLOR_BUFFER_BIT);
-
-		glDisable(GL_SCISSOR_TEST);
-		glDisable(GL_DEPTH_TEST);
-		glDisable(GL_CULL_FACE);
-		glDisable(GL_BLEND);
 
 		update();
 		glfwSwapBuffers(window);

@@ -123,6 +123,7 @@ void UpdateCameraSystem() {
 
 	for (i = 0; i < numCameras; ++i) {
 		GLuint program;
+		int passes;
 
 		c = cameras + i;
 		if (!Enabled(c->e))
@@ -132,7 +133,11 @@ void UpdateCameraSystem() {
 		if (!GetViewDir(c->e, &rot.x, &rot.y, &rot.z))
 			return;
 
-		if (c->numPasses > 0) {
+		passes = c->numPasses;
+		if (!c->doPost)
+			passes = 0;
+
+		if (passes > 0) {
 			glBindFramebuffer(GL_FRAMEBUFFER, c->passes[0].fbo);
 			glViewport(0, 0, c->passes[0].width,
 			           c->passes[0].height);
@@ -142,8 +147,8 @@ void UpdateCameraSystem() {
 		}
 		glUseProgram(program);
 
-		glClearColor(1.0, 1.0, 1.0, 1.0);
-		glClearDepth(1.0f);
+		glClearColor(1.f, 1.f, 1.f, 1.f);
+		glClearDepth(100.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glDisable(GL_BLEND);
@@ -164,8 +169,8 @@ void UpdateCameraSystem() {
 		for (j = 0; j < numRenders; ++j)
 			drawRender(v, cameras[i].projection, j);
 
-		for (j = 0; j < c->numPasses; ++j) {
-			if (j < (c->numPasses - 1)) {
+		for (j = 0; j < passes; ++j) {
+			if (j < (passes - 1)) {
 				glBindFramebuffer(GL_FRAMEBUFFER,
 				                  c->passes[j + 1].fbo);
 				glViewport(0, 0, c->passes[j + 1].width,
@@ -177,8 +182,6 @@ void UpdateCameraSystem() {
 				glViewport(0, 0, w, h);
 			}
 
-			glClearColor(1.0, 1.0, 1.0, 1.0);
-			glClearDepth(1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			doPass(c, j);
 		}
@@ -252,6 +255,7 @@ void AddCamera(Entity e, uint32_t layers) {
 	cameras[numCameras].dir[2] = 1;
 	cameras[numCameras].layers = layers;
 	cameras[numCameras].numPasses = 0;
+	cameras[numCameras].doPost = false;
 
 	int w, h;
 	glfwGetFramebufferSize(win, &w, &h);
@@ -295,7 +299,7 @@ void CameraPerspective(Entity e, float fov, float aspect) {
 		return;
 	}
 
-	near = 0.f;
+	near = 0.5f;
 	far = 100.f;
 
 	c->type = CAMERA_PERSPECTIVE;

@@ -183,6 +183,6 @@ void GenerateRoom(Entity e, enum RoomType type) {
 		float z = rand() % (size * 2) - size;
 
 		Tree1(E_ROOM + i + 5, x + .5f, y, z + .1f);
-		Berry(E_ROOM + i + 6, x, y, z);
+		Berry(E_ROOM + i + 6, x, y + 1, z);
 	}
 }
