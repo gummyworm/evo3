@@ -10,6 +10,8 @@ void DrawInit();
 void Rect(mat4x4, unsigned, unsigned, unsigned, unsigned, uint32_t);
 void TexRect(mat4x4, GLint, unsigned, unsigned, unsigned, unsigned, float,
              float, float, float, GLuint);
+void TexRectZ(mat4x4, GLint, unsigned, unsigned, float, unsigned, unsigned,
+              float, float, float, float, GLuint);
 void Text(mat4x4, unsigned, unsigned, unsigned, const char *);
 GLuint GetTexture(const char *filename);
 

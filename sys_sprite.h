@@ -9,6 +9,7 @@ enum { MAX_SPRITES = 4096 };
 
 /* Sprite is a struct that represents a movable, visible object in the world. */
 struct Sprite {
+	Entity e;
 	int x, y;
 	int w, h;
 	GLuint texture;

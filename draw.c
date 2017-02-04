@@ -262,10 +262,10 @@ void Rect(mat4x4 mvp, unsigned x, unsigned y, unsigned w, unsigned h,
 	glBindVertexArray(0);
 }
 
-/* TexRect draws a w x h rectangle @ (x,y). */
-void TexRect(mat4x4 mvp, GLint program, unsigned x, unsigned y, unsigned w,
-             unsigned h, float clipx, float clipy, float clipw, float cliph,
-             GLuint tex) {
+/* TexRectZ draws a wxh rectangle @ (x,y,z).  */
+void TexRectZ(mat4x4 mvp, GLint program, unsigned x, unsigned y, float z,
+              unsigned w, unsigned h, float clipx, float clipy, float clipw,
+              float cliph, GLuint tex) {
 	static GLuint vao;
 	static struct { GLuint texco, pos; } buffs;
 	static struct { GLint texco, pos; } attrs;
@@ -273,8 +273,8 @@ void TexRect(mat4x4 mvp, GLint program, unsigned x, unsigned y, unsigned w,
 	u = clipx;
 	v = clipy;
 
-	uint16_t vd[] = {x, y, 1, 1, x + w, y,     1, 1, x + w, y + h, 1, 1,
-	                 x, y, 1, 1, x + w, y + h, 1, 1, x,     y + h, 1, 1};
+	float vd[] = {x, y, z, 1, x + w, y,     z, 1, x + w, y + h, z, 1,
+	              x, y, z, 1, x + w, y + h, z, 1, x,     y + h, z, 1};
 
 	float td[] = {u, v, u + clipw, v,         u + clipw, v + cliph,
 	              u, v, u + clipw, v + cliph, u,         v + cliph};
@@ -331,7 +331,7 @@ void TexRect(mat4x4 mvp, GLint program, unsigned x, unsigned y, unsigned w,
 
 	glEnableVertexAttribArray(attrs.pos);
 	glBindBuffer(GL_ARRAY_BUFFER, buffs.pos);
-	glVertexAttribPointer(attrs.pos, 4, GL_UNSIGNED_SHORT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(attrs.pos, 4, GL_FLOAT, GL_FALSE, 0, 0);
 
 	glEnableVertexAttribArray(attrs.texco);
 	glBindBuffer(GL_ARRAY_BUFFER, buffs.texco);
@@ -343,6 +343,14 @@ void TexRect(mat4x4 mvp, GLint program, unsigned x, unsigned y, unsigned w,
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
+}
+
+/* TexRect draws a w x h rectangle @ (x,y). */
+void TexRect(mat4x4 mvp, GLint program, unsigned x, unsigned y, unsigned w,
+             unsigned h, float clipx, float clipy, float clipw, float cliph,
+             GLuint tex) {
+	TexRectZ(mvp, program, x, y, 1.f, w, h, clipx, clipy, clipw, cliph,
+	         tex);
 }
 
 /* Text renders msg at (x,y). */
@@ -386,6 +394,9 @@ GLuint GetTexture(const char *filename) {
 	             GL_UNSIGNED_BYTE, image);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	SOIL_free_image_data(image);

@@ -1,6 +1,8 @@
-#include "sys_sprite.h"
-#include <SOIL.h>
+#include "draw.h"
+#include "entities.h"
+#include "systems.h"
 #include "third-party/include/uthash.h"
+#include <SOIL.h>
 
 struct entityToSprite {
 	Entity e;
@@ -19,10 +21,12 @@ static struct SpriteUpdate updates[MAX_SPRITES];
 static struct Sprite *getSprite(Entity e) {
 	struct entityToSprite *s;
 
-	if (entitiesToSprites == NULL) return NULL;
+	if (entitiesToSprites == NULL)
+		return NULL;
 
 	HASH_FIND_INT(entitiesToSprites, &e, s);
-	if (s == NULL) return NULL;
+	if (s == NULL)
+		return NULL;
 
 	return s->sprite;
 }
@@ -34,13 +38,45 @@ static void addUpdate(struct SpriteUpdate *u) { updates[numUpdates++] = *u; }
 void InitSpriteSystem() {}
 
 /* UpdateSpriteSystem updates all sprites that have been created. */
-void UpdateSpriteSystem() {}
+void UpdateSpriteSystem() {
+	int i;
+	for (i = 0; i < numSprites; ++i) {
+		int sx, sy;
+		int w, h;
+		vec3 lpos;
+		vec3 ppos;
+		vec3 dist;
+
+		if (!Enabled(sprites[i].e))
+			continue;
+
+		if (!GetPos(sprites[i].e, &lpos[0], &lpos[1], &lpos[2]))
+			continue;
+
+		WorldToScreen(E_PLAYER, lpos[0], lpos[1], lpos[2], &sx, &sy);
+
+		GetPos(E_PLAYER, &ppos[0], &ppos[1], &ppos[2]);
+		vec3_sub(dist, lpos, ppos);
+
+		w = sprites[i].w / vec3_len(dist);
+		h = sprites[i].h / vec3_len(dist);
+
+		if (sx >= 0) {
+			mat4x4 proj;
+			ScreenToGui(sx, sy, &sx, &sy);
+			GuiProjection(&proj);
+			TexRect(proj, getTextureProgram(), sx, sy, w, h, 0, 0,
+			        1, 1, sprites[i].texture);
+		}
+	}
+}
 
 /* NewSprite creates a new sprite attached to the entity e. */
 void NewSprite(Entity e, const char *filename) {
 	struct entityToSprite *item;
 
-	if (getSprite(e) != NULL) return;
+	if (getSprite(e) != NULL)
+		return;
 
 	item = malloc(sizeof(struct entityToSprite));
 	item->sprite = sprites + numSprites;
@@ -49,7 +85,7 @@ void NewSprite(Entity e, const char *filename) {
 	sprites[numSprites].texture = SOIL_load_OGL_texture(
 	    filename, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID,
 	    SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB |
-		SOIL_FLAG_COMPRESS_TO_DXT);
+	        SOIL_FLAG_COMPRESS_TO_DXT);
 
 	HASH_ADD_INT(entitiesToSprites, e, item);
 	numSprites++;
