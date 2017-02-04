@@ -523,6 +523,8 @@ void GetProjection(Entity e, mat4x4 *projection) {
 
 /* lmouse is the left mouse button callback. */
 void lmouse(int action) {
+	return;
+
 	if (action == GLFW_PRESS) {
 		double x, y;
 		vec3 start, stop;

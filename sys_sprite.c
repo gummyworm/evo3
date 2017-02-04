@@ -114,3 +114,19 @@ struct SpriteUpdate *GetSpriteUpdates(int *num) {
 	*num = numUpdates;
 	return updates;
 }
+
+/* SpritePick returns the entity that contains the given screen coordinates
+ * (or 0 if there were no matches). */
+Entity SpritePick(Entity e, int px, int py) {
+	UNUSED(e);
+	int i;
+
+	for (i = 0; i < numSprites; ++i) {
+		int x, y, w, h;
+		GetSpriteBounds(sprites[i].e, &x, &y, &w, &h);
+		if (px > x && px < (x + w) && py > y && py < (y + h))
+			return sprites[i].e;
+	}
+
+	return 0;
+}

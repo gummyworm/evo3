@@ -27,7 +27,7 @@ static void init(GLFWwindow *win) {
 	InitTransformSystem();
 	InitCommanderSystem();
 	InitFPSControllerSystem();
-	InitConsoleSystem();
+	InitConsoleSystem(win);
 
 	InitWidgetSystem(win);
 	InitCameraSystem(win);

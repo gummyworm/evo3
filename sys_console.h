@@ -61,7 +61,7 @@ struct ConsoleUpdate {
 	Entity e;
 };
 
-void InitConsoleSystem();
+void InitConsoleSystem(GLFWwindow *);
 void UpdateConsoleSystem();
 void AddConsole(Entity);
 void RemoveConsole(Entity);

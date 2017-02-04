@@ -24,6 +24,8 @@ struct SpriteUpdate {
 void InitSpriteSystem();
 void UpdateSpriteSystem();
 void AddSprite(Entity, const char *, float scale);
+bool GetSpriteBounds(Entity, int *, int *, int *, int *);
+Entity SpritePick(Entity, int, int);
 struct SpriteUpdate *GetSpriteUpdates(int *);
 
 #endif

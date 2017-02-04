@@ -73,6 +73,8 @@ static int numConsoles;
 static int numUpdates;
 static struct ConsoleUpdate updates[MAX_CONSOLES];
 
+static struct GLFWwindow *win;
+
 /* addChar adds the character ch to the console and updates the col/row etc.
  * accordingly. */
 static void addChar(struct Console *console, int ch) {
@@ -302,7 +304,7 @@ static void exec(struct Console *console, char *line) {
 	}
 }
 
-/* button is called when a button is pressed. */
+/* key is called when a keyboard button is pressed. */
 static void key(int key, int button, int action, int mods) {
 	UNUSED(button);
 	UNUSED(mods);
@@ -326,6 +328,20 @@ static void key(int key, int button, int action, int mods) {
 	if (key == GLFW_KEY_ENTER)
 		exec(console,
 		     console->text + console->lines[console->numLines - 1]);
+}
+
+/* lmouse is the left mouse button callback. */
+void lmouse(int action) {
+	if (action == GLFW_PRESS) {
+		Entity e;
+		double x, y;
+		int gx, gy;
+
+		glfwGetCursorPos(win, &x, &y);
+		ScreenToGui(x, y, &gx, &gy);
+		e = SpritePick(0, x, y);
+		dinfof("picked %s", GetThingName(e));
+	}
 }
 
 /* draw renders console as a GUI element. */
@@ -459,6 +475,8 @@ void AddConsole(Entity e) {
 	consoles[numConsoles].addBuff[0] = '\0';
 	consoles[numConsoles].overlayTex = GetTexture("consoleoverlay.png");
 
+	InputRegisterMouseButtonEvent(INPUT_LAYER_DEFAULT, lmouse, NULL);
+
 	HASH_ADD_INT(entitiesToConsoles, e, item);
 	numConsoles++;
 }
@@ -482,7 +500,10 @@ void RemoveConsole(Entity e) {
 }
 
 /* Initconsolesystem initializes the transform system. */
-void InitConsoleSystem() { InputRegisterKeyEvent(INPUT_LAYER_CONSOLE, key); }
+void InitConsoleSystem(GLFWwindow *window) {
+	win = window;
+	InputRegisterKeyEvent(INPUT_LAYER_CONSOLE, key);
+}
 
 /* Updateconsolesystem updates all consoles that have been created. */
 void UpdateConsoleSystem() {
