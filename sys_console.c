@@ -365,8 +365,6 @@ static void draw(struct Console *console) {
 		y += CONSOLE_FONT_HEIGHT;
 	}
 
-	return;
-
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	TexRect(mvp, getTextureProgram(), CONSOLE_BSTART_X, CONSOLE_BSTART_Y,

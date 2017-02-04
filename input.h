@@ -32,5 +32,6 @@ void InputDisable(uint32_t layers);
 
 void InputRegisterKeyEvent(uint32_t, void (*)(int, int, int, int));
 void InputRegisterMouseEvent(uint32_t, void (*)(double, double));
+void InputRegisterMouseButtonEvent(uint32_t, void (*)(int), void (*)(int));
 
 #endif

@@ -27,6 +27,15 @@ struct {
 } mouseCallbacks[MAX_MOUSE_CALLBACKS];
 static int numMouseCallbacks;
 
+/* mouseButtonCallbacks contains the callbacks to be executed on mouse button
+ * events. */
+struct {
+	void (*left)(int);
+	void (*right)(int);
+	uint32_t layer;
+} mouseButtonCallbacks[MAX_MOUSE_CALLBACKS];
+static int numMouseButtonCallbacks;
+
 /* key is the GLFW callback to handle key events. */
 void key(GLFWwindow *window, int key, int scancode, int action, int mods) {
 	UNUSED(window);
@@ -60,6 +69,26 @@ void mouseMove(GLFWwindow *window, double x, double y) {
 	}
 }
 
+void mouseButton(GLFWwindow *window, int button, int action, int mods) {
+	UNUSED(window);
+	UNUSED(mods);
+	int i;
+
+	if (button == GLFW_MOUSE_BUTTON_LEFT) {
+		for (i = 0; i < numMouseCallbacks; ++i) {
+			if ((mouseButtonCallbacks[i].layer & enabled) != 0)
+				if (mouseButtonCallbacks[i].left)
+					mouseButtonCallbacks[i].left(action);
+		}
+	} else if (button == GLFW_MOUSE_BUTTON_RIGHT) {
+		for (i = 0; i < numMouseCallbacks; ++i) {
+			if ((mouseButtonCallbacks[i].layer & enabled) != 0)
+				if (mouseButtonCallbacks[i].right)
+					mouseButtonCallbacks[i].right(action);
+		}
+	}
+}
+
 /* InitInput initializes the engine for input related events. */
 void InitInput(GLFWwindow *win) {
 	enabled = 0xffffffff;
@@ -67,6 +96,7 @@ void InitInput(GLFWwindow *win) {
 	numMouseCallbacks = 0;
 	glfwSetKeyCallback(win, key);
 	glfwSetCursorPosCallback(win, mouseMove);
+	glfwSetMouseButtonCallback(win, mouseButton);
 }
 
 /* UpdateInput updates input related state. */
@@ -119,4 +149,13 @@ void InputRegisterMouseEvent(uint32_t layer, void (*move)(double, double)) {
 	mouseCallbacks[numMouseCallbacks].layer = layer;
 	mouseCallbacks[numMouseCallbacks].moved = move;
 	numMouseCallbacks++;
+}
+
+/* InputRegisterMouseButtonEvent registers the given mouse button callbacks. */
+void InputRegisterMouseButtonEvent(uint32_t layer, void (*l)(int),
+                                   void (*r)(int)) {
+	mouseButtonCallbacks[numMouseButtonCallbacks].layer = layer;
+	mouseButtonCallbacks[numMouseButtonCallbacks].left = l;
+	mouseButtonCallbacks[numMouseButtonCallbacks].left = r;
+	numMouseButtonCallbacks++;
 }

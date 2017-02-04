@@ -1,14 +1,14 @@
+#include <stdio.h>
+
 #include "base.h"
 
 #include "debug.h"
 #include "draw.h"
-#include "sys_camera.h"
-#include "sys_mesh.h"
-#include "sys_transform.h"
+#include "entities.h"
+#include "systems.h"
 #include "thing.h"
 #include "third-party/include/linmath.h"
 #include "third-party/include/uthash.h"
-#include <stdio.h>
 
 struct entityToCamera {
 	Entity e;
@@ -35,6 +35,8 @@ static struct Render renders[MAX_RENDERS];
 static int numRenders;
 
 static GLFWwindow *win;
+
+static void lmouse(int action);
 
 /* getCamera returns the camera attached to entity e (if there is one). */
 static struct Camera *getCamera(Entity e) {
@@ -261,6 +263,8 @@ void AddCamera(Entity e, uint32_t layers) {
 	glfwGetFramebufferSize(win, &w, &h);
 	addPass(cameras + numCameras, getBayerProgram(), 256, 256);
 	addPass(cameras + numCameras, getTextureProgram(), 256, 256);
+
+	InputRegisterMouseButtonEvent(INPUT_LAYER_DEFAULT, lmouse, NULL);
 
 	numCameras++;
 }
@@ -513,4 +517,14 @@ void GetProjection(Entity e, mat4x4 *projection) {
 		return;
 
 	memcpy(*projection, c->projection, sizeof(projection));
+}
+
+/* lmouse is the left mouse button callback. */
+void lmouse(int action) {
+	if (action == GLFW_PRESS) {
+		double x, y;
+		vec3 start, stop;
+		glfwGetCursorPos(win, &x, &y);
+		Raycast(E_PLAYER, x, y, start, stop);
+	}
 }

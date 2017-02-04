@@ -140,7 +140,6 @@ void AddFPSController(Entity e, float speed) {
 	fpsControllers[numFPSControllers].keyCodes.turnR = GLFW_KEY_RIGHT;
 
 	InputRegisterKeyEvent(INPUT_LAYER_DEFAULT, key);
-
 	numFPSControllers++;
 }
 
