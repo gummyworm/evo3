@@ -8,7 +8,7 @@
 #include "sys_gui.h"
 
 #define CONSOLE_BLINK_INTERVAL 0.10 /* seconds */
-#define CONSOLE_PRINT_INTERVAL 0.05 /* seconds */
+#define CONSOLE_PRINT_INTERVAL 0.01 /* seconds */
 
 enum { MAX_CONSOLES = 1,
 };

@@ -332,15 +332,34 @@ static void key(int key, int button, int action, int mods) {
 
 /* lmouse is the left mouse button callback. */
 void lmouse(int action) {
+	struct Console *c;
+
+	if (numConsoles <= 0)
+		return;
+	c = consoles + 0;
+
 	if (action == GLFW_PRESS) {
+		char l[256];
 		Entity e;
 		double x, y;
 		int gx, gy;
 
 		glfwGetCursorPos(win, &x, &y);
 		ScreenToGui(x, y, &gx, &gy);
-		e = SpritePick(0, x, y);
-		dinfof("picked %s", GetThingName(e));
+		e = SpritePick(0, gx, gy);
+
+		switch (GetType(e)) {
+		case THING_ITEM:
+			HandleAction(e, 0, c->e, (char *)ACTION_TAKE, l);
+			break;
+		case THING_BOX:
+			HandleAction(e, 0, c->e, (char *)ACTION_OPEN, l);
+			break;
+		case THING_NOTHING:
+		default:
+			break;
+		}
+		addLineOverTime(consoles + 0, l, CONSOLE_PRINT_INTERVAL);
 	}
 }
 
@@ -380,6 +399,8 @@ static void draw(struct Console *console) {
 		Text(mvp, CONSOLE_START_X, y, CONSOLE_FONT_WIDTH, buff);
 		y += CONSOLE_FONT_HEIGHT;
 	}
+
+	return;
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

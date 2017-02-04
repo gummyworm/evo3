@@ -40,4 +40,5 @@ void AddItem(Entity e, const char *name, const char *desc) {
 	AddThing(e, name, desc);
 	AddActionHandler(e, ACTION_TAKE, handleTake);
 	AddActionHandler(e, ACTION_DROP, handleDrop);
+	SetType(e, THING_ITEM);
 }

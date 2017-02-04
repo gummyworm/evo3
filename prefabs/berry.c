@@ -13,6 +13,6 @@ int Banana(int e, float x, float y, float z) {
 	AddTransform(e, x, y, z);
 	AddLabel(e, "BANANA", 0.8f);
 	AddSprite(e, "res/banana.png", 1.0f);
-	AddItem(e, "BERRY", "A yellow banana");
+	AddItem(e, "BANANA", "A yellow banana");
 	return 0;
 }

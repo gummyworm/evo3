@@ -38,10 +38,9 @@ static void addUpdate(struct SpriteUpdate *u) { updates[numUpdates++] = *u; }
 void InitSpriteSystem() {}
 
 /* GetSpriteBounds sets the (x, y, w, h) rectangle that bounds the sprite
- * attached to e. */
-bool GetSpriteBounds(Entity e, int *x, int *y, int *w, int *h) {
+ * attached to e. z is set to the distance the sprite is from the player. */
+bool GetSpriteBounds(Entity e, int *x, int *y, float *z, int *w, int *h) {
 	struct Sprite *s;
-	float z;
 	vec3 lpos;
 	vec3 ppos;
 	vec3 dist;
@@ -58,9 +57,9 @@ bool GetSpriteBounds(Entity e, int *x, int *y, int *w, int *h) {
 
 	WorldToScreen(E_PLAYER, lpos[0], lpos[1], lpos[2], x, y);
 
-	z = vec3_len(dist);
-	*w = ((float)s->w) / z;
-	*h = ((float)s->h) / z;
+	*z = vec3_len(dist);
+	*w = ((float)s->w) / *z;
+	*h = ((float)s->h) / *z;
 
 	if (*x >= 0 && *y >= 0) {
 		ScreenToGui(*x, *y, x, y);
@@ -78,8 +77,9 @@ void UpdateSpriteSystem() {
 	GuiProjection(&proj);
 
 	for (i = 0; i < numSprites; ++i) {
+		float z;
 		int x, y, w, h;
-		if (!GetSpriteBounds(sprites[i].e, &x, &y, &w, &h))
+		if (!GetSpriteBounds(sprites[i].e, &x, &y, &z, &w, &h))
 			continue;
 		TexRectZ(proj, getTextureProgram(), x, y, 1.f, w, h, 0, 0, 1, 1,
 		         sprites[i].texture);
@@ -120,13 +120,27 @@ struct SpriteUpdate *GetSpriteUpdates(int *num) {
 Entity SpritePick(Entity e, int px, int py) {
 	UNUSED(e);
 	int i;
+	Entity picked;
+	float pickedZ;
+
+	picked = 0;
+	pickedZ = 100000.f;
 
 	for (i = 0; i < numSprites; ++i) {
 		int x, y, w, h;
-		GetSpriteBounds(sprites[i].e, &x, &y, &w, &h);
-		if (px > x && px < (x + w) && py > y && py < (y + h))
-			return sprites[i].e;
+		float z;
+		GetSpriteBounds(sprites[i].e, &x, &y, &z, &w, &h);
+		if ((px > x) && (px < (x + w))) {
+			if ((py > y) && (py < (y + h))) {
+				if (picked == 0 || z < pickedZ) {
+					if (GetThingName(sprites[i].e)) {
+						pickedZ = z;
+						picked = sprites[i].e;
+					}
+				}
+			}
+		}
 	}
 
-	return 0;
+	return picked;
 }

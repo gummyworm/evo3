@@ -31,7 +31,7 @@ struct Thing {
 	bool takeable;
 
 	UT_array *contents;
-	enum { THING_BOX } type;
+	enum { THING_NOTHING, THING_ITEM, THING_BOX } type;
 	union {
 		struct {
 			bool open;
@@ -79,5 +79,8 @@ void AddItem(Entity, const char *, const char *);
 void AddContainer(Entity, const char *, const char *);
 void AddToContainer(Entity, Entity);
 bool GetFromContainer(Entity e, Entity item);
+
+int GetType(Entity);
+void SetType(Entity, int);
 
 #endif

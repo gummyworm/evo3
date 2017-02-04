@@ -151,3 +151,21 @@ bool HandleAction(Entity e, Entity prop, Entity actor, char *action,
 		return h->handler(e, prop, actor, outBuff);
 	return false;
 }
+
+/* GetType returns the thing type of the Thing attached to the entity e. */
+int GetType(Entity e) {
+	struct Thing *t;
+	if ((t = getThing(e)) == NULL)
+		return 0;
+
+	return t->type;
+}
+
+/* SetType sets the type of the thing attached to the entity e to type. */
+void SetType(Entity e, int type) {
+	struct Thing *t;
+	if ((t = getThing(e)) == NULL)
+		return;
+
+	t->type = type;
+}
