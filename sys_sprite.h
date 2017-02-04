@@ -11,6 +11,7 @@ enum { MAX_SPRITES = 4096 };
 struct Sprite {
 	Entity e;
 	int w, h;
+	float scale;
 	GLuint texture;
 };
 

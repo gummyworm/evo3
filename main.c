@@ -41,6 +41,7 @@ static void update() {
 	UpdateFPSControllerSystem();
 
 	/* render */
+	glDepthFunc(GL_LEQUAL);
 	glEnable(GL_DEPTH_TEST);
 	UpdateCameraSystem();
 	glEnable(GL_BLEND);

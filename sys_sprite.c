@@ -37,39 +37,52 @@ static void addUpdate(struct SpriteUpdate *u) { updates[numUpdates++] = *u; }
 /* InitSpriteSystem initializes the sprite system. */
 void InitSpriteSystem() {}
 
+/* GetSpriteBounds sets the (x, y, w, h) rectangle that bounds the sprite
+ * attached to e. */
+bool GetSpriteBounds(Entity e, int *x, int *y, int *w, int *h) {
+	struct Sprite *s;
+	float z;
+	vec3 lpos;
+	vec3 ppos;
+	vec3 dist;
+
+	if (!Enabled(e))
+		return false;
+	if ((s = getSprite(e)) == NULL)
+		return false;
+	if (!GetPos(e, &lpos[0], &lpos[1], &lpos[2]))
+		return false;
+
+	GetPos(E_PLAYER, &ppos[0], &ppos[1], &ppos[2]);
+	vec3_sub(dist, lpos, ppos);
+
+	WorldToScreen(E_PLAYER, lpos[0], lpos[1], lpos[2], x, y);
+
+	z = vec3_len(dist);
+	*w = ((float)s->w) / z;
+	*h = ((float)s->h) / z;
+
+	if (*x >= 0 && *y >= 0) {
+		ScreenToGui(*x, *y, x, y);
+		*y -= *h;
+		return true;
+	}
+	return true;
+}
+
 /* UpdateSpriteSystem updates all sprites that have been created. */
 void UpdateSpriteSystem() {
 	int i;
+	mat4x4 proj;
+
+	GuiProjection(&proj);
+
 	for (i = 0; i < numSprites; ++i) {
-		int sx, sy;
-		float z;
-		int w, h;
-		vec3 lpos;
-		vec3 ppos;
-		vec3 dist;
-
-		if (!Enabled(sprites[i].e))
+		int x, y, w, h;
+		if (!GetSpriteBounds(sprites[i].e, &x, &y, &w, &h))
 			continue;
-
-		if (!GetPos(sprites[i].e, &lpos[0], &lpos[1], &lpos[2]))
-			continue;
-
-		WorldToScreen(E_PLAYER, lpos[0], lpos[1], lpos[2], &sx, &sy);
-
-		GetPos(E_PLAYER, &ppos[0], &ppos[1], &ppos[2]);
-		vec3_sub(dist, lpos, ppos);
-
-		z = vec3_len(dist);
-		w = ((float)sprites[i].w) / z;
-		h = ((float)sprites[i].h) / z;
-
-		if (sx >= 0) {
-			mat4x4 proj;
-			GuiProjection(&proj);
-			ScreenToGui(sx, sy, &sx, &sy);
-			TexRectZ(proj, getTextureProgram(), sx, sy, 1.f, w, h,
-			         0, 0, 1, 1, sprites[i].texture);
-		}
+		TexRectZ(proj, getTextureProgram(), x, y, 1.f, w, h, 0, 0, 1, 1,
+		         sprites[i].texture);
 	}
 }
 
@@ -85,6 +98,7 @@ void AddSprite(Entity e, const char *filename, float scale) {
 	item->e = e;
 
 	sprites[numSprites].e = e;
+	sprites[numSprites].scale = scale;
 	sprites[numSprites].w = scale * 128;
 	sprites[numSprites].h = scale * 128;
 	sprites[numSprites].texture = GetTexture(filename);
@@ -93,7 +107,8 @@ void AddSprite(Entity e, const char *filename, float scale) {
 	numSprites++;
 }
 
-/* GetSpriteUpdates returns any updates made to sprites this frame and sets
+/* GetSpriteUpdates returns any updates made to sprites this frame and
+* sets
 * numUpdates to the number of sprites updated. */
 struct SpriteUpdate *GetSpriteUpdates(int *num) {
 	*num = numUpdates;

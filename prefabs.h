@@ -2,6 +2,7 @@
 #define PREFABS_H
 
 int Berry(int, float, float, float);
+int Banana(int, float, float, float);
 int Grass1(int, float, float, float);
 int Tree1(int, float, float, float);
 int Floor1(int, float, float, float);

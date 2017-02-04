@@ -190,7 +190,7 @@ void GenerateRoom(Entity e, enum RoomType type) {
 	int grass = trees + i;
 	for (i = 0; i < 500; ++i) {
 		float x = rand() % (size * 2) - size;
-		float y = 0;
+		float y = -1;
 		float z = rand() % (size * 2) - size;
 		Grass1(grass + i, x, y, z);
 	}
@@ -199,8 +199,11 @@ void GenerateRoom(Entity e, enum RoomType type) {
 	int berries = grass + i;
 	for (i = 0; i < 10; i++) {
 		float x = rand() % (size * 2) - size;
-		float y = 0;
+		float y = -1;
 		float z = rand() % (size * 2) - size;
-		Berry(berries + i, x, y, z);
+		if (i % 2)
+			Berry(berries + i, x, y, z);
+		else
+			Banana(berries + i, x, y, z);
 	}
 }
