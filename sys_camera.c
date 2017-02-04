@@ -470,13 +470,13 @@ void WorldToScreen(Entity e, float x, float y, float z, int *sx, int *sy) {
 }
 
 /* Raycast casts a ray from the camera at the given screen coordinates. */
-void Raycast(Entity e, int x, int y, vec3 start, vec3 stop) {
+bool Raycast(Entity e, int x, int y, vec3 start, vec3 stop) {
 	struct Camera *c;
 	int width, height;
 	mat4x4 v, pv, invPV;
 
 	if ((c = getCamera(e)) == NULL)
-		return;
+		return false;
 
 	glfwGetFramebufferSize(win, &width, &height);
 	mat4x4_mul(pv, c->projection, v);
@@ -489,7 +489,7 @@ void Raycast(Entity e, int x, int y, vec3 start, vec3 stop) {
 		           (float)y / height * 2.f - 1.f, 2.f * z - 1.f, 1.f};
 		mat4x4_mul_vec4(res, invPV, in);
 		if (res[3] == 0.f)
-			return;
+			return false;
 		start[0] = res[0];
 		start[1] = res[1];
 		start[2] = res[2];
@@ -501,11 +501,13 @@ void Raycast(Entity e, int x, int y, vec3 start, vec3 stop) {
 		           (float)y / height * 2.f - 1.f, 2.f * z - 1.f, 1.f};
 		mat4x4_mul_vec4(res, invPV, in);
 		if (res[3] == 0.f)
-			return;
+			return false;
 		stop[0] = res[0];
 		stop[1] = res[1];
 		stop[2] = res[2];
 	}
+
+	return true;
 }
 
 /* GetProjection sets projection to e's camera's projection matrix. */
@@ -525,6 +527,11 @@ void lmouse(int action) {
 		double x, y;
 		vec3 start, stop;
 		glfwGetCursorPos(win, &x, &y);
-		Raycast(E_PLAYER, x, y, start, stop);
+		if (Raycast(E_PLAYER, x, y, start, stop)) {
+			dinfof("%f %f %f", start[0], start[1], start[2]);
+			dinfof("%f %f %f", stop[0], stop[1], stop[2]);
+		} else {
+			dwarnf("raycast failed");
+		}
 	}
 }

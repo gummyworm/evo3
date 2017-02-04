@@ -69,22 +69,27 @@ void mouseMove(GLFWwindow *window, double x, double y) {
 	}
 }
 
+/* mouseButton is the GLFW callback to handle mouse button events. */
 void mouseButton(GLFWwindow *window, int button, int action, int mods) {
 	UNUSED(window);
 	UNUSED(mods);
 	int i;
 
 	if (button == GLFW_MOUSE_BUTTON_LEFT) {
-		for (i = 0; i < numMouseCallbacks; ++i) {
-			if ((mouseButtonCallbacks[i].layer & enabled) != 0)
-				if (mouseButtonCallbacks[i].left)
+		for (i = 0; i < numMouseButtonCallbacks; ++i) {
+			if ((mouseButtonCallbacks[i].layer & enabled) != 0) {
+				if (mouseButtonCallbacks[i].left) {
 					mouseButtonCallbacks[i].left(action);
+				}
+			}
 		}
 	} else if (button == GLFW_MOUSE_BUTTON_RIGHT) {
-		for (i = 0; i < numMouseCallbacks; ++i) {
-			if ((mouseButtonCallbacks[i].layer & enabled) != 0)
-				if (mouseButtonCallbacks[i].right)
+		for (i = 0; i < numMouseButtonCallbacks; ++i) {
+			if ((mouseButtonCallbacks[i].layer & enabled) != 0) {
+				if (mouseButtonCallbacks[i].right) {
 					mouseButtonCallbacks[i].right(action);
+				}
+			}
 		}
 	}
 }
@@ -94,6 +99,7 @@ void InitInput(GLFWwindow *win) {
 	enabled = 0xffffffff;
 	numKeyCallbacks = 0;
 	numMouseCallbacks = 0;
+	numMouseButtonCallbacks = 0;
 	glfwSetKeyCallback(win, key);
 	glfwSetCursorPosCallback(win, mouseMove);
 	glfwSetMouseButtonCallback(win, mouseButton);
@@ -156,6 +162,6 @@ void InputRegisterMouseButtonEvent(uint32_t layer, void (*l)(int),
                                    void (*r)(int)) {
 	mouseButtonCallbacks[numMouseButtonCallbacks].layer = layer;
 	mouseButtonCallbacks[numMouseButtonCallbacks].left = l;
-	mouseButtonCallbacks[numMouseButtonCallbacks].left = r;
+	mouseButtonCallbacks[numMouseButtonCallbacks].right = r;
 	numMouseButtonCallbacks++;
 }
