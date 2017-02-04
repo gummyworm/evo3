@@ -160,8 +160,8 @@ extern void genWalls(Entity n, Entity s, Entity e, Entity w);
 /* GenerateRoom creates a new room and attaches it to e.  It then adds a number
  * of additional entities (influenced by the given room type). */
 void GenerateRoom(Entity e, enum RoomType type) {
-	const int size = 10;
-	int i;
+	const int size = 6;
+	int i, j;
 
 	AddRoom(e, "GENERATED ROOM", "This test room was generated", -size,
 	        -size, -size, size * 2, size * 2, size * 2);
@@ -177,12 +177,30 @@ void GenerateRoom(Entity e, enum RoomType type) {
 	genFloor(E_ROOM + 4);
 	genCeiling(E_ROOM + 5);
 
-	for (i = 0; i < 10; i += 2) {
+	/* add some trees */
+	int trees = E_ROOM + 5;
+	for (i = 0; i < 10; ++i) {
 		float x = rand() % (size * 2) - size;
 		float y = -1;
 		float z = rand() % (size * 2) - size;
+		Tree1(trees + i, x, y, z);
+	}
 
-		Tree1(E_ROOM + i + 5, x + .5f, y, z + .1f);
-		Berry(E_ROOM + i + 6, x, y + 1, z);
+	/* grass */
+	int grass = trees + i;
+	for (i = 0; i < 500; ++i) {
+		float x = rand() % (size * 2) - size;
+		float y = 0;
+		float z = rand() % (size * 2) - size;
+		Grass1(grass + i, x, y, z);
+	}
+
+	/* add some frutas */
+	int berries = grass + i;
+	for (i = 0; i < 10; i++) {
+		float x = rand() % (size * 2) - size;
+		float y = 0;
+		float z = rand() % (size * 2) - size;
+		Berry(berries + i, x, y, z);
 	}
 }

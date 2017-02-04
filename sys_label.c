@@ -67,7 +67,7 @@ void UpdateLabelSystem() {
 		if (size > LABEL_MAX_FONT_SIZE)
 			size = LABEL_MAX_FONT_SIZE;
 
-		if (sx >= 0) {
+		if (sx >= 0 && sy >= 0) {
 			mat4x4 proj;
 			ScreenToGui(sx, sy, &sx, &sy);
 			GuiProjection(&proj);

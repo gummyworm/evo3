@@ -11,6 +11,9 @@
 #define MAX_VERTEX_BUFFER 512 * 1024
 #define MAX_ELEMENT_BUFFER 128 * 1024
 
+#define GUI_NEAR_PLANE -1.f
+#define GUI_FAR_PLANE 1.f
+
 struct entityToWidget {
 	Entity e;
 	struct Widget *widget;
@@ -32,7 +35,7 @@ static GLFWwindow *win;
 static void drawTextbox(struct Widget *w) {
 	mat4x4 proj;
 	mat4x4_identity(proj);
-	mat4x4_ortho(proj, 0, GUI_WIDTH, GUI_HEIGHT, 0, 1.f, -1.f);
+	GuiProjection(&proj);
 	Text(proj, w->x, w->y, w->data.textbox.fontsize, w->data.textbox.text);
 }
 
@@ -139,7 +142,7 @@ struct WidgetUpdate *GetWidgetUpdates(int *num) {
 static void DrawWidget(struct Widget *w) {
 	mat4x4 proj;
 	mat4x4_identity(proj);
-	mat4x4_ortho(proj, 0, GUI_WIDTH, GUI_HEIGHT, 0, 1.f, -1.f);
+	GuiProjection(&proj);
 
 	Rect(proj, w->x, w->y, w->width, w->height, w->color);
 }
@@ -158,7 +161,8 @@ void AddTextBox(Entity e, unsigned x, unsigned y, const char *text) {
 
 /* GuiProjection sets proj to the standard GUI projection matrix. */
 void GuiProjection(mat4x4 *proj) {
-	mat4x4_ortho(*proj, 0, GUI_WIDTH, GUI_HEIGHT, 0, 1.f, -1.f);
+	mat4x4_ortho(*proj, 0, GUI_WIDTH, GUI_HEIGHT, 0, GUI_NEAR_PLANE,
+	             GUI_FAR_PLANE);
 }
 
 /* ScreenToGui sets (x, y) to the GUI coordinates that correspond to the given

@@ -38,12 +38,13 @@ static void update() {
 	/* pre render updates */
 	UpdateTransformSystem();
 	UpdateInput();
-	UpdateSpriteSystem();
 	UpdateFPSControllerSystem();
 
 	/* render */
 	glEnable(GL_DEPTH_TEST);
 	UpdateCameraSystem();
+	glEnable(GL_BLEND);
+	UpdateSpriteSystem();
 
 	/* post main render updates */
 	glDisable(GL_DEPTH_TEST);

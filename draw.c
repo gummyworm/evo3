@@ -1,5 +1,6 @@
 #include "draw.h"
 #include "debug.h"
+#include "third-party/include/uthash.h"
 #include <SOIL.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -92,6 +93,14 @@ static GLchar const *bayerFrag =
     "  float final = find_closest(x, y, grayscale);\n"
     "  oColor = vec4(finalRGB, 1.0);\n"
     "}\n";
+
+struct LoadedTexture {
+	GLuint id;
+	char filename[32];
+	UT_hash_handle hh;
+};
+
+static struct LoadedTexture *loadedTextures;
 
 /* makeProgram returns a compiled and linked shader from the given vertex
  * and
@@ -382,6 +391,11 @@ void Text(mat4x4 proj, unsigned x, unsigned y, unsigned sz, const char *msg) {
 GLuint GetTexture(const char *filename) {
 	int width, height;
 	GLuint tex;
+	struct LoadedTexture *lup;
+
+	HASH_FIND_STR(loadedTextures, filename, lup);
+	if (lup != NULL)
+		return lup->id;
 
 	unsigned char *image =
 	    SOIL_load_image(filename, &width, &height, 0, SOIL_LOAD_RGBA);
@@ -400,6 +414,12 @@ GLuint GetTexture(const char *filename) {
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	SOIL_free_image_data(image);
+
+	lup = malloc(sizeof(struct LoadedTexture));
+	strcpy(lup->filename, filename);
+	lup->id = tex;
+	HASH_ADD_STR(loadedTextures, filename, lup);
+
 	return tex;
 }
 

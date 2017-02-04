@@ -42,6 +42,7 @@ void UpdateSpriteSystem() {
 	int i;
 	for (i = 0; i < numSprites; ++i) {
 		int sx, sy;
+		float z;
 		int w, h;
 		vec3 lpos;
 		vec3 ppos;
@@ -58,21 +59,22 @@ void UpdateSpriteSystem() {
 		GetPos(E_PLAYER, &ppos[0], &ppos[1], &ppos[2]);
 		vec3_sub(dist, lpos, ppos);
 
-		w = sprites[i].w / vec3_len(dist);
-		h = sprites[i].h / vec3_len(dist);
+		z = vec3_len(dist);
+		w = ((float)sprites[i].w) / z;
+		h = ((float)sprites[i].h) / z;
 
 		if (sx >= 0) {
 			mat4x4 proj;
-			ScreenToGui(sx, sy, &sx, &sy);
 			GuiProjection(&proj);
-			TexRect(proj, getTextureProgram(), sx, sy, w, h, 0, 0,
-			        1, 1, sprites[i].texture);
+			ScreenToGui(sx, sy, &sx, &sy);
+			TexRectZ(proj, getTextureProgram(), sx, sy, 1.f, w, h,
+			         0, 0, 1, 1, sprites[i].texture);
 		}
 	}
 }
 
-/* NewSprite creates a new sprite attached to the entity e. */
-void NewSprite(Entity e, const char *filename) {
+/* AddSprite creates a new sprite attached to the entity e. */
+void AddSprite(Entity e, const char *filename, float scale) {
 	struct entityToSprite *item;
 
 	if (getSprite(e) != NULL)
@@ -82,10 +84,10 @@ void NewSprite(Entity e, const char *filename) {
 	item->sprite = sprites + numSprites;
 	item->e = e;
 
-	sprites[numSprites].texture = SOIL_load_OGL_texture(
-	    filename, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID,
-	    SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB |
-	        SOIL_FLAG_COMPRESS_TO_DXT);
+	sprites[numSprites].e = e;
+	sprites[numSprites].w = scale * 128;
+	sprites[numSprites].h = scale * 128;
+	sprites[numSprites].texture = GetTexture(filename);
 
 	HASH_ADD_INT(entitiesToSprites, e, item);
 	numSprites++;
@@ -96,15 +98,4 @@ void NewSprite(Entity e, const char *filename) {
 struct SpriteUpdate *GetSpriteUpdates(int *num) {
 	*num = numUpdates;
 	return updates;
-}
-
-/* MoveSprite moves the sprite associated with the entity e by (dx, dy). */
-void MoveSprite(Entity e, int dx, int dy) {
-	UNUSED(dx);
-	UNUSED(dy);
-
-	{
-		struct SpriteUpdate u = {e};
-		addUpdate(&u);
-	}
 }
