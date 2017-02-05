@@ -383,7 +383,7 @@ void TexRect(mat4x4 mvp, GLint program, int x, int y, int w, int h, float clipx,
 }
 
 /* Text renders msg at (x,y). */
-void Text(mat4x4 proj, unsigned x, unsigned y, unsigned sz, const char *msg) {
+void Text(mat4x4 proj, int x, int y, unsigned sz, const char *msg) {
 	unsigned i;
 	unsigned cx, cy;
 	float clipx, clipy, clipw, cliph;
@@ -392,14 +392,16 @@ void Text(mat4x4 proj, unsigned x, unsigned y, unsigned sz, const char *msg) {
 	static GLuint fontTex;
 
 	if (fontTex == 0) {
-		fontTex = GetTexture("font.png");
+		if ((fontTex = GetTexture("font.png")) == 0)
+			return;
 	}
 
 	cx = x;
 	cy = y;
 	for (i = 0; i < strlen(msg); ++i) {
-		clipx = (msg[i] % 16) / 16.f;
-		clipy = (msg[i] / 16) / 16.f;
+		int c = msg[i];
+		clipx = clipw * (c % 16);
+		clipy = cliph * (c / 16);
 		TexRect(proj, getTextureProgram(), cx, cy, sz, sz, clipx, clipy,
 		        clipw, cliph, fontTex);
 		cx += sz;

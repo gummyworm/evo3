@@ -14,7 +14,7 @@ void TexRectZ(mat4x4, GLint, int, int, float, int, int, float, float, float,
               float, GLuint);
 void TexRectZRot(mat4x4, GLint, int, int, float, int, int, float, float, float,
                  float, float, GLuint);
-void Text(mat4x4, unsigned, unsigned, unsigned, const char *);
+void Text(mat4x4, int, int, unsigned, const char *);
 GLuint GetTexture(const char *filename);
 
 GLint makeProgram(GLchar const *, GLchar const *);

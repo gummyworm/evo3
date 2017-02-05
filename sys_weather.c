@@ -1,6 +1,8 @@
 #include "draw.h"
 #include "systems.h"
 #include "third-party/include/uthash.h"
+#include <stdio.h>
+#include <string.h>
 
 struct entityToWeather {
 	Entity e;
@@ -35,6 +37,7 @@ static void addUpdate(struct WeatherUpdate *u) { updates[numUpdates++] = *u; }
 /* drawWeatherUI renders the GUI that displays weather information. */
 static void drawWeatherUI(struct Weather *w) {
 	static GLuint vane;
+	char temp[32];
 	mat4x4 proj;
 
 	if (vane == 0) {
@@ -43,9 +46,11 @@ static void drawWeatherUI(struct Weather *w) {
 	}
 
 	GuiProjection(proj);
+
+	sprintf(temp, "%f", w->temp);
 	TexRectZRot(proj, getTextureProgram(), VANE_X, VANE_Y, 0.f, VANE_W,
 	            VANE_H, 0.f, 0.f, 1.f, 1.f, w->windAngle, vane);
-	dinfof("%f", w->windAngle);
+	Text(proj, VANE_X + VANE_W, 0, 8, temp);
 }
 
 /* InitWeatherSystem initializes the weather system. */
