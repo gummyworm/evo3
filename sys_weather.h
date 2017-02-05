@@ -6,7 +6,7 @@
 enum { MAX_WEATHERS = 8192,
 };
 
-enum { VANE_X = 20,
+enum { VANE_X = 30,
        VANE_Y = 0,
        VANE_W = 20,
        VANE_H = 20,

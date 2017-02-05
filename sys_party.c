@@ -40,18 +40,27 @@ void InitPartySystem() {}
 
 /* UpdatePartySystem updates all partys that have been created. */
 void UpdatePartySystem() {
+	static GLuint overlay;
 	int i;
 	int x, y, w, h;
 	mat4x4 proj;
 
+	if (overlay == 0)
+		if ((overlay = GetTexture("res/portraitoverlay.png")) == 0)
+			return;
+
 	GuiProjection(proj);
-	w = 20;
-	h = 20;
+	w = 30;
+	h = 33;
 	x = 0;
 	y = 0;
-	for (i = 0; i < numPartyMembers; ++i) {
+	for (i = 0; i < 5; ++i) {
+		Rect(proj, x, y, w, h, 0x000000ff);
+		if (i < numPartyMembers)
+			TexRect(proj, getTextureProgram(), x, y, w, h, 0.f, 0.f,
+			        1.f, 1.f, partyMembers[i].portraitTexture);
 		TexRect(proj, getTextureProgram(), x, y, w, h, 0.f, 0.f, 1.f,
-		        1.f, partyMembers[i].portraitTexture);
+		        1.f, overlay);
 		y += h;
 	}
 }
