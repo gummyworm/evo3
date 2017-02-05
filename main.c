@@ -20,6 +20,7 @@ static void init(GLFWwindow *win) {
 
 	DrawInit();
 	InitInput(win);
+	InitAudioSystem();
 
 	InitUnitSystem();
 	InitSpriteSystem();
@@ -31,6 +32,13 @@ static void init(GLFWwindow *win) {
 
 	InitWidgetSystem(win);
 	InitCameraSystem(win);
+}
+
+/* deinit deinitializes the various systems used in the game. */
+static void deinit(GLFWwindow *win) {
+	DeinitAudioSystem();
+	glfwDestroyWindow(win);
+	glfwTerminate();
 }
 
 /* update updates the game. */
@@ -132,8 +140,7 @@ int main() {
 		frame++;
 	}
 
-	glfwDestroyWindow(window);
-	glfwTerminate();
+	deinit(window);
 
 	return 0;
 }
