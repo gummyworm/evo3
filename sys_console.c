@@ -331,7 +331,7 @@ static void key(int key, int button, int action, int mods) {
 }
 
 /* lmouse is the left mouse button callback. */
-void lmouse(int action) {
+static void lmouse(int action) {
 	struct Console *c;
 
 	if (numConsoles <= 0)
@@ -363,6 +363,32 @@ void lmouse(int action) {
 		if (strlen(l) > 0)
 			addLineOverTime(consoles + 0, l,
 			                CONSOLE_PRINT_INTERVAL);
+	}
+}
+
+/* rmouse is the right mouse button callback. */
+static void rmouse(int action) {
+	struct Console *c;
+
+	if (numConsoles <= 0)
+		return;
+	c = consoles + 0;
+
+	if (action == GLFW_PRESS) {
+		Entity e;
+		double x, y;
+		int gx, gy;
+
+		glfwGetCursorPos(win, &x, &y);
+		WindowToGui(x, y, &gx, &gy);
+		e = SpritePick(0, gx, gy);
+
+		{
+			const char *desc = GetThingDescription(e);
+			if (desc != NULL)
+				addLineOverTime(consoles + 0, (char *)desc,
+				                CONSOLE_PRINT_INTERVAL);
+		}
 	}
 }
 
@@ -496,7 +522,7 @@ void AddConsole(Entity e) {
 	consoles[numConsoles].addBuff[0] = '\0';
 	consoles[numConsoles].overlayTex = GetTexture("res/consoleoverlay.png");
 
-	InputRegisterMouseButtonEvent(INPUT_LAYER_DEFAULT, lmouse, NULL);
+	InputRegisterMouseButtonEvent(INPUT_LAYER_DEFAULT, lmouse, rmouse);
 
 	HASH_ADD_INT(entitiesToConsoles, e, item);
 	numConsoles++;

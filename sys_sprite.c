@@ -87,7 +87,7 @@ void UpdateSpriteSystem() {
 }
 
 /* AddSprite creates a new sprite attached to the entity e. */
-void AddSprite(Entity e, const char *filename, float scale) {
+void AddSprite(Entity e, const char *filename, float xscale, float yscale) {
 	struct entityToSprite *item;
 
 	if (getSprite(e) != NULL)
@@ -98,9 +98,8 @@ void AddSprite(Entity e, const char *filename, float scale) {
 	item->e = e;
 
 	sprites[numSprites].e = e;
-	sprites[numSprites].scale = scale;
-	sprites[numSprites].w = scale * 128;
-	sprites[numSprites].h = scale * 128;
+	sprites[numSprites].w = xscale * 128;
+	sprites[numSprites].h = yscale * 128;
 	sprites[numSprites].texture = GetTexture(filename);
 
 	HASH_ADD_INT(entitiesToSprites, e, item);

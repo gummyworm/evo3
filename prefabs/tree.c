@@ -6,7 +6,7 @@ int Tree1(int e, float x, float y, float z) {
 
 	AddTransform(e, x, y, z);
 	// AddColorRender(e, "tree.obj", 0.f, 1.f, 0.3f, 1.f);
-	AddSprite(e, "res/tree.png", scale);
-	AddLabel(e, "TREE", 5.0f);
+	AddSprite(e, "res/tree.png", scale, scale);
+	AddLabel(e, "TREE", 5.f);
 	return 0;
 }

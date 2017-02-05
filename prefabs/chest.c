@@ -3,7 +3,7 @@
 
 void Chest(Entity e, float x, float y, float z) {
 	AddTransform(e, x, y, z);
-	AddSprite(e, "res/chest.png", 1.f);
+	AddSprite(e, "res/chest.png", 1.5f, 1.f);
 	AddLabel(e, "chest", 1.0f);
 	AddContainer(e, "CHEST", "GOOOOOOOOOLLLLLD");
 }
