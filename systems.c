@@ -14,6 +14,7 @@ void RemoveEntity(Entity e) {
 	RemoveTransform(e);
 	RemoveRoom(e);
 	RemoveThing(e);
+	RemovePartyMember(e);
 }
 
 /* DisableEntity notifies systems that e is not to be updated. */

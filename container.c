@@ -1,7 +1,17 @@
 #include "system.h"
-#include "thing.h"
+#include "systems.h"
 
 extern struct Thing *getThing(Entity e);
+
+/* mouseHandler is called when the OPEN dialog receives a mouse event. */
+static void mouseHandler(Entity self, int action) {
+	struct Thing *t;
+
+	if (action != GLFW_PRESS)
+		return;
+	if ((t = getThing(self)) == NULL)
+		return;
+}
 
 /* handleOpenBox provides default behavior for the OPEN action for
  * containers.
@@ -20,7 +30,11 @@ static bool handleOpenBox(Entity self, Entity prop, Entity actor, char *out) {
 	}
 
 	t->properties.box.open = true;
+	t->properties.box.opener = actor;
 	sprintf(out, "The %s is now open", t->name);
+
+	AddTextBox(self, 1, 1, GetThingName(self));
+
 	return true;
 }
 

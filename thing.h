@@ -34,6 +34,7 @@ struct Thing {
 	enum { THING_NOTHING, THING_ITEM, THING_BOX } type;
 	union {
 		struct {
+			Entity opener;
 			bool open;
 		} box;
 		struct {

@@ -35,7 +35,7 @@ static GLFWwindow *win;
 static void drawTextbox(struct Widget *w) {
 	mat4x4 proj;
 	mat4x4_identity(proj);
-	GuiProjection(&proj);
+	GuiProjection(proj);
 	Text(proj, w->x, w->y, w->data.textbox.fontsize, w->data.textbox.text);
 }
 
@@ -142,26 +142,28 @@ struct WidgetUpdate *GetWidgetUpdates(int *num) {
 static void DrawWidget(struct Widget *w) {
 	mat4x4 proj;
 	mat4x4_identity(proj);
-	GuiProjection(&proj);
+	GuiProjection(proj);
 
 	Rect(proj, w->x, w->y, w->width, w->height, w->color);
 }
 
 /* AddTextBox adds a TextBox widget to entity e. */
 void AddTextBox(Entity e, unsigned x, unsigned y, const char *text) {
-	struct Widget w = {.x = x,
-	                   .y = y,
-	                   .width = 100,
-	                   .height = 32,
-	                   .color = 0x00000000,
-	                   .type = TEXTBOX,
-	                   .data = {.textbox = {.text = text, .fontsize = 32}}};
+	struct Widget w = {
+	    .x = x,
+	    .y = y,
+	    .width = 100,
+	    .height = 32,
+	    .color = 0x00000000,
+	    .type = TEXTBOX,
+	    .data = {.textbox = {.text = text, .fontsize = 32}},
+	};
 	addWidget(e, &w);
 }
 
 /* GuiProjection sets proj to the standard GUI projection matrix. */
-void GuiProjection(mat4x4 *proj) {
-	mat4x4_ortho(*proj, 0, GUI_WIDTH, GUI_HEIGHT, 0, GUI_NEAR_PLANE,
+void GuiProjection(mat4x4 proj) {
+	mat4x4_ortho(proj, 0, GUI_WIDTH, GUI_HEIGHT, 0, GUI_NEAR_PLANE,
 	             GUI_FAR_PLANE);
 }
 

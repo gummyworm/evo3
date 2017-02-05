@@ -369,6 +369,7 @@ static void lmouse(int action) {
 /* rmouse is the right mouse button callback. */
 static void rmouse(int action) {
 	struct Console *c;
+	char *desc;
 
 	if (numConsoles <= 0)
 		return;
@@ -383,12 +384,14 @@ static void rmouse(int action) {
 		WindowToGui(x, y, &gx, &gy);
 		e = SpritePick(0, gx, gy);
 
-		{
-			const char *desc = GetThingDescription(e);
-			if (desc != NULL)
-				addLineOverTime(consoles + 0, (char *)desc,
-				                CONSOLE_PRINT_INTERVAL);
+		desc = (char *)GetThingDescription(e);
+		if (desc == NULL) {
+			dinfof("%s", GetActorName(e));
+			desc = (char *)GetActorDescription(e);
 		}
+
+		if (desc != NULL)
+			addLineOverTime(c, desc, CONSOLE_PRINT_INTERVAL);
 	}
 }
 
@@ -398,7 +401,7 @@ static void draw(struct Console *console) {
 	char buff[CONSOLE_WIDTH / CONSOLE_FONT_WIDTH + 2];
 	mat4x4 mvp;
 
-	GuiProjection(&mvp);
+	GuiProjection(mvp);
 	Rect(mvp, CONSOLE_BSTART_X, CONSOLE_BSTART_Y + 4, CONSOLE_BWIDTH,
 	     CONSOLE_BHEIGHT, CONSOLE_COLOR);
 

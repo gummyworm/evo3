@@ -45,7 +45,7 @@ void AddWidget(Entity);
 void RemoveWidget(Entity);
 void AddTextBox(Entity, unsigned, unsigned, const char *);
 
-void GuiProjection(mat4x4 *);
+void GuiProjection(mat4x4);
 void ScreenToGui(int, int, int *, int *);
 void WindowToGui(int, int, int *, int *);
 

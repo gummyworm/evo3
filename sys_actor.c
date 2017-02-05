@@ -40,17 +40,19 @@ void InitActorSystem() {}
 void UpdateActorSystem() {}
 
 /* AddActor adds a actor component to the entity e. */
-void AddActor(Entity e, const char *name) {
+void AddActor(Entity e, const char *name, const char *desc) {
 	struct entityToActor *item;
 
 	if (getActor(e) != NULL)
 		return;
 	item = malloc(sizeof(struct entityToActor));
+
 	item->actor = actors + numActors;
 	item->e = e;
 
 	actors[numActors].e = e;
 	actors[numActors].name = name;
+	actors[numActors].desc = desc;
 	actors[numActors].numItems = 0;
 
 	HASH_ADD_INT(entitiesToActors, e, item);
@@ -111,4 +113,20 @@ int GetInventory(Entity e, Entity **inv) {
 
 	*inv = a->inventory;
 	return a->numItems;
+}
+
+/* GetActorName returns the name of the actor attached to e. */
+const char *GetActorName(Entity e) {
+	struct Actor *t;
+	if ((t = getActor(e)) == NULL)
+		return NULL;
+	return t->name;
+}
+
+/* GetActorName returns the description of the actor attached to e. */
+const char *GetActorDescription(Entity e) {
+	struct Actor *t;
+	if ((t = getActor(e)) == NULL)
+		return NULL;
+	return t->desc;
 }

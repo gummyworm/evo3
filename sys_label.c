@@ -39,40 +39,58 @@ static void addUpdate(struct LabelUpdate *u) {
 /* InitLabelSystem initializes the label system. */
 void InitLabelSystem() {}
 
+/* drawLabel renders the given label. */
+void drawLabel(struct Label *l) {
+	int sx, sy;
+	int i;
+	int size;
+	vec3 lpos;
+	vec3 ppos;
+	vec3 dist;
+
+	if (!Enabled(l->e))
+		return;
+	if (!GetPos(l->e, &lpos[0], &lpos[1], &lpos[2]))
+		return;
+
+	lpos[1] += l->offset;
+
+	WorldToScreen(E_PLAYER, lpos[0], lpos[1], lpos[2], &sx, &sy);
+
+	GetPos(E_PLAYER, &ppos[0], &ppos[1], &ppos[2]);
+	vec3_sub(dist, lpos, ppos);
+
+	size = 10.f / vec3_len(dist) * LABEL_MAX_FONT_SIZE;
+	if (size > LABEL_MAX_FONT_SIZE)
+		size = LABEL_MAX_FONT_SIZE;
+
+	if (sx < 0 || sy < 0)
+		return;
+
+	mat4x4 proj;
+	ScreenToGui(sx, sy, &sx, &sy);
+	GuiProjection(proj);
+
+	for (i = 0; i < l->numContent; ++i) {
+		struct LabelContent *c = l->content + i;
+		switch (c->type) {
+		case LABEL_TEXT:
+			Text(proj, sx, sy, size, c->data.text);
+			break;
+		case LABEL_RECT:
+			Rect(proj, sx, sy, c->data.rect.w, c->data.rect.h,
+			     c->data.rect.color);
+		}
+		sy += size;
+	}
+}
+
 /* UpdateLabelSystem updates all labels that have been created. */
 void UpdateLabelSystem() {
 	int i;
 
 	for (i = 0; i < numLabels; ++i) {
-		int sx, sy;
-		int size;
-		vec3 lpos;
-		vec3 ppos;
-		vec3 dist;
-
-		if (!Enabled(labels[i].e))
-			continue;
-
-		if (!GetPos(labels[i].e, &lpos[0], &lpos[1], &lpos[2]))
-			continue;
-
-		lpos[1] += labels[i].offset;
-
-		WorldToScreen(E_PLAYER, lpos[0], lpos[1], lpos[2], &sx, &sy);
-
-		GetPos(E_PLAYER, &ppos[0], &ppos[1], &ppos[2]);
-		vec3_sub(dist, lpos, ppos);
-
-		size = 10.f / vec3_len(dist) * LABEL_MAX_FONT_SIZE;
-		if (size > LABEL_MAX_FONT_SIZE)
-			size = LABEL_MAX_FONT_SIZE;
-
-		if (sx >= 0 && sy >= 0) {
-			mat4x4 proj;
-			ScreenToGui(sx, sy, &sx, &sy);
-			GuiProjection(&proj);
-			Text(proj, sx, sy, size, labels[i].text);
-		}
+		drawLabel(labels + i);
 	}
 }
 
@@ -87,8 +105,10 @@ void AddLabel(Entity e, const char *text, float offset) {
 	item->e = e;
 
 	labels[numLabels].e = e;
-	labels[numLabels].text = text;
 	labels[numLabels].offset = offset;
+	labels[numLabels].content[0] =
+	    (struct LabelContent){.type = LABEL_TEXT, .data = {.text = text}};
+	labels[numLabels].numContent = 1;
 
 	HASH_ADD_INT(entitiesToLabels, e, item);
 	numLabels++;
@@ -109,4 +129,20 @@ void RemoveLabel(Entity e) {
 		HASH_DEL(entitiesToLabels, c);
 		free(c);
 	}
+}
+
+/* AddLabelRect adds a rectangle to the Label content of the label attached to
+ * e. */
+void AddLabelRect(Entity e, int w, int h, uint32_t color) {
+	struct Label *l;
+
+	if ((l = getLabel(e)) == NULL)
+		return;
+
+	l->content[l->numContent].type = LABEL_RECT;
+	l->content[l->numContent].data.rect.w = w;
+	l->content[l->numContent].data.rect.h = h;
+	l->content[l->numContent].data.rect.color = color;
+
+	l->numContent++;
 }

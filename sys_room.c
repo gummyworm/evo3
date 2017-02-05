@@ -215,4 +215,13 @@ void GenerateRoom(Entity e, enum RoomType type) {
 		float z = rand() / (float)(RAND_MAX / (size * 2)) - size;
 		Chest(treasure + i, x, y, z);
 	}
+
+	/* add monsters */
+	int monsters = treasure + i;
+	for (i = 0; i < 1; i++) {
+		float x = rand() / (float)(RAND_MAX / (size * 2)) - size;
+		float y = -1;
+		float z = rand() / (float)(RAND_MAX / (size * 2)) - size;
+		Snake(monsters + i, x, y, z);
+	}
 }

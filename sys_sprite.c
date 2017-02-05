@@ -74,7 +74,7 @@ void UpdateSpriteSystem() {
 	int i;
 	mat4x4 proj;
 
-	GuiProjection(&proj);
+	GuiProjection(proj);
 
 	for (i = 0; i < numSprites; ++i) {
 		float z;
@@ -132,7 +132,9 @@ Entity SpritePick(Entity e, int px, int py) {
 			continue;
 		if ((px > x) && (px < (x + w)) && (py > y) && (py < (y + h))) {
 			if (picked == 0 || z < pickedZ) {
-				if (GetThingName(sprites[i].e)) {
+				/* only pick "Thing"s and "Actor"s */
+				if (GetThingName(sprites[i].e) ||
+				    GetActorName(sprites[i].e)) {
 					pickedZ = z;
 					picked = sprites[i].e;
 				}

@@ -12,5 +12,6 @@ int Floor2(Entity, float, float, float);
 int WallEW(Entity, float, float, float);
 int WallNS(Entity, float, float, float);
 void Chest(Entity, float, float, float);
+void Snake(Entity, float, float, float);
 
 #endif

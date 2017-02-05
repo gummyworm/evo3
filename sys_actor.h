@@ -10,12 +10,20 @@ enum { MAX_ACTORS = 8192,
        MAX_INVENTORY_SIZE = 1024,
 };
 
+struct ActorStats {
+	int hp;
+};
+
 /* Actor is a struct that represents an animate character */
 struct Actor {
 	Entity e;
 	const char *name;
 	const char *brief;
 	const char *desc;
+
+	struct ActorStats currentStats;
+	struct ActorStats baseStats;
+	struct ActorStats maximumStats;
 
 	Entity inventory[MAX_INVENTORY_SIZE];
 	int numItems;
@@ -28,10 +36,12 @@ struct ActorUpdate {
 
 void InitActorSystem();
 void UpdateActorSystem();
-void AddActor(Entity, const char *);
+void AddActor(Entity, const char *, const char *);
 void RemoveActor(Entity);
 void InventoryRemove(Entity, Entity);
 void InventoryAdd(Entity, Entity);
 int GetInventory(Entity, Entity **);
+const char *GetActorName(Entity);
+const char *GetActorDescription(Entity);
 
 #endif
