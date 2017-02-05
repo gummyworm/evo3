@@ -8,6 +8,7 @@
 #include <stdlib.h>
 
 #include "entities.h"
+#include "prefabs.h"
 
 /* onError is the GLFW callback for error handling. */
 static void onError(int error, const char *description) {
@@ -30,6 +31,7 @@ static void init(GLFWwindow *win) {
 	InitCommanderSystem();
 	InitFPSControllerSystem();
 	InitConsoleSystem(win);
+	InitWeatherSystem();
 
 	InitWidgetSystem(win);
 	InitCameraSystem(win);
@@ -61,6 +63,7 @@ static void update() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDisable(GL_DEPTH_TEST);
 	UpdatePartySystem();
+	UpdateWeatherSystem();
 	UpdateConsoleSystem();
 	UpdateWidgetSystem();
 	UpdateLabelSystem();
@@ -84,6 +87,8 @@ static void test() {
 	AddRender(E_ORANGE, "person.obj");
 	AddLabel(E_ORANGE, "orange", 1.0f);
 	AddToContainer(E_APPLE, E_ORANGE);
+
+	Weather(E_WEATHER, 0, 0, 0);
 }
 
 /* ClearUpdates resets all systems' updates. */

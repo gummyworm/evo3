@@ -13,5 +13,6 @@ int WallEW(Entity, float, float, float);
 int WallNS(Entity, float, float, float);
 void Chest(Entity, float, float, float);
 void Snake(Entity, float, float, float);
+void Weather(Entity e, float x, float y, float z);
 
 #endif

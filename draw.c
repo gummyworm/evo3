@@ -271,9 +271,10 @@ void Rect(mat4x4 mvp, unsigned x, unsigned y, unsigned w, unsigned h,
 	glBindVertexArray(0);
 }
 
-/* TexRectZ draws a wxh rectangle @ (x,y,z).  */
-void TexRectZ(mat4x4 mvp, GLint program, int x, int y, float z, int w, int h,
-              float clipx, float clipy, float clipw, float cliph, GLuint tex) {
+/* TexRectZRot draws a wxh rectangle @ (x,y,z) rotated by angle radians.  */
+void TexRectZRot(mat4x4 mvp, GLint program, int x, int y, float z, int w, int h,
+                 float clipx, float clipy, float clipw, float cliph,
+                 float angle, GLuint tex) {
 	static GLuint vao;
 	static struct { GLuint texco, pos; } buffs;
 	static struct { GLint texco, pos; } attrs;
@@ -281,8 +282,13 @@ void TexRectZ(mat4x4 mvp, GLint program, int x, int y, float z, int w, int h,
 	u = clipx;
 	v = clipy;
 
-	float vd[] = {x, y, z, 1, x + w, y,     z, 1, x + w, y + h, z, 1,
-	              x, y, z, 1, x + w, y + h, z, 1, x,     y + h, z, 1};
+	float x1 = -w / 2.f;
+	float x2 = w / 2.f;
+	float y1 = -h / 2.f;
+	float y2 = h / 2.f;
+
+	float vd[] = {x1, y1, z, 1, x2, y1, z, 1, x2, y2, z, 1,
+	              x1, y1, z, 1, x2, y2, z, 1, x1, y2, z, 1};
 
 	float td[] = {u, v, u + clipw, v,         u + clipw, v + cliph,
 	              u, v, u + clipw, v + cliph, u,         v + cliph};
@@ -321,8 +327,17 @@ void TexRectZ(mat4x4 mvp, GLint program, int x, int y, float z, int w, int h,
 			dwarnf("No MVP uniform found");
 			return;
 		}
-		glUniformMatrix4fv(mvp_location, 1, GL_FALSE,
-		                   (const GLfloat *)mvp);
+		{
+			mat4x4 rot, trans;
+			mat4x4 m, mv;
+			mat4x4_identity(m);
+			mat4x4_rotate_Z(rot, m, angle);
+			mat4x4_translate(trans, x + w / 2.f, y + h / 2.f, 0);
+			mat4x4_mul(mv, trans, rot);
+			mat4x4_mul(m, mvp, mv);
+			glUniformMatrix4fv(mvp_location, 1, GL_FALSE,
+			                   (const GLfloat *)m);
+		}
 
 		if ((tex_location = glGetUniformLocation(program, "tex0")) <
 		    0) {
@@ -351,6 +366,13 @@ void TexRectZ(mat4x4 mvp, GLint program, int x, int y, float z, int w, int h,
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
+}
+
+/* TexRectZ draws a w x h rectangle @ (x,y,z). */
+void TexRectZ(mat4x4 mvp, GLint program, int x, int y, float z, int w, int h,
+              float clipx, float clipy, float clipw, float cliph, GLuint tex) {
+	TexRectZRot(mvp, program, x, y, z, w, h, clipx, clipy, clipw, cliph,
+	            0.f, tex);
 }
 
 /* TexRect draws a w x h rectangle @ (x,y). */
