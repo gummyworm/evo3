@@ -272,9 +272,8 @@ void Rect(mat4x4 mvp, unsigned x, unsigned y, unsigned w, unsigned h,
 }
 
 /* TexRectZ draws a wxh rectangle @ (x,y,z).  */
-void TexRectZ(mat4x4 mvp, GLint program, unsigned x, unsigned y, float z,
-              unsigned w, unsigned h, float clipx, float clipy, float clipw,
-              float cliph, GLuint tex) {
+void TexRectZ(mat4x4 mvp, GLint program, int x, int y, float z, int w, int h,
+              float clipx, float clipy, float clipw, float cliph, GLuint tex) {
 	static GLuint vao;
 	static struct { GLuint texco, pos; } buffs;
 	static struct { GLint texco, pos; } attrs;
@@ -355,9 +354,8 @@ void TexRectZ(mat4x4 mvp, GLint program, unsigned x, unsigned y, float z,
 }
 
 /* TexRect draws a w x h rectangle @ (x,y). */
-void TexRect(mat4x4 mvp, GLint program, unsigned x, unsigned y, unsigned w,
-             unsigned h, float clipx, float clipy, float clipw, float cliph,
-             GLuint tex) {
+void TexRect(mat4x4 mvp, GLint program, int x, int y, int w, int h, float clipx,
+             float clipy, float clipw, float cliph, GLuint tex) {
 	TexRectZ(mvp, program, x, y, 1.f, w, h, clipx, clipy, clipw, cliph,
 	         tex);
 }
