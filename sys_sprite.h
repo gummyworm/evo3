@@ -25,6 +25,7 @@ void InitSpriteSystem();
 void UpdateSpriteSystem();
 void AddSprite(Entity, const char *, float, float);
 bool GetSpriteBounds(Entity, int *, int *, float *, int *, int *);
+GLuint GetSpriteTexture(Entity);
 Entity SpritePick(Entity, int, int);
 struct SpriteUpdate *GetSpriteUpdates(int *);
 

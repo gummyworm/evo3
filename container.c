@@ -1,7 +1,31 @@
+#include "draw.h"
 #include "system.h"
 #include "systems.h"
 
 extern struct Thing *getThing(Entity e);
+
+/* drawContents renders a widget to display the contents of the box e. */
+static void drawContents(Entity e, mat4x4 proj) {
+	struct Thing *t;
+	Entity *p;
+
+	if ((t = getThing(e)) == NULL)
+		return;
+
+	for (p = (int *)utarray_front(t->contents); p != NULL;
+	     p = (int *)utarray_next(t->contents, p)) {
+		GLuint tex;
+		if ((tex = GetSpriteTexture(*p))) {
+			float x, y, w, h;
+			x = 0.f;
+			y = 0.f;
+			w = 32.f;
+			h = 32.f;
+			TexRect(proj, getTextureProgram(), x, y, w, h, 0, 0, 1,
+			        1, tex);
+		}
+	}
+}
 
 /* mouseHandler is called when the OPEN dialog receives a mouse event. */
 static void mouseHandler(Entity self, int action) {
@@ -33,7 +57,7 @@ static bool handleOpenBox(Entity self, Entity prop, Entity actor, char *out) {
 	t->properties.box.opener = actor;
 	sprintf(out, "The %s is now open", t->name);
 
-	AddTextBox(self, 1, 1, GetThingName(self));
+	AddRenderWindow(self, drawContents);
 
 	return true;
 }

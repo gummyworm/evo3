@@ -69,6 +69,17 @@ bool GetSpriteBounds(Entity e, int *x, int *y, float *z, int *w, int *h) {
 	return false;
 }
 
+/* GetSpriteTexture returns the sprite attached to e's texture. */
+GLuint GetSpriteTexture(Entity e) {
+	struct Sprite *s;
+
+	if (!Enabled(e))
+		return 0;
+	if ((s = getSprite(e)) == NULL)
+		return false;
+	return s->texture;
+}
+
 /* UpdateSpriteSystem updates all sprites that have been created. */
 void UpdateSpriteSystem() {
 	int i;

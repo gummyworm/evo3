@@ -7,16 +7,22 @@ extern struct Thing *getThing(Entity e);
 static bool handleDrop(Entity self, Entity prop, Entity actor, char *out) {
 	UNUSED(prop);
 	struct Thing *t;
+	float x, y, z;
+	float dx, dy, dz;
 
 	if ((t = getThing(self)) == NULL)
 		return false;
 	if (t->owner != actor)
 		return false;
 
-	sprintf(out, "You drop the %s", t->name);
-	InventoryRemove(actor, self);
-	t->owner = actor;
+	if (GetPos(actor, &x, &y, &z) && GetViewDir(actor, &dx, &dy, &dz))
+		TransformSet(self, x + (dx * 2), -1, z + (dz * 2));
+
+	t->owner = 0;
 	EnableEntity(self);
+	InventoryRemove(actor, self);
+
+	sprintf(out, "You drop the %s", t->name);
 	return true;
 }
 

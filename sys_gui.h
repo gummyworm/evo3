@@ -23,12 +23,16 @@ struct Widget {
 	uint32_t color;
 	enum { NONE,
 	       TEXTBOX,
+	       WINDOW,
 	} type;
 	union {
 		struct {
 			unsigned fontsize;
 			const char *text;
 		} textbox;
+		struct {
+			void (*render)(Entity, mat4x4);
+		} window;
 
 	} data;
 	Entity e;
@@ -44,6 +48,7 @@ void UpdateWidgetSystem();
 void AddWidget(Entity);
 void RemoveWidget(Entity);
 void AddTextBox(Entity, unsigned, unsigned, const char *);
+void AddRenderWindow(Entity, void (*)(Entity, mat4x4));
 
 void GuiProjection(mat4x4);
 void ScreenToGui(int, int, int *, int *);

@@ -39,6 +39,23 @@ static void drawTextbox(struct Widget *w) {
 	Text(proj, w->x, w->y, w->data.textbox.fontsize, w->data.textbox.text);
 }
 
+/* drawWindow renders the window w. */
+static void drawWindow(struct Widget *w) {
+	mat4x4 proj, gui, trans;
+
+	GuiProjection(gui);
+	mat4x4_translate(trans, w->x, w->y, 0.f);
+	mat4x4_mul(proj, gui, trans);
+
+	glEnable(GL_SCISSOR_TEST);
+	glScissor(w->x, GUI_HEIGHT - w->y - w->height, w->width, w->height);
+
+	Rect(proj, 0, 0, w->width, w->height, 0x000000ff);
+	w->data.window.render(w->e, proj);
+
+	glDisable(GL_SCISSOR_TEST);
+}
+
 /* getWidget returns the widget attached to entity e (if there is one). */
 static struct Widget *getWidget(Entity e) {
 	struct entityToWidget *t;
@@ -107,6 +124,8 @@ void UpdateWidgetSystem() {
 		switch (w->type) {
 		case TEXTBOX:
 			drawTextbox(w);
+		case WINDOW:
+			drawWindow(w);
 		case NONE:
 		default:
 			break;
@@ -157,6 +176,20 @@ void AddTextBox(Entity e, unsigned x, unsigned y, const char *text) {
 	    .color = 0x00000000,
 	    .type = TEXTBOX,
 	    .data = {.textbox = {.text = text, .fontsize = 32}},
+	};
+	addWidget(e, &w);
+}
+
+/* AddRenderWindow adds a Window widget to entity e. */
+void AddRenderWindow(Entity e, void (*render)(Entity, mat4x4)) {
+	struct Widget w = {
+	    .x = 100,
+	    .y = 100,
+	    .width = GUI_WIDTH - 100,
+	    .height = GUI_HEIGHT - 100,
+	    .color = 0x00000000,
+	    .type = WINDOW,
+	    .data = {.window = {.render = render}},
 	};
 	addWidget(e, &w);
 }
