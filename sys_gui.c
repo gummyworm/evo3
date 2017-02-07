@@ -47,8 +47,18 @@ static void drawWindow(struct Widget *w) {
 	mat4x4_translate(trans, w->x, w->y, 0.f);
 	mat4x4_mul(proj, gui, trans);
 
-	glEnable(GL_SCISSOR_TEST);
-	glScissor(w->x, GUI_HEIGHT - w->y - w->height, w->width, w->height);
+	{
+		GLint vp[4];
+		float xs, ys;
+		glGetIntegerv(GL_VIEWPORT, vp);
+
+		xs = (float)vp[2] / GUI_WIDTH;
+		ys = (float)vp[3] / GUI_HEIGHT;
+
+		glEnable(GL_SCISSOR_TEST);
+		glScissor(w->x * xs, ys * (GUI_HEIGHT - w->y - w->height),
+		          xs * w->width, ys * w->height);
+	}
 
 	Rect(proj, 0, 0, w->width, w->height, 0x000000ff);
 	w->data.window.render(w->e, proj);
