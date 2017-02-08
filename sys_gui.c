@@ -193,6 +193,7 @@ void AddTextBox(Entity e, unsigned x, unsigned y, const char *text) {
 /* AddRenderWindow adds a Window widget to entity e. */
 void AddRenderWindow(Entity e, void (*render)(Entity, mat4x4)) {
 	struct Widget w = {
+	    .e = e,
 	    .x = 100,
 	    .y = 100,
 	    .width = GUI_WIDTH - 100,

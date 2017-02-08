@@ -84,6 +84,7 @@ static void test() {
 
 	AddTransform(E_ORANGE, 1, 0, -6.0f);
 	AddThing(E_ORANGE, "ORANGE", "It's a bright citrus fruit");
+	AddSprite(E_ORANGE, "res/banana.png", 1.f, 1.f);
 	AddRender(E_ORANGE, "person.obj");
 	AddLabel(E_ORANGE, "orange", 1.0f);
 	AddToContainer(E_APPLE, E_ORANGE);

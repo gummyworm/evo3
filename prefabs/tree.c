@@ -1,7 +1,7 @@
 #include "../entity.h"
 #include "../systems.h"
 
-int Tree1(int e, float x, float y, float z) {
+int Tree1(Entity e, float x, float y, float z) {
 	float scale = 5.f;
 
 	AddTransform(e, x, y, z);

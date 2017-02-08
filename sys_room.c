@@ -209,11 +209,13 @@ void GenerateRoom(Entity e, enum RoomType type) {
 
 	/* add treasure */
 	int treasure = berries + i;
-	for (i = 0; i < 1; i++) {
+	for (i = 0; i < 1; i += 2) {
 		float x = rand() / (float)(RAND_MAX / (size * 2)) - size;
 		float y = -1;
 		float z = rand() / (float)(RAND_MAX / (size * 2)) - size;
 		Chest(treasure + i, x, y, z);
+		Berry(treasure + i + 1, x, y, z);
+		AddToContainer(treasure + i, treasure + i + 1);
 	}
 
 	/* add monsters */

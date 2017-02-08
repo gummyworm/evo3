@@ -15,7 +15,7 @@ static void drawContents(Entity e, mat4x4 proj) {
 	for (p = (int *)utarray_front(t->contents); p != NULL;
 	     p = (int *)utarray_next(t->contents, p)) {
 		GLuint tex;
-		if ((tex = GetSpriteTexture(*p))) {
+		if ((tex = GetSpriteTexture(*p)) != 0) {
 			float x, y, w, h;
 			x = 0.f;
 			y = 0.f;

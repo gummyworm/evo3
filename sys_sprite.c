@@ -73,10 +73,9 @@ bool GetSpriteBounds(Entity e, int *x, int *y, float *z, int *w, int *h) {
 GLuint GetSpriteTexture(Entity e) {
 	struct Sprite *s;
 
-	if (!Enabled(e))
-		return 0;
 	if ((s = getSprite(e)) == NULL)
-		return false;
+		return 0;
+
 	return s->texture;
 }
 

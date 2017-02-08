@@ -1,7 +1,7 @@
 #include "../entity.h"
 #include "../systems.h"
 
-int Player(int e) {
+int Player(Entity e) {
 	AddTransform(e, 0, 0, 0);
 	AddCamera(e, 0);
 	AddActor(e, "PLAYER", "A heroic and mighty warrior!");
