@@ -1,28 +1,69 @@
 #include "draw.h"
+#include "entities.h"
 #include "system.h"
 #include "systems.h"
 
 extern struct Thing *getThing(Entity e);
 
 /* drawContents renders a widget to display the contents of the box e. */
-static void drawContents(Entity e, mat4x4 proj) {
+static void drawContents(Entity e, mat4x4 proj, int w, int h) {
 	struct Thing *t;
 	Entity *p;
+	float x, y, itemW, itemH;
 
 	if ((t = getThing(e)) == NULL)
 		return;
+
+	x = 0.f;
+	y = 0.f;
+	itemW = 32.f;
+	itemH = 32.f;
 
 	for (p = (int *)utarray_front(t->contents); p != NULL;
 	     p = (int *)utarray_next(t->contents, p)) {
 		GLuint tex;
 		if ((tex = GetSpriteTexture(*p)) != 0) {
-			float x, y, w, h;
-			x = 0.f;
-			y = 0.f;
-			w = 32.f;
-			h = 32.f;
-			TexRect(proj, getTextureProgram(), x, y, w, h, 0, 0, 1,
-			        1, tex);
+			if (y > h) {
+				y = 0;
+				x += itemW;
+			}
+			TexRect(proj, getTextureProgram(), x, y, itemW, itemH,
+			        0, 0, 1, 1, tex);
+			y += itemH;
+		}
+	}
+}
+
+/* lmouse is the left mouse button callback for containers. */
+static void lmouse(Entity e, int x, int y, int w, int h) {
+	struct Thing *t;
+	Entity *p;
+	int i, j, itemW, itemH;
+
+	if ((t = getThing(e)) == NULL)
+		return;
+
+	i = 0;
+	j = 0;
+	itemW = 32.f;
+	itemH = 32.f;
+
+	for (p = (int *)utarray_front(t->contents); p != NULL;
+	     p = (int *)utarray_next(t->contents, p)) {
+		GLuint tex;
+		char out[256];
+		if ((tex = GetSpriteTexture(*p)) != 0) {
+			if (x > i && x < (i + itemW) && y > j &&
+			    y < (j + itemH)) {
+				HandleAction(e, 0, E_PLAYER,
+				             (char *)ACTION_TAKE, out);
+				return;
+			}
+			if (y > h) {
+				j = 0;
+				i += itemW;
+			}
+			i += itemW;
 		}
 	}
 }
@@ -57,7 +98,7 @@ static bool handleOpenBox(Entity self, Entity prop, Entity actor, char *out) {
 	t->properties.box.opener = actor;
 	sprintf(out, "The %s is now open", t->name);
 
-	AddRenderWindow(self, drawContents);
+	AddRenderWindow(self, 40, 20, drawContents, lmouse, NULL);
 
 	return true;
 }
@@ -86,6 +127,7 @@ static bool handleCloseBox(Entity self, Entity prop, Entity actor, char *out) {
 
 	t->properties.box.open = false;
 	sprintf(out, "The %s is now closed", t->name);
+	RemoveWidget(t->e);
 	return true;
 }
 

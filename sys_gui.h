@@ -14,6 +14,9 @@ enum { GUI_WIDTH = 320,
        GUI_HEIGHT = 200,
 };
 
+typedef void (*MouseEvent)(Entity, int, int, int, int);
+typedef void (*DrawEvent)(Entity, mat4x4, int, int);
+
 struct WidgetUpdate {
 	Entity e;
 };
@@ -31,7 +34,9 @@ struct Widget {
 			const char *text;
 		} textbox;
 		struct {
-			void (*render)(Entity, mat4x4);
+			DrawEvent render;
+			MouseEvent lmouse;
+			MouseEvent rmouse;
 		} window;
 
 	} data;
@@ -48,10 +53,13 @@ void UpdateWidgetSystem();
 void AddWidget(Entity);
 void RemoveWidget(Entity);
 void AddTextBox(Entity, unsigned, unsigned, const char *);
-void AddRenderWindow(Entity, void (*)(Entity, mat4x4));
+void AddRenderWindow(Entity, int, int, DrawEvent, MouseEvent, MouseEvent);
 
 void GuiProjection(mat4x4);
 void ScreenToGui(int, int, int *, int *);
 void WindowToGui(int, int, int *, int *);
+
+bool GetWidgetPos(Entity, int *, int *);
+bool GetRelWidgetPos(Entity, int, int, int, int);
 
 #endif

@@ -31,6 +31,8 @@ static void DrawWidget(struct Widget *);
 
 static GLFWwindow *win;
 
+static struct { GLuint overlay; } skin;
+
 /* drawTextbox renders the textbox w. */
 static void drawTextbox(struct Widget *w) {
 	mat4x4 proj;
@@ -42,10 +44,6 @@ static void drawTextbox(struct Widget *w) {
 /* drawWindow renders the window w. */
 static void drawWindow(struct Widget *w) {
 	mat4x4 proj, gui, trans;
-
-	GuiProjection(gui);
-	mat4x4_translate(trans, w->x, w->y, 0.f);
-	mat4x4_mul(proj, gui, trans);
 
 	{
 		GLint vp[4];
@@ -60,8 +58,17 @@ static void drawWindow(struct Widget *w) {
 		          xs * w->width, ys * w->height);
 	}
 
-	Rect(proj, 0, 0, w->width, w->height, 0x000000ff);
-	w->data.window.render(w->e, proj);
+	GuiProjection(proj);
+	Rect(proj, w->x, w->y + 10, w->width, w->height - 10, 0x000000ff);
+
+	mat4x4_translate(trans, w->x, w->y + 10, 0.f);
+	GuiProjection(gui);
+	mat4x4_mul(proj, gui, trans);
+	w->data.window.render(w->e, proj, w->width, w->height);
+
+	GuiProjection(proj);
+	TexRect(proj, getTextureProgram(), w->x, w->y, w->width, w->height, 0.f,
+	        0.f, 1.f, 1.f, skin.overlay);
 
 	glDisable(GL_SCISSOR_TEST);
 }
@@ -114,11 +121,15 @@ void RemoveWidget(Entity e) {
 		memmove(sys, sys + 1, sz);
 		HASH_DEL(entitiesToWidgets, c);
 		free(c);
+		numWidgets--;
 	}
 }
 
 /* InitWidgetSystem initializes the widget system. */
-void InitWidgetSystem(GLFWwindow *w) { win = w; }
+void InitWidgetSystem(GLFWwindow *w) {
+	win = w;
+	skin.overlay = GetTexture("res/consoleoverlay.png");
+}
 
 /* UpdateWidgetSystem updates all widgets that have been created. */
 void UpdateWidgetSystem() {
@@ -191,16 +202,20 @@ void AddTextBox(Entity e, unsigned x, unsigned y, const char *text) {
 }
 
 /* AddRenderWindow adds a Window widget to entity e. */
-void AddRenderWindow(Entity e, void (*render)(Entity, mat4x4)) {
+void AddRenderWindow(Entity e, int x, int y,
+                     void (*render)(Entity, mat4x4, int, int),
+                     MouseEvent lmouse, MouseEvent rmouse) {
 	struct Widget w = {
 	    .e = e,
-	    .x = 100,
-	    .y = 100,
+	    .x = x,
+	    .y = y,
 	    .width = GUI_WIDTH - 100,
 	    .height = GUI_HEIGHT - 100,
 	    .color = 0x00000000,
 	    .type = WINDOW,
-	    .data = {.window = {.render = render}},
+	    .data = {.window = {.render = render,
+	                        .lmouse = lmouse,
+	                        .rmouse = rmouse}},
 	};
 	addWidget(e, &w);
 }
@@ -227,4 +242,30 @@ void WindowToGui(int sx, int sy, int *x, int *y) {
 	glfwGetWindowSize(win, &w, &h);
 	*x = (int)(sx * ((float)GUI_WIDTH / (float)w));
 	*y = (int)(sy * ((float)GUI_HEIGHT / (float)h));
+}
+
+/* GetWidgetPos sets x and y to the (x, y) coordinates of the widget attached to
+ * e. */
+bool GetWidgetPos(Entity e, int *x, int *y) {
+	struct Widget *w;
+
+	if ((w = getWidget(e)) != NULL)
+		return false;
+
+	*x = w->x;
+	*y = w->y;
+	return true;
+}
+
+/* GetRelWidgetPos sets x and y to the relative coordinates of (x, y) from the
+ * upper left corner of the widget attached to e. */
+bool GetRelWidgetPos(Entity e, int x, int y, int *rx, int *ry) {
+	struct Widget *w;
+
+	if ((w = getWidget(e)) != NULL)
+		return false;
+
+	*rx = x - w->x;
+	*ry = y - w->y;
+	return true;
 }
