@@ -1,6 +1,5 @@
 #include "base.h"
-
-#include "input.h"
+#include "systems.h"
 
 static bool mouseMoved;
 
@@ -13,16 +12,31 @@ enum { MAX_KEY_CALLBACKS = 16,
        MAX_MOUSE_CALLBACKS = 16,
 };
 
+struct entityToInput {
+	Entity e;
+	struct Input *input;
+	UT_hash_handle hh;
+};
+
+static struct entityToInput *entitiesToInputs;
+static struct Input inputs[MAX_INPUTS];
+static int numInputs;
+
+int numInputUpdates;
+static struct InputUpdate updates[MAX_INPUTS];
+
 /* keyCallbacks contains the callbacks executed upon keyboard events. */
 static struct {
-	void (*key)(int, int, int, int);
+	Entity e;
+	KeyEvent key;
 	uint32_t layer;
 } keyCallbacks[MAX_KEY_CALLBACKS];
 static int numKeyCallbacks;
 
 /* mouseCallbacks contains the callbacks to be executed on mouse events. */
 struct {
-	void (*moved)(double, double);
+	Entity e;
+	MouseMotionEvent moved;
 	uint32_t layer;
 } mouseCallbacks[MAX_MOUSE_CALLBACKS];
 static int numMouseCallbacks;
@@ -30,12 +44,83 @@ static int numMouseCallbacks;
 /* mouseButtonCallbacks contains the callbacks to be executed on mouse button
  * events. */
 struct {
-	void (*left)(int);
-	void (*right)(int);
+	Entity e;
+	MouseButtonEvent left;
+	MouseButtonEvent right;
 	uint32_t layer;
 } mouseButtonCallbacks[MAX_MOUSE_CALLBACKS];
 static int numMouseButtonCallbacks;
 
+/* getInput returns the input attached to entity e (if there is one). */
+static struct Input *getInput(Entity e) {
+	struct entityToInput *t;
+
+	if (entitiesToInputs == NULL)
+		return NULL;
+
+	HASH_FIND_INT(entitiesToInputs, &e, t);
+	if (t == NULL)
+		return NULL;
+
+	return t->input;
+}
+
+/* addUpdate adds a new update for this frame. */
+static void addUpdate(struct InputUpdate *u) {
+	updates[numInputUpdates++] = *u;
+}
+
+/* InitInputSystem initializes the input system. */
+void InitInputSystem() {}
+
+/* UpdateInputSystem updates all inputs that have been created. */
+void UpdateInputSystem() {}
+
+void TransformSystemClearUpdates() { numInputUpdates = 0; }
+
+/* AddInput adds a input component to the entity e. */
+void AddInput(Entity e) {
+	struct entityToInput *item;
+
+	if (getInput(e) != NULL)
+		return;
+	item = malloc(sizeof(struct entityToInput));
+	item->input = inputs + numInputs;
+	item->e = e;
+
+	inputs[numInputs].e = e;
+
+	HASH_ADD_INT(entitiesToInputs, e, item);
+	numInputs++;
+}
+
+/* RemoveInput removes the input attached to e from the Input
+ * system. */
+void RemoveInput(Entity e) {
+	struct entityToInput *c;
+
+	if (entitiesToInputs == NULL)
+		return;
+
+	HASH_FIND_INT(entitiesToInputs, &e, c);
+	if (c != NULL) {
+		struct Input *sys = c->input;
+		int sz = (inputs + numInputs) - sys;
+		memmove(sys, sys + 1, sz);
+		HASH_DEL(entitiesToInputs, c);
+		free(c);
+		numInputs--;
+	}
+}
+
+/* GetInputUpdate returns any input updates for the entity e. */
+struct InputUpdate *GetInputUpdate(Entity e) {}
+
+/* GetInputUpdates returns the input updates this frame. */
+struct InputUpdate *GetInputUpdates(int *num) {
+	*num = numInputUpdates;
+	return updates;
+}
 /* key is the GLFW callback to handle key events. */
 void key(GLFWwindow *window, int key, int scancode, int action, int mods) {
 	UNUSED(window);
@@ -49,8 +134,10 @@ void key(GLFWwindow *window, int key, int scancode, int action, int mods) {
 	}
 
 	for (i = 0; i < numKeyCallbacks; ++i) {
-		if ((keyCallbacks[i].layer & enabled) != 0)
-			keyCallbacks[i].key(key, scancode, action, mods);
+		if ((keyCallbacks[i].layer & enabled) != 0) {
+			Entity e = keyCallbacks[i].e;
+			keyCallbacks[i].key(e, key, scancode, action, mods);
+		}
 	}
 }
 
@@ -64,8 +151,10 @@ void mouseMove(GLFWwindow *window, double x, double y) {
 	mouseY = y;
 
 	for (i = 0; i < numMouseCallbacks; ++i) {
-		if ((mouseCallbacks[i].layer & enabled) != 0)
-			mouseCallbacks[i].moved(x, y);
+		if ((mouseCallbacks[i].layer & enabled) != 0) {
+			Entity e = mouseCallbacks[i].e;
+			mouseCallbacks[i].moved(e, x, y);
+		}
 	}
 }
 
@@ -79,7 +168,8 @@ void mouseButton(GLFWwindow *window, int button, int action, int mods) {
 		for (i = 0; i < numMouseButtonCallbacks; ++i) {
 			if ((mouseButtonCallbacks[i].layer & enabled) != 0) {
 				if (mouseButtonCallbacks[i].left) {
-					mouseButtonCallbacks[i].left(action);
+					Entity e = mouseButtonCallbacks[i].e;
+					mouseButtonCallbacks[i].left(e, action);
 				}
 			}
 		}
@@ -87,7 +177,9 @@ void mouseButton(GLFWwindow *window, int button, int action, int mods) {
 		for (i = 0; i < numMouseButtonCallbacks; ++i) {
 			if ((mouseButtonCallbacks[i].layer & enabled) != 0) {
 				if (mouseButtonCallbacks[i].right) {
-					mouseButtonCallbacks[i].right(action);
+					Entity e = mouseButtonCallbacks[i].e;
+					mouseButtonCallbacks[i].right(e,
+					                              action);
 				}
 			}
 		}
@@ -143,23 +235,25 @@ void InputEnable(uint32_t layers) { enabled |= layers; }
 void InputDisable(uint32_t layers) { enabled &= ~(layers); }
 
 /* InputRegisterKeyEvent registers the given keyboard event callback. */
-void InputRegisterKeyEvent(uint32_t layer,
-                           void (*callback)(int, int, int, int)) {
+void InputRegisterKeyEvent(Entity e, uint32_t layer, KeyEvent evt) {
+	keyCallbacks[numKeyCallbacks].e = e;
 	keyCallbacks[numKeyCallbacks].layer = layer;
-	keyCallbacks[numKeyCallbacks].key = callback;
+	keyCallbacks[numKeyCallbacks].key = evt;
 	numKeyCallbacks++;
 }
 
 /* InputRegisterMouseEvent registers the given mouse motion callback. */
-void InputRegisterMouseEvent(uint32_t layer, void (*move)(double, double)) {
+void InputRegisterMouseEvent(Entity e, uint32_t layer, MouseMotionEvent move) {
+	mouseCallbacks[numMouseCallbacks].e = e;
 	mouseCallbacks[numMouseCallbacks].layer = layer;
 	mouseCallbacks[numMouseCallbacks].moved = move;
 	numMouseCallbacks++;
 }
 
 /* InputRegisterMouseButtonEvent registers the given mouse button callbacks. */
-void InputRegisterMouseButtonEvent(uint32_t layer, void (*l)(int),
-                                   void (*r)(int)) {
+void InputRegisterMouseButtonEvent(Entity e, uint32_t layer, MouseButtonEvent l,
+                                   MouseButtonEvent r) {
+	mouseButtonCallbacks[numMouseButtonCallbacks].e = e;
 	mouseButtonCallbacks[numMouseButtonCallbacks].layer = layer;
 	mouseButtonCallbacks[numMouseButtonCallbacks].left = l;
 	mouseButtonCallbacks[numMouseButtonCallbacks].right = r;

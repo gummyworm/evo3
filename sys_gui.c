@@ -3,7 +3,7 @@
 
 #include "draw.h"
 
-#include "sys_gui.h"
+#include "systems.h"
 #include "third-party/include/linmath.h"
 #include "third-party/include/uthash.h"
 #include <stdio.h>
@@ -59,9 +59,10 @@ static void drawWindow(struct Widget *w) {
 	}
 
 	GuiProjection(proj);
-	Rect(proj, w->x, w->y + 10, w->width, w->height - 10, 0x000000ff);
+	Rect(proj, w->x, w->y + w->border.height, w->width,
+	     w->height - w->border.height, 0x000000ff);
 
-	mat4x4_translate(trans, w->x, w->y + 10, 0.f);
+	mat4x4_translate(trans, w->x, w->y + w->border.height, 0.f);
 	GuiProjection(gui);
 	mat4x4_mul(proj, gui, trans);
 	w->data.window.render(w->e, proj, w->width, w->height);
@@ -197,6 +198,7 @@ void AddTextBox(Entity e, unsigned x, unsigned y, const char *text) {
 	    .color = 0x00000000,
 	    .type = TEXTBOX,
 	    .data = {.textbox = {.text = text, .fontsize = 32}},
+	    .border = {.width = 10, .height = 10},
 	};
 	addWidget(e, &w);
 }
@@ -216,7 +218,9 @@ void AddRenderWindow(Entity e, int x, int y,
 	    .data = {.window = {.render = render,
 	                        .lmouse = lmouse,
 	                        .rmouse = rmouse}},
+	    .border = {.width = 10, .height = 10},
 	};
+	InputRegisterMouseButtonEvent(e, INPUT_LAYER_DEFAULT, lmouse, rmouse);
 	addWidget(e, &w);
 }
 
@@ -265,7 +269,19 @@ bool GetRelWidgetPos(Entity e, int x, int y, int *rx, int *ry) {
 	if ((w = getWidget(e)) != NULL)
 		return false;
 
-	*rx = x - w->x;
-	*ry = y - w->y;
+	*rx = x - w->x - w->border.width;
+	*ry = y - w->y - w->border.height;
+	return true;
+}
+
+/* GetWidgetDim sets w and h to the dimensions of the widget attached to e. */
+bool GetWidgetDim(Entity e, int *w, int *h) {
+	struct Widget *widget;
+
+	if ((widget = getWidget(e)) != NULL)
+		return false;
+
+	*w = widget->width;
+	*h = widget->height;
 	return true;
 }

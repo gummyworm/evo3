@@ -35,11 +35,14 @@ static void drawContents(Entity e, mat4x4 proj, int w, int h) {
 }
 
 /* lmouse is the left mouse button callback for containers. */
-static void lmouse(Entity e, int x, int y, int w, int h) {
+static void lmouse(Entity e, int action) {
 	struct Thing *t;
 	Entity *p;
 	int i, j, itemW, itemH;
+	int x, y, w, h;
 
+	if (action != GLFW_PRESS)
+		return;
 	if ((t = getThing(e)) == NULL)
 		return;
 
@@ -47,6 +50,16 @@ static void lmouse(Entity e, int x, int y, int w, int h) {
 	j = 0;
 	itemW = 32.f;
 	itemH = 32.f;
+
+	{
+		double ax, ay;
+		int gx, gy;
+		InputGetMouse(&ax, &ay);
+		ScreenToGui(ax, ay, &gx, &gy);
+		GetRelWidgetPos(e, gx, gy, &x, &y);
+		GetWidgetDim(e, &w, &h);
+	}
+	dinfof("%d %d", x, y);
 
 	for (p = (int *)utarray_front(t->contents); p != NULL;
 	     p = (int *)utarray_next(t->contents, p)) {
@@ -57,6 +70,7 @@ static void lmouse(Entity e, int x, int y, int w, int h) {
 			    y < (j + itemH)) {
 				HandleAction(e, 0, E_PLAYER,
 				             (char *)ACTION_TAKE, out);
+				dinfof("OK!");
 				return;
 			}
 			if (y > h) {

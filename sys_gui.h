@@ -23,6 +23,9 @@ struct WidgetUpdate {
 
 struct Widget {
 	unsigned x, y, width, height;
+	struct {
+		int width, height;
+	} border;
 	uint32_t color;
 	enum { NONE,
 	       TEXTBOX,
@@ -60,6 +63,7 @@ void ScreenToGui(int, int, int *, int *);
 void WindowToGui(int, int, int *, int *);
 
 bool GetWidgetPos(Entity, int *, int *);
-bool GetRelWidgetPos(Entity, int, int, int, int);
+bool GetRelWidgetPos(Entity, int, int, int *, int *);
+bool GetWidgetDim(Entity, int *, int *);
 
 #endif

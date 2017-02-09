@@ -21,70 +21,70 @@ static float dt;
 static int numUpdates;
 static struct FPSControllerUpdate updates[MAX_FPS_CONTROLLERS];
 
+static struct FPSController *getFPSController(Entity e);
+
 /* key is the input callback to handle key events. */
-static void key(int key, int scancode, int action, int mods) {
+static void key(Entity e, int key, int scancode, int action, int mods) {
 	UNUSED(scancode);
 	UNUSED(action);
 	UNUSED(mods);
-	int i;
 
-	for (i = 0; i < numFPSControllers; ++i) {
-		struct FPSController *f;
-		vec3 dpos;
-		float angle;
-		float cosa, sina;
-		bool rotate, translate;
+	struct FPSController *f;
+	vec3 dpos;
+	float angle;
+	float cosa, sina;
+	bool rotate, translate;
 
-		f = fpsControllers + i;
-		if (!Enabled(f->e))
-			continue;
+	if ((f = getFPSController(e)) == NULL)
+		return;
+	if (!Enabled(f->e))
+		return;
 
-		angle = f->angle;
-		cosa = cos(angle);
-		sina = sin(angle);
+	angle = f->angle;
+	cosa = cos(angle);
+	sina = sin(angle);
 
-		rotate = false;
-		translate = false;
-		if (key == f->keyCodes.forward) {
-			dpos[0] = -sina;
-			dpos[1] = 0;
-			dpos[2] = -cosa;
-			translate = true;
-		} else if (key == f->keyCodes.backward) {
-			dpos[0] = sina;
-			dpos[1] = 0;
-			dpos[2] = cosa;
-			translate = true;
-		} else if (key == f->keyCodes.left) {
-			dpos[0] = -cosa;
-			dpos[1] = 0;
-			dpos[2] = sina;
-			translate = true;
-		} else if (key == f->keyCodes.right) {
-			dpos[0] = cosa;
-			dpos[1] = 0;
-			dpos[2] = -sina;
-			translate = true;
-		} else if (key == f->keyCodes.turnL) {
-			f->angle += f->turnSpeed * dt;
-			rotate = true;
-		} else if (key == f->keyCodes.turnR) {
-			f->angle -= f->turnSpeed * dt;
-			rotate = true;
-		}
+	rotate = false;
+	translate = false;
+	if (key == f->keyCodes.forward) {
+		dpos[0] = -sina;
+		dpos[1] = 0;
+		dpos[2] = -cosa;
+		translate = true;
+	} else if (key == f->keyCodes.backward) {
+		dpos[0] = sina;
+		dpos[1] = 0;
+		dpos[2] = cosa;
+		translate = true;
+	} else if (key == f->keyCodes.left) {
+		dpos[0] = -cosa;
+		dpos[1] = 0;
+		dpos[2] = sina;
+		translate = true;
+	} else if (key == f->keyCodes.right) {
+		dpos[0] = cosa;
+		dpos[1] = 0;
+		dpos[2] = -sina;
+		translate = true;
+	} else if (key == f->keyCodes.turnL) {
+		f->angle += f->turnSpeed * dt;
+		rotate = true;
+	} else if (key == f->keyCodes.turnR) {
+		f->angle -= f->turnSpeed * dt;
+		rotate = true;
+	}
 
-		if (translate) {
-			vec3 dposn;
-			float tscale = dt * f->speed;
-			vec3_norm(dposn, dpos);
-			vec3_scale(dpos, dposn, tscale);
-			TransformMove(f->e, dpos[0], dpos[1], dpos[2]);
-		}
+	if (translate) {
+		vec3 dposn;
+		float tscale = dt * f->speed;
+		vec3_norm(dposn, dpos);
+		vec3_scale(dpos, dposn, tscale);
+		TransformMove(f->e, dpos[0], dpos[1], dpos[2]);
+	}
 
-		if (rotate) {
-			vec3 dir = {-sin(f->angle), 0, -cos(f->angle)};
-			SetViewDir(f->e, dir[0], dir[1], dir[2]);
-		}
+	if (rotate) {
+		vec3 dir = {-sin(f->angle), 0, -cos(f->angle)};
+		SetViewDir(f->e, dir[0], dir[1], dir[2]);
 	}
 }
 
@@ -139,7 +139,7 @@ void AddFPSController(Entity e, float speed) {
 	fpsControllers[numFPSControllers].keyCodes.turnL = GLFW_KEY_LEFT;
 	fpsControllers[numFPSControllers].keyCodes.turnR = GLFW_KEY_RIGHT;
 
-	InputRegisterKeyEvent(INPUT_LAYER_DEFAULT, key);
+	InputRegisterKeyEvent(e, INPUT_LAYER_DEFAULT, key);
 	numFPSControllers++;
 }
 

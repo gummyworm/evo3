@@ -36,7 +36,7 @@ static int numRenders;
 
 static GLFWwindow *win;
 
-static void lmouse(int action);
+static void lmouse(int, int);
 
 /* getCamera returns the camera attached to entity e (if there is one). */
 static struct Camera *getCamera(Entity e) {
@@ -264,7 +264,7 @@ void AddCamera(Entity e, uint32_t layers) {
 	addPass(cameras + numCameras, getBayerProgram(), 256, 256);
 	addPass(cameras + numCameras, getTextureProgram(), 256, 256);
 
-	InputRegisterMouseButtonEvent(INPUT_LAYER_DEFAULT, lmouse, NULL);
+	InputRegisterMouseButtonEvent(e, INPUT_LAYER_DEFAULT, lmouse, NULL);
 
 	numCameras++;
 }
@@ -522,7 +522,7 @@ void GetProjection(Entity e, mat4x4 *projection) {
 }
 
 /* lmouse is the left mouse button callback. */
-void lmouse(int action) {
+void lmouse(Entity e, int action) {
 	return;
 
 	if (action == GLFW_PRESS) {
