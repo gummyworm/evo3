@@ -55,11 +55,10 @@ static void lmouse(Entity e, int action) {
 		double ax, ay;
 		int gx, gy;
 		InputGetMouse(&ax, &ay);
-		ScreenToGui(ax, ay, &gx, &gy);
-		GetRelWidgetPos(e, gx, gy, &x, &y);
+		GetRelWidgetPos(e, ax, ay, &gx, &gy);
+		ScreenToGui(gx, gy, &x, &y);
 		GetWidgetDim(e, &w, &h);
 	}
-	dinfof("%d %d", x, y);
 
 	for (p = (int *)utarray_front(t->contents); p != NULL;
 	     p = (int *)utarray_next(t->contents, p)) {
@@ -68,9 +67,11 @@ static void lmouse(Entity e, int action) {
 		if ((tex = GetSpriteTexture(*p)) != 0) {
 			if (x > i && x < (i + itemW) && y > j &&
 			    y < (j + itemH)) {
-				HandleAction(e, 0, E_PLAYER,
+				HandleAction(*p, 0, E_PLAYER,
 				             (char *)ACTION_TAKE, out);
-				dinfof("OK!");
+				utarray_erase(t->contents,
+				              utarray_eltidx(t->contents, p),
+				              1);
 				return;
 			}
 			if (y > h) {

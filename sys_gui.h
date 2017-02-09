@@ -2,6 +2,7 @@
 #define SYS_GUI_H
 
 #include "base.h"
+#include "input.h"
 #include "third-party/include/linmath.h"
 
 #include "entity.h"
@@ -14,7 +15,6 @@ enum { GUI_WIDTH = 320,
        GUI_HEIGHT = 200,
 };
 
-typedef void (*MouseEvent)(Entity, int, int, int, int);
 typedef void (*DrawEvent)(Entity, mat4x4, int, int);
 
 struct WidgetUpdate {
@@ -38,8 +38,8 @@ struct Widget {
 		} textbox;
 		struct {
 			DrawEvent render;
-			MouseEvent lmouse;
-			MouseEvent rmouse;
+			MouseButtonEvent lmouse;
+			MouseButtonEvent rmouse;
 		} window;
 
 	} data;
@@ -56,7 +56,8 @@ void UpdateWidgetSystem();
 void AddWidget(Entity);
 void RemoveWidget(Entity);
 void AddTextBox(Entity, unsigned, unsigned, const char *);
-void AddRenderWindow(Entity, int, int, DrawEvent, MouseEvent, MouseEvent);
+void AddRenderWindow(Entity, int, int, DrawEvent, MouseButtonEvent,
+                     MouseButtonEvent);
 
 void GuiProjection(mat4x4);
 void ScreenToGui(int, int, int *, int *);

@@ -206,7 +206,7 @@ void AddTextBox(Entity e, unsigned x, unsigned y, const char *text) {
 /* AddRenderWindow adds a Window widget to entity e. */
 void AddRenderWindow(Entity e, int x, int y,
                      void (*render)(Entity, mat4x4, int, int),
-                     MouseEvent lmouse, MouseEvent rmouse) {
+                     MouseButtonEvent lmouse, MouseButtonEvent rmouse) {
 	struct Widget w = {
 	    .e = e,
 	    .x = x,
@@ -266,7 +266,7 @@ bool GetWidgetPos(Entity e, int *x, int *y) {
 bool GetRelWidgetPos(Entity e, int x, int y, int *rx, int *ry) {
 	struct Widget *w;
 
-	if ((w = getWidget(e)) != NULL)
+	if ((w = getWidget(e)) == NULL)
 		return false;
 
 	*rx = x - w->x - w->border.width;
@@ -278,7 +278,7 @@ bool GetRelWidgetPos(Entity e, int x, int y, int *rx, int *ry) {
 bool GetWidgetDim(Entity e, int *w, int *h) {
 	struct Widget *widget;
 
-	if ((widget = getWidget(e)) != NULL)
+	if ((widget = getWidget(e)) == NULL)
 		return false;
 
 	*w = widget->width;
