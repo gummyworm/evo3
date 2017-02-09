@@ -8,6 +8,7 @@ int Player(Entity e) {
 	AddPartyMember(e, "res/banana.png");
 	AddFPSController(e, 2.35f);
 	CameraPerspective(e, 45.0f, 640.0f / 480.0f);
+	AddCommander(e);
 	AddConsole(e);
 	return 0;
 }

@@ -385,11 +385,8 @@ static void rmouse(Entity e, int action) {
 		e = SpritePick(0, gx, gy);
 
 		desc = (char *)GetThingDescription(e);
-		if (desc == NULL) {
-			dinfof("%s", GetActorName(e));
+		if (desc == NULL)
 			desc = (char *)GetActorDescription(e);
-		}
-
 		if (desc != NULL)
 			addLineOverTime(c, desc, CONSOLE_PRINT_INTERVAL);
 	}

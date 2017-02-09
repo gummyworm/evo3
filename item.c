@@ -22,7 +22,8 @@ static bool handleDrop(Entity self, Entity prop, Entity actor, char *out) {
 	EnableEntity(self);
 	InventoryRemove(actor, self);
 
-	sprintf(out, "You drop the %s", t->name);
+	if (out)
+		sprintf(out, "You drop the %s", t->name);
 	return true;
 }
 
@@ -34,7 +35,9 @@ static bool handleTake(Entity self, Entity prop, Entity actor, char *out) {
 	if ((t = getThing(self)) == NULL)
 		return false;
 
-	sprintf(out, "You take the %s", t->name);
+	if (out)
+		sprintf(out, "You take the %s", t->name);
+
 	InventoryAdd(actor, self);
 	t->owner = actor;
 	DisableEntity(self);

@@ -27,5 +27,6 @@ struct Unit {
 void InitUnitSystem();
 void NewUnit(Entity, const char *, int);
 void UnitHarm(Entity, int damage);
+bool SelectUnit(Entity);
 
 #endif

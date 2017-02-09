@@ -83,6 +83,13 @@ static void lmouse(Entity e, int action) {
 	}
 }
 
+/* rmouse is the right mouse button callback for containers. */
+static void rmouse(Entity e, int action) {
+	if (action != GLFW_PRESS)
+		return;
+
+	HandleAction(e, 0, E_PLAYER, (char *)ACTION_CLOSE, NULL);
+}
 /* mouseHandler is called when the OPEN dialog receives a mouse event. */
 static void mouseHandler(Entity self, int action) {
 	struct Thing *t;
@@ -105,15 +112,17 @@ static bool handleOpenBox(Entity self, Entity prop, Entity actor, char *out) {
 		return false;
 
 	if (t->properties.box.open) {
-		sprintf(out, "The %s is already open", t->name);
+		if (out)
+			sprintf(out, "The %s is already open", t->name);
 		return true;
 	}
 
 	t->properties.box.open = true;
 	t->properties.box.opener = actor;
-	sprintf(out, "The %s is now open", t->name);
+	if (out)
+		sprintf(out, "The %s is now open", t->name);
 
-	AddRenderWindow(self, 40, 20, drawContents, lmouse, NULL);
+	AddRenderWindow(self, 40, 20, drawContents, lmouse, rmouse);
 
 	return true;
 }
@@ -131,7 +140,8 @@ static bool handleCloseBox(Entity self, Entity prop, Entity actor, char *out) {
 		return false;
 
 	if (!t->properties.box.open) {
-		sprintf(out, "The %s is already closed", t->name);
+		if (out)
+			sprintf(out, "The %s is already closed", t->name);
 		return true;
 	}
 
@@ -141,7 +151,8 @@ static bool handleCloseBox(Entity self, Entity prop, Entity actor, char *out) {
 	}
 
 	t->properties.box.open = false;
-	sprintf(out, "The %s is now closed", t->name);
+	if (out)
+		sprintf(out, "The %s is now closed", t->name);
 	RemoveWidget(t->e);
 	return true;
 }
@@ -159,12 +170,14 @@ static bool handleEmptyBox(Entity self, Entity prop, Entity actor, char *out) {
 		return false;
 
 	if (!t->properties.box.open) {
-		sprintf(out, "It is closed");
+		if (out)
+			sprintf(out, "It is closed");
 		return true;
 	}
 
 	t->properties.box.open = true;
-	sprintf(out, "You empty the %s", t->name);
+	if (out)
+		sprintf(out, "You empty the %s", t->name);
 
 	for (p = (int *)utarray_front(t->contents); p != NULL;
 	     p = (int *)utarray_next(t->contents, p)) {
@@ -191,12 +204,14 @@ static bool handleLookBox(Entity self, Entity prop, Entity actor, char *out) {
 		return false;
 
 	if (!t->properties.box.open) {
-		sprintf(out, "%s\nIt is closed", t->desc);
+		if (out)
+			sprintf(out, "%s\nIt is closed", t->desc);
 		return true;
 	}
 
 	t->properties.box.open = true;
-	sprintf(out, "The %s contains the following:\n", t->name);
+	if (out)
+		sprintf(out, "The %s contains the following:\n", t->name);
 
 	for (p = (int *)utarray_front(t->contents); p != NULL;
 	     p = (int *)utarray_next(t->contents, p)) {

@@ -64,6 +64,7 @@ static void update() {
 	glDisable(GL_DEPTH_TEST);
 	UpdatePartySystem();
 	UpdateWeatherSystem();
+	UpdateCommanderSystem();
 	UpdateConsoleSystem();
 	UpdateWidgetSystem();
 	UpdateLabelSystem();

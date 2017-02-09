@@ -203,6 +203,26 @@ void AddTextBox(Entity e, unsigned x, unsigned y, const char *text) {
 	addWidget(e, &w);
 }
 
+static void ldispatch(Entity e, int action) {
+	struct Widget *w;
+
+	if ((w = getWidget(e)) == NULL)
+		return;
+
+	if (w->data.window.lmouse)
+		w->data.window.lmouse(e, action);
+}
+
+static void rdispatch(Entity e, int action) {
+	struct Widget *w;
+
+	if ((w = getWidget(e)) == NULL)
+		return;
+
+	if (w->data.window.rmouse)
+		w->data.window.rmouse(e, action);
+}
+
 /* AddRenderWindow adds a Window widget to entity e. */
 void AddRenderWindow(Entity e, int x, int y,
                      void (*render)(Entity, mat4x4, int, int),
@@ -220,7 +240,8 @@ void AddRenderWindow(Entity e, int x, int y,
 	                        .rmouse = rmouse}},
 	    .border = {.width = 10, .height = 10},
 	};
-	InputRegisterMouseButtonEvent(e, INPUT_LAYER_DEFAULT, lmouse, rmouse);
+	InputRegisterMouseButtonEvent(e, INPUT_LAYER_DEFAULT, ldispatch,
+	                              rdispatch);
 	addWidget(e, &w);
 }
 

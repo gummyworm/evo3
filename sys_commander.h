@@ -7,7 +7,13 @@ enum { MAX_COMMANDERS = 8 };
 
 /* Commader is a struct that represents a commander component.
  */
-struct Commander {};
+struct Commander {
+	Entity e;
+	struct {
+		double x, y, w, h;
+		bool selecting;
+	} selection;
+};
 
 /* CommanderUpdate defines an update message that can be polled by interested
  * systems. */
@@ -17,7 +23,7 @@ struct CommanderUpdate {
 
 void InitCommanderSystem();
 void UpdateCommanderSystem();
-void NewCommander(Entity);
+void AddCommander(Entity);
 struct CommanderUpdate *GetCommanderUpdates(int *);
 
 #endif
