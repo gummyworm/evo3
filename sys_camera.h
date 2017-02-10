@@ -19,6 +19,7 @@ enum { MAX_CAMERAS = 16,
 struct Camera {
 	Entity e;
 
+	vec3 eye;
 	vec3 dir;
 
 	bool doPost;
@@ -80,6 +81,9 @@ void CameraPerspective(Entity, float, float);
 void CameraOrtho(Entity, float, float, float, float, float);
 bool GetViewDir(Entity, float *, float *, float *);
 void SetViewDir(Entity, float, float, float);
+void SetEye(Entity, float, float, float);
+bool GetEye(Entity, float *, float *, float *);
+bool GetViewPos(Entity, float *, float *, float *);
 
 void WorldToScreen(Entity, float, float, float, int *, int *);
 void GetProjection(Entity, mat4x4 *);

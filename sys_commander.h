@@ -2,6 +2,7 @@
 #define SYS_COMMANDER_H
 
 #include "entity.h"
+#include "third-party/include/linmath.h"
 
 enum { MAX_COMMANDERS = 8 };
 
@@ -9,6 +10,7 @@ enum { MAX_COMMANDERS = 8 };
  */
 struct Commander {
 	Entity e;
+	vec2 panSpeed;
 	struct {
 		double x, y, w, h;
 		bool selecting;

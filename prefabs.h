@@ -4,6 +4,8 @@
 #include "entity.h"
 
 int Berry(Entity, float, float, float);
+int Player(Entity);
+int OverworldCommander(Entity);
 int Banana(Entity, float, float, float);
 int Grass1(Entity, float, float, float);
 int Tree1(Entity, float, float, float);

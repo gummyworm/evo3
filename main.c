@@ -71,12 +71,12 @@ static void update() {
 }
 
 /* test spawns test entities. */
-extern void Player(int);
 extern void TestRoom(int);
 static void test() {
 	// TestRoom(E_TEST_ROOM);
 	GenerateRoom(E_TEST_ROOM, CANOPY);
-	Player(E_PLAYER);
+	// Player(E_PLAYER);
+	OverworldCommander(E_PLAYER);
 
 	AddTransform(E_APPLE, 0, 0, -7.0f);
 	AddRender(E_APPLE, "person.obj");

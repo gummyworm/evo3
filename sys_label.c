@@ -57,7 +57,7 @@ void drawLabel(struct Label *l) {
 
 	WorldToScreen(E_PLAYER, lpos[0], lpos[1], lpos[2], &sx, &sy);
 
-	GetPos(E_PLAYER, &ppos[0], &ppos[1], &ppos[2]);
+	GetViewPos(E_PLAYER, &ppos[0], &ppos[1], &ppos[2]);
 	vec3_sub(dist, lpos, ppos);
 
 	size = 10.f / vec3_len(dist) * LABEL_MAX_FONT_SIZE;

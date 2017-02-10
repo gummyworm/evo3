@@ -56,7 +56,7 @@ static struct Camera *getCamera(Entity e) {
 static void getView(struct Camera *c, mat4x4 *v) {
 	vec3 eye, center, up;
 
-	GetPos(c->e, &eye[0], &eye[1], &eye[2]);
+	GetViewPos(c->e, &eye[0], &eye[1], &eye[2]);
 	GetViewDir(c->e, &up[0], &up[1], &up[2]);
 	vec3_add(center, eye, up);
 	up[0] = 0;
@@ -160,6 +160,7 @@ void UpdateCameraSystem() {
 		{
 			vec3 eye, center, up;
 			GetPos(c->e, &eye[0], &eye[1], &eye[2]);
+			vec3_add(eye, eye, c->eye);
 			GetViewDir(c->e, &up[0], &up[1], &up[2]);
 			vec3_add(center, eye, up);
 			up[0] = 0;
@@ -429,6 +430,50 @@ void SetViewDir(Entity e, float x, float y, float z) {
 	c->dir[0] = x;
 	c->dir[1] = y;
 	c->dir[2] = z;
+}
+
+/* GetEye returns the position of the camera's eyepoint. */
+bool GetEye(Entity e, float *x, float *y, float *z) {
+	struct Camera *c;
+
+	if ((c = getCamera(e)) == NULL)
+		return false;
+
+	*x = c->eye[0];
+	*y = c->eye[1];
+	*z = c->eye[2];
+	return true;
+}
+
+/* SetEye sets the eye position of e's camera to (x, y, z). */
+void SetEye(Entity e, float x, float y, float z) {
+	struct Camera *c;
+
+	if ((c = getCamera(e)) == NULL)
+		return;
+
+	c->eye[0] = x;
+	c->eye[1] = y;
+	c->eye[2] = z;
+}
+
+/* GetViewPos retrieves the eye point that the camera is viewing from PLUS the
+ * transform of the entity that it is attached to. */
+bool GetViewPos(Entity e, float *x, float *y, float *z) {
+	struct Camera *c;
+	float tx, ty, tz;
+
+	if ((c = getCamera(e)) == NULL)
+		return false;
+
+	tx = 0;
+	ty = 0;
+	tz = 0;
+	GetPos(e, &tx, &ty, &tz);
+
+	*x = c->eye[0] + tx;
+	*y = c->eye[1] + ty;
+	*z = c->eye[2] + tz;
 }
 
 /* WorldToScreen sets (sx, sy) to the screen coordiantes of the given (x, y, z)

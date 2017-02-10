@@ -16,6 +16,8 @@ static int numCommanders;
 static int numUpdates;
 static struct CommanderUpdate updates[MAX_COMMANDERS];
 
+static float dt;
+
 /* getCommander returns the commander attached to entity e (if there is one). */
 static struct Commander *getCommander(Entity e) {
 	struct entityToCommander *c;
@@ -51,6 +53,7 @@ static void lmouse(Entity e, int action) {
 	}
 }
 
+/* mousemove is the mouse motion callback. */
 static void mousemove(Entity e, double x, double y) {
 	struct Commander *c;
 	if ((c = getCommander(e)) == NULL)
@@ -61,6 +64,41 @@ static void mousemove(Entity e, double x, double y) {
 		c->selection.w = gx - c->selection.x;
 		c->selection.h = gy - c->selection.y;
 	}
+}
+
+/* key is the commander key callback. */
+static void key(Entity e, int key, int scancode, int action, int mods) {
+	UNUSED(scancode);
+	UNUSED(action);
+	UNUSED(mods);
+	struct Commander *c;
+	float x, y, z;
+
+	if (!Enabled(e))
+		return;
+	if (!GetEye(e, &x, &y, &z))
+		return;
+	if ((c = getCommander(e)) == NULL)
+		return;
+
+	switch (key) {
+	case GLFW_KEY_LEFT:
+		x -= c->panSpeed[0] * dt;
+		break;
+	case GLFW_KEY_RIGHT:
+		x += c->panSpeed[1] * dt;
+		break;
+	case GLFW_KEY_UP:
+		y -= c->panSpeed[1] * dt;
+		break;
+	case GLFW_KEY_DOWN:
+		y += c->panSpeed[1] * dt;
+		break;
+	default:
+		break;
+	}
+
+	SetEye(e, x, y, z);
 }
 
 /* addUpdate adds a new update for this frame. */
@@ -79,9 +117,12 @@ void AddCommander(Entity e) {
 
 	HASH_ADD_INT(entitiesToCommanders, e, item);
 	commanders[numCommanders].e = e;
+	commanders[numCommanders].panSpeed[0] = 5.f;
+	commanders[numCommanders].panSpeed[1] = 5.f;
 	commanders[numCommanders].selection.selecting = false;
 	InputRegisterMouseButtonEvent(e, INPUT_LAYER_DEFAULT, lmouse, NULL);
 	InputRegisterMouseEvent(e, INPUT_LAYER_DEFAULT, mousemove);
+	InputRegisterKeyEvent(e, INPUT_LAYER_DEFAULT, key);
 	numCommanders++;
 }
 
@@ -92,6 +133,10 @@ void InitCommanderSystem() {}
 void UpdateCommanderSystem() {
 	int i;
 	mat4x4 proj;
+	static float lastUpdate;
+
+	dt = GetTime() - lastUpdate;
+	lastUpdate = GetTime();
 
 	GuiProjection(proj);
 	for (i = 0; i < numCommanders; ++i) {
