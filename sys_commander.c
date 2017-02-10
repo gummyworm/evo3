@@ -81,22 +81,14 @@ static void key(Entity e, int key, int scancode, int action, int mods) {
 	if ((c = getCommander(e)) == NULL)
 		return;
 
-	switch (key) {
-	case GLFW_KEY_LEFT:
+	if (key == GLFW_KEY_LEFT)
 		x += c->panSpeed[0] * dt;
-		break;
-	case GLFW_KEY_RIGHT:
+	if (key == GLFW_KEY_RIGHT)
 		x -= c->panSpeed[1] * dt;
-		break;
-	case GLFW_KEY_UP:
+	if (key == GLFW_KEY_UP)
 		y += c->panSpeed[1] * dt;
-		break;
-	case GLFW_KEY_DOWN:
+	if (key == GLFW_KEY_DOWN)
 		y -= c->panSpeed[1] * dt;
-		break;
-	default:
-		break;
-	}
 
 	SetEye(e, x, y, z);
 }
