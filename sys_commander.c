@@ -83,16 +83,16 @@ static void key(Entity e, int key, int scancode, int action, int mods) {
 
 	switch (key) {
 	case GLFW_KEY_LEFT:
-		x -= c->panSpeed[0] * dt;
+		x += c->panSpeed[0] * dt;
 		break;
 	case GLFW_KEY_RIGHT:
-		x += c->panSpeed[1] * dt;
+		x -= c->panSpeed[1] * dt;
 		break;
 	case GLFW_KEY_UP:
-		y -= c->panSpeed[1] * dt;
+		y += c->panSpeed[1] * dt;
 		break;
 	case GLFW_KEY_DOWN:
-		y += c->panSpeed[1] * dt;
+		y -= c->panSpeed[1] * dt;
 		break;
 	default:
 		break;
