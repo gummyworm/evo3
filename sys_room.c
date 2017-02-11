@@ -227,7 +227,7 @@ void GenerateRoom(Entity e, enum RoomType type) {
 
 /* GenerateOverworldRoom creates an overworld (2D) room. */
 void GenerateOverworldRoom(Entity e, enum RoomType type) {
-	const int size = 10;
+	const int size = 20;
 	int i;
 
 	AddRoom(e, "GENERATED ROOM", "This test room was generated", -size,
@@ -242,12 +242,53 @@ void GenerateOverworldRoom(Entity e, enum RoomType type) {
 
 	genOverworld(E_ROOM);
 
+	/* grass */
+	int grass = E_ROOM + 1;
+	for (i = 0; i < 500; ++i) {
+		float x = rand() / (float)(RAND_MAX / (size * 2)) - size;
+		float y = rand() / (float)(RAND_MAX / (size * 2)) - size;
+		float z = 30;
+		Grass1(grass + i, x, y, z);
+	}
+
 	/* add some trees */
-	int trees = E_ROOM + 5;
+	int trees = grass + 5;
 	for (i = 0; i < 10; ++i) {
 		float x = rand() / (float)(RAND_MAX / (size * 2)) - size;
 		float y = rand() / (float)(RAND_MAX / (size * 2)) - size;
-		float z = 10;
+		float z = 30;
 		Tree1(trees + i, x, y, z);
+	}
+
+	/* add some frutas */
+	int berries = trees + i;
+	for (i = 0; i < 10; i++) {
+		float x = rand() / (float)(RAND_MAX / (size * 2)) - size;
+		float y = rand() / (float)(RAND_MAX / (size * 2)) - size;
+		float z = 30;
+		if (i % 2)
+			Berry(berries + i, x, y, z);
+		else
+			Banana(berries + i, x, y, z);
+	}
+
+	/* add treasure */
+	int treasure = berries + i;
+	for (i = 0; i < 1; i += 2) {
+		float x = rand() / (float)(RAND_MAX / (size * 2)) - size;
+		float y = rand() / (float)(RAND_MAX / (size * 2)) - size;
+		float z = 30;
+		Chest(treasure + i, x, y, z);
+		Berry(treasure + i + 1, x, y, z);
+		AddToContainer(treasure + i, treasure + i + 1);
+	}
+
+	/* add monsters */
+	int monsters = treasure + i;
+	for (i = 0; i < 1; i++) {
+		float x = rand() / (float)(RAND_MAX / (size * 2)) - size;
+		float y = rand() / (float)(RAND_MAX / (size * 2)) - size;
+		float z = 30;
+		Snake(monsters + i, x, y, z);
 	}
 }

@@ -15,4 +15,4 @@ void genWalls(Entity n, Entity s, Entity e, Entity w) {
 }
 
 /* genOverworld creates a plane background for the overworld. */
-void genOverworld(Entity e) { WallNS(e, 0, 0, 10.f); }
+void genOverworld(Entity e) { OverworldBG(e, 0, 0, 30.f); }

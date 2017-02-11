@@ -93,7 +93,7 @@ static void test() {
 	AddToContainer(E_APPLE, E_ORANGE);
 
 	Weather(E_WEATHER, 0, 0, 0);
-	Worm(E_WORM, 0, 0, 6);
+	Worm(E_WORM, 0, 0, 29.f);
 }
 
 /* ClearUpdates resets all systems' updates. */

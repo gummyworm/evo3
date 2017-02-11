@@ -12,6 +12,7 @@ struct Commander {
 	Entity e;
 	vec2 panSpeed;
 	float zoomSpeed;
+	vec2 zoomLimits;
 	struct {
 		double x, y, w, h;
 		bool selecting;

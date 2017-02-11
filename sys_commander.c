@@ -92,6 +92,10 @@ static void scroll(Entity e, double dx, double dy) {
 		float x, y, z;
 		GetEye(e, &x, &y, &z);
 		z += dy * c->zoomSpeed * dt;
+		if (z < c->zoomLimits[0])
+			z = c->zoomLimits[0];
+		if (z > c->zoomLimits[1])
+			z = c->zoomLimits[1];
 		SetEye(e, x, y, z);
 	}
 }
@@ -142,6 +146,8 @@ void AddCommander(Entity e) {
 	commanders[numCommanders].panSpeed[0] = 5.f;
 	commanders[numCommanders].panSpeed[1] = 5.f;
 	commanders[numCommanders].zoomSpeed = 5.f;
+	commanders[numCommanders].zoomLimits[0] = -10.f;
+	commanders[numCommanders].zoomLimits[1] = 20.f;
 	commanders[numCommanders].selection.selecting = false;
 	InputRegisterMouseButtonEvent(e, INPUT_LAYER_DEFAULT, lmouse, NULL);
 	InputRegisterMouseEvent(e, INPUT_LAYER_DEFAULT, mousemove);
