@@ -68,8 +68,7 @@ static GLchar const *fragmentShaderShadow =
     "uniform sampler2D tex0;\n"
     "void main()\n"
     "{\n"
-    "  vec4 c = vec4(0, 0, 0, 0);\n"
-    "  out_color = mix(c, texture(tex0, out_texco).aaaa, .5);\n"
+    "  out_color = mix(vec4(0,0,0,0), texture(tex0, out_texco).aaaa, .5);\n"
     "}\n";
 
 /* bayerFrag is the bayer dither fragment shader source. */

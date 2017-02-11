@@ -14,6 +14,12 @@ struct ActorStats {
 	int hp;
 };
 
+enum ActorMood {
+	MOOD_GRUMPY,
+	MOOD_HOT,
+	MOOD_TIRED,
+};
+
 /* Actor is a struct that represents an animate character */
 struct Actor {
 	Entity e;
@@ -27,6 +33,10 @@ struct Actor {
 
 	Entity inventory[MAX_INVENTORY_SIZE];
 	int numItems;
+
+	enum ActorMood mood;
+	double remarkTmr;
+	double remarkInterval;
 };
 
 /* ActorUpdate defines updates that may be polled by interested systems. */
@@ -43,5 +53,6 @@ void InventoryAdd(Entity, Entity);
 int GetInventory(Entity, Entity **);
 const char *GetActorName(Entity);
 const char *GetActorDescription(Entity);
+void ActorRemark(Entity);
 
 #endif

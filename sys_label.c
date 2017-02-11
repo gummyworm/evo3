@@ -97,9 +97,16 @@ void UpdateLabelSystem() {
 /* AddLabel adds a label component to the entity e. */
 void AddLabel(Entity e, const char *text, float offset) {
 	struct entityToLabel *item;
+	struct Label *l;
 
-	if (getLabel(e) != NULL)
+	if ((l = getLabel(e)) != NULL) {
+		l->content[0] = (struct LabelContent){.type = LABEL_TEXT,
+		                                      .data = {.text = text}};
+		l->offset = offset;
+		labels[numLabels].numContent = 1;
 		return;
+	}
+
 	item = malloc(sizeof(struct entityToLabel));
 	item->label = labels + numLabels;
 	item->e = e;

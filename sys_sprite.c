@@ -96,16 +96,14 @@ void UpdateSpriteSystem() {
 		if (!GetSpriteBounds(sprites[i].e, &x, &y, &z, &w, &h))
 			continue;
 
-		loc = glGetUniformLocation(getTextureProgram(), "color");
-		if (sprites[i].castShadow) {
-			TexRectZ(proj, getShadowProgram(), x + 10, y + 10, 0.9f,
+		if (sprites[i].castShadow)
+			TexRectZ(proj, getShadowProgram(), x + 5, y + 5, 0.9f,
 			         w, h, 0, 0, 1, 1, sprites[i].texture);
-		}
+		loc = glGetUniformLocation(getTextureProgram(), "color");
 		if (loc >= 0)
 			glUniform4f(loc, s->r, s->g, s->b, s->a);
 		TexRectZ(proj, getTextureProgram(), x, y, 1.f, w, h, 0, 0, 1, 1,
 		         sprites[i].texture);
-
 		if (loc >= 0)
 			glUniform4f(loc, 0, 0, 0, 0);
 	}

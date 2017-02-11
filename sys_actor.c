@@ -1,4 +1,4 @@
-#include "sys_actor.h"
+#include "systems.h"
 #include "third-party/include/uthash.h"
 
 struct entityToActor {
@@ -13,6 +13,8 @@ static int numActors;
 
 int numActorUpdates;
 static struct ActorUpdate updates[MAX_ACTORS];
+
+static float dt;
 
 /* getActor returns the actor attached to entity e (if there is one). */
 static struct Actor *getActor(Entity e) {
@@ -37,7 +39,21 @@ static void addUpdate(struct ActorUpdate *u) {
 void InitActorSystem() {}
 
 /* UpdateActorSystem updates all actors that have been created. */
-void UpdateActorSystem() {}
+void UpdateActorSystem() {
+	static float lastUpdate;
+	int i;
+
+	dt = GetTime() - lastUpdate;
+	lastUpdate = GetTime();
+	for (i = 0; i < numActors; ++i) {
+		struct Actor *a = actors + i;
+		a->remarkTmr -= dt;
+		if (a->remarkTmr <= 0.) {
+			ActorRemark(a->e);
+			a->remarkTmr = a->remarkInterval;
+		}
+	}
+}
 
 /* AddActor adds a actor component to the entity e. */
 void AddActor(Entity e, const char *name, const char *desc) {
@@ -54,6 +70,8 @@ void AddActor(Entity e, const char *name, const char *desc) {
 	actors[numActors].name = name;
 	actors[numActors].desc = desc;
 	actors[numActors].numItems = 0;
+	actors[numActors].remarkTmr = 10.;
+	actors[numActors].remarkInterval = 10.;
 
 	HASH_ADD_INT(entitiesToActors, e, item);
 	numActors++;
@@ -129,4 +147,12 @@ const char *GetActorDescription(Entity e) {
 	if ((t = getActor(e)) == NULL)
 		return NULL;
 	return t->desc;
+}
+
+/* ActorRemark generates a remark for the actor attached to e based upon its
+ * mood. */
+void ActorRemark(Entity e) {
+	struct Actor *t;
+	if ((t = getActor(e)) == NULL)
+		return;
 }
