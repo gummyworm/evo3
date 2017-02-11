@@ -14,6 +14,7 @@ struct Sprite {
 	int w, h;
 	float scale;
 	GLuint texture;
+	float r, g, b, a;
 };
 
 /* SpriteUpdate defines an update message that can be polled by interested
@@ -28,6 +29,7 @@ void AddSprite(Entity, const char *, float, float);
 bool GetSpriteBounds(Entity, int *, int *, float *, int *, int *);
 GLuint GetSpriteTexture(Entity);
 Entity SpritePick(Entity, int, int);
+void SetSpriteColor(Entity, float, float, float, float);
 struct SpriteUpdate *GetSpriteUpdates(int *);
 int GetSpritesInBounds(Entity *, int, vec2, vec2, bool (*)(Entity));
 

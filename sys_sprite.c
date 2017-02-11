@@ -87,12 +87,24 @@ void UpdateSpriteSystem() {
 	GuiProjection(proj);
 
 	for (i = 0; i < numSprites; ++i) {
+		struct Sprite *s;
 		float z;
 		int x, y, w, h;
+		GLint loc;
+
+		s = sprites + i;
 		if (!GetSpriteBounds(sprites[i].e, &x, &y, &z, &w, &h))
 			continue;
+
+		loc = glGetUniformLocation(getTextureProgram(), "color");
+		if (loc >= 0)
+			glUniform4f(loc, s->r, s->g, s->b, s->a);
+
 		TexRectZ(proj, getTextureProgram(), x, y, 1.f, w, h, 0, 0, 1, 1,
 		         sprites[i].texture);
+
+		if (loc >= 0)
+			glUniform4f(loc, 0, 0, 0, 0);
 	}
 }
 
@@ -185,4 +197,16 @@ int GetSpritesInBounds(Entity *found, int max, vec2 center, vec2 dim,
 		}
 	}
 	return numFound;
+}
+
+/* SetSpriteColor sets the color of the sprite to (r,g,b,a). */
+void SetSpriteColor(Entity e, float r, float g, float b, float a) {
+	struct Sprite *s;
+
+	if ((s = getSprite(e)) == NULL)
+		return;
+	s->r = r;
+	s->g = g;
+	s->b = b;
+	s->a = a;
 }

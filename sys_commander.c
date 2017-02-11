@@ -48,16 +48,22 @@ static void lmouse(Entity e, int action) {
 		c->selection.selecting = true;
 	} else if (action == GLFW_RELEASE) {
 		if (c->selection.selecting) {
+			int i;
 			vec2 center, dim;
 			dim[0] = c->selection.w;
 			dim[1] = c->selection.h;
 			center[0] = c->selection.x + dim[0] / 2.f;
 			center[1] = c->selection.y + dim[1] / 2.f;
+
+			for (i = 0; i < c->numSelected; ++i) {
+				SetSpriteColor(c->selected[i], 0, 0, 0, 0);
+			}
 			c->numSelected =
 			    GetSpritesInBounds(c->selected, MAX_SELECTION,
 			                       center, dim, SelectUnit);
-			if (c->numSelected > 0)
-				dinfof("%d selected", c->numSelected);
+			for (i = 0; i < c->numSelected; ++i) {
+				SetSpriteColor(c->selected[i], 0, 1, 0, 1);
+			}
 		}
 		c->selection.selecting = false;
 	}
