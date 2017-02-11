@@ -55,6 +55,7 @@ static void update() {
 	glDepthFunc(GL_LEQUAL);
 	glEnable(GL_DEPTH_TEST);
 	UpdateCameraSystem();
+	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	UpdateSpriteSystem();
 

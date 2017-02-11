@@ -97,9 +97,12 @@ void UpdateSpriteSystem() {
 			continue;
 
 		loc = glGetUniformLocation(getTextureProgram(), "color");
+		if (sprites[i].castShadow) {
+			TexRectZ(proj, getShadowProgram(), x + 10, y + 10, 0.9f,
+			         w, h, 0, 0, 1, 1, sprites[i].texture);
+		}
 		if (loc >= 0)
 			glUniform4f(loc, s->r, s->g, s->b, s->a);
-
 		TexRectZ(proj, getTextureProgram(), x, y, 1.f, w, h, 0, 0, 1, 1,
 		         sprites[i].texture);
 
@@ -123,6 +126,7 @@ void AddSprite(Entity e, const char *filename, float xscale, float yscale) {
 	sprites[numSprites].w = xscale * 128;
 	sprites[numSprites].h = yscale * 128;
 	sprites[numSprites].texture = GetTexture(filename);
+	sprites[numSprites].castShadow = true;
 
 	HASH_ADD_INT(entitiesToSprites, e, item);
 	numSprites++;

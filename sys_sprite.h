@@ -15,6 +15,7 @@ struct Sprite {
 	float scale;
 	GLuint texture;
 	float r, g, b, a;
+	bool castShadow;
 };
 
 /* SpriteUpdate defines an update message that can be polled by interested

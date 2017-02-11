@@ -49,6 +49,29 @@ static GLchar const *fragmentShaderT =
     "  out_color = vec4(texture(tex0, out_texco)) + color;\n"
     "}\n";
 
+/* vertexShaderShadow is the vertex shader used for rendering shadows. */
+static GLchar const *vertexShaderShadow = "#version 150\n"
+                                          "in vec4 vPos;\n"
+                                          "in vec2 vTexco;\n"
+                                          "out vec2 out_texco;\n"
+                                          "uniform mat4 MVP;\n"
+                                          "void main( void ) {"
+                                          "    gl_Position = MVP * vPos;\n"
+                                          "    out_texco = vTexco;\n"
+                                          "}\n";
+
+/* fragmentShaderShadow is the fragment shader used for rendering shadows . */
+static GLchar const *fragmentShaderShadow =
+    "#version 150\n"
+    "in vec2 out_texco;\n"
+    "out vec4 out_color;\n"
+    "uniform sampler2D tex0;\n"
+    "void main()\n"
+    "{\n"
+    "  vec4 c = vec4(0, 0, 0, 0);\n"
+    "  out_color = mix(c, texture(tex0, out_texco).aaaa, .5);\n"
+    "}\n";
+
 /* bayerFrag is the bayer dither fragment shader source. */
 static GLchar const *bayerFrag =
     "#version 150\n"
@@ -191,6 +214,16 @@ GLint getTextureProgram() {
 		return program;
 
 	program = makeProgram(vertexShaderT, fragmentShaderT);
+	return program;
+}
+
+/* getShadowProgram returns the shadow program. */
+GLint getShadowProgram() {
+	static GLint program;
+	if (program != 0)
+		return program;
+
+	program = makeProgram(vertexShaderShadow, fragmentShaderShadow);
 	return program;
 }
 

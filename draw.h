@@ -19,6 +19,7 @@ GLuint GetTexture(const char *filename);
 
 GLint makeProgram(GLchar const *, GLchar const *);
 GLint getTextureProgram();
+GLint getShadowProgram();
 GLint getColorProgram();
 GLint getBayerProgram();
 
