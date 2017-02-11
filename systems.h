@@ -14,6 +14,7 @@
 #include "sys_fps_controller.h"
 #include "sys_gui.h"
 #include "sys_label.h"
+#include "sys_map.h"
 #include "sys_mesh.h"
 #include "sys_party.h"
 #include "sys_room.h"

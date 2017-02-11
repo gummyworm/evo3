@@ -1,6 +1,8 @@
 #include "sys_map.h"
 #include "debug.h"
 #include "draw.h"
+#include "entities.h"
+#include "systems.h"
 #include "third-party/include/cJSON.h"
 #include "third-party/include/uthash.h"
 
@@ -22,7 +24,7 @@ static void parseMap(struct TileMap *m, const char *json) {
 	int i, numTiles;
 	char *contents;
 	long fsize;
-	cJSON *root, *layer;
+	cJSON *root, *layer, *data;
 	FILE *f = fopen(json, "r");
 
 	fseek(f, 0, SEEK_END);
@@ -33,25 +35,59 @@ static void parseMap(struct TileMap *m, const char *json) {
 	fread(contents, fsize, 1, f);
 	fclose(f);
 	contents[fsize] = '\0';
+	dinfof("OK");
 
 	root = cJSON_Parse(contents);
 
 	m->h = cJSON_GetObjectItem(root, "height")->valueint;
 	m->w = cJSON_GetObjectItem(root, "width")->valueint;
-	m->tileh = cJSON_GetObjectItem(root, "tileheight")->valueint;
-	m->tilew = cJSON_GetObjectItem(root, "tilewidth")->valueint;
-	m->tileset =
-	    GetTexture(cJSON_GetObjectItem(root, "image")->valuestring);
+	{
+		float imgw, imgh, tw, th;
+		cJSON *tileset = cJSON_GetObjectItem(root, "tilesets");
+		tileset = tileset->child;
+
+		imgw = cJSON_GetObjectItem(tileset, "imagewidth")->valueint;
+		imgh = cJSON_GetObjectItem(tileset, "imageheight")->valueint;
+		tw = cJSON_GetObjectItem(tileset, "tilewidth")->valueint;
+		th = cJSON_GetObjectItem(tileset, "tileheight")->valueint;
+		m->tilesetW = imgw / tw;
+		m->tilesetH = imgh / th;
+		m->tilew = 1.f / m->tilesetW;
+		m->tileh = 1.f / m->tilesetW;
+
+		m->tileset = GetTexture(
+		    cJSON_GetObjectItem(tileset, "image")->valuestring);
+	}
 
 	layer = cJSON_GetObjectItem(root, "layers");
 	layer = layer->child;
+	data = cJSON_GetObjectItem(layer, "data");
 
-	numTiles = cJSON_GetArraySize(layer);
+	numTiles = cJSON_GetArraySize(data);
 	dassert(numTiles == (m->w * m->h));
 	m->tiles = malloc(numTiles * sizeof(int));
 
 	for (i = 0; i < numTiles; i++)
-		m->tiles[i] = cJSON_GetArrayItem(layer, i)->valueint;
+		m->tiles[i] = cJSON_GetArrayItem(data, i)->valueint;
+}
+
+/* drawMap renders the given map. */
+static void drawMap(struct TileMap *m) {
+	int i, j;
+	mat4x4 proj;
+
+	GetProjection(E_PLAYER, proj);
+
+	for (i = 0; i < m->h; ++i) {
+		for (j = 0; j < m->w; ++j) {
+			int t = m->tiles[i * m->w + j];
+			float u = 1.f / (t % m->tilesetW);
+			float v = 1.f / (t / m->tilesetW);
+			TexRect(proj, getTextureProgram(), j * TILE_W,
+			        i * TILE_H, TILE_W, TILE_H, u, v, m->tilew,
+			        m->tileh, m->tileset);
+		}
+	}
 }
 
 /* getTileMap returns the tileMap attached to entity e (if there is
@@ -78,7 +114,12 @@ static void addUpdate(struct TileMapUpdate *u) {
 void InitTileMapSystem() {}
 
 /* UpdateTileMapSystem updates all tileMaps that have been created. */
-void UpdateTileMapSystem() {}
+void UpdateTileMapSystem() {
+	int i;
+
+	for (i = 0; i < numTileMaps; ++i)
+		drawMap(tileMaps + i);
+}
 
 /* AddTileMap adds a tileMap component to the entity e. */
 void AddTileMap(Entity e, const char *file) {

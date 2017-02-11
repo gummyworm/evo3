@@ -8,12 +8,17 @@
 
 enum { MAX_MAPS = 1024 };
 
+enum { TILE_W = 4,
+       TILE_H = 4,
+};
+
 /* TileMap is a struct that represents a tile-based map. */
 struct TileMap {
 	Entity e;
 	int w, h;
 	GLuint tileset;
-	int tilew, tileh;
+	float tilew, tileh;
+	int tilesetW, tilesetH;
 	int *tiles;
 };
 

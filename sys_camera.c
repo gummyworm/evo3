@@ -556,14 +556,14 @@ bool Raycast(Entity e, int x, int y, vec3 start, vec3 stop) {
 }
 
 /* GetProjection sets projection to e's camera's projection matrix. */
-void GetProjection(Entity e, mat4x4 *projection) {
+void GetProjection(Entity e, mat4x4 projection) {
 	struct Camera *c;
 
 	c = getCamera(e);
 	if (c == NULL)
 		return;
 
-	memcpy(*projection, c->projection, sizeof(projection));
+	memcpy(projection, c->projection, sizeof(*projection));
 }
 
 /* lmouse is the left mouse button callback. */

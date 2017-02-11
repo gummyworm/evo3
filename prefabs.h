@@ -18,5 +18,6 @@ void Chest(Entity, float, float, float);
 void Snake(Entity, float, float, float);
 void Weather(Entity, float, float, float);
 void Worm(Entity, float, float, float);
+void TestMap(Entity e, float, float, float);
 
 #endif

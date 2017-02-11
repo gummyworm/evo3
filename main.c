@@ -32,6 +32,7 @@ static void init(GLFWwindow *win) {
 	InitFPSControllerSystem();
 	InitConsoleSystem(win);
 	InitWeatherSystem();
+	InitTileMapSystem();
 
 	InitWidgetSystem(win);
 	InitCameraSystem(win);
@@ -63,6 +64,7 @@ static void update() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDisable(GL_DEPTH_TEST);
+	UpdateTileMapSystem();
 	UpdatePartySystem();
 	UpdateWeatherSystem();
 	UpdateCommanderSystem();
@@ -76,7 +78,8 @@ extern void TestRoom(int);
 static void test() {
 	// TestRoom(E_TEST_ROOM);
 	// GenerateRoom(E_TEST_ROOM, CANOPY);
-	GenerateOverworldRoom(E_TEST_ROOM, CANOPY);
+	// GenerateOverworldRoom(E_TEST_ROOM, CANOPY);
+	TestMap(E_TEST_ROOM, 0.f, 0.f, 0.f);
 	// Player(E_PLAYER);
 	OverworldCommander(E_PLAYER);
 
