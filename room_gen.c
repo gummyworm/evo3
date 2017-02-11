@@ -13,3 +13,6 @@ void genWalls(Entity n, Entity s, Entity e, Entity w) {
 	WallEW(e, -10.f, 0.f, 0.f);
 	WallEW(w, 10.f, 0.f, 0.f);
 }
+
+/* genOverworld creates a plane background for the overworld. */
+void genOverworld(Entity e) { WallNS(e, 0, 0, 10.f); }

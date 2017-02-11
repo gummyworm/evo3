@@ -74,7 +74,8 @@ static void update() {
 extern void TestRoom(int);
 static void test() {
 	// TestRoom(E_TEST_ROOM);
-	GenerateRoom(E_TEST_ROOM, CANOPY);
+	// GenerateRoom(E_TEST_ROOM, CANOPY);
+	GenerateOverworldRoom(E_TEST_ROOM, CANOPY);
 	// Player(E_PLAYER);
 	OverworldCommander(E_PLAYER);
 

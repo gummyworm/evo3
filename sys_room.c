@@ -1,6 +1,7 @@
 #include "sys_room.h"
 #include "entities.h"
 #include "prefabs.h"
+#include "room_gen.h"
 #include "sys_transform.h"
 #include "thing.h"
 #include "third-party/include/uthash.h"
@@ -153,10 +154,6 @@ int ThingsInRoom(Entity e, Entity *found) {
 	return count;
 }
 
-extern void genFloor(Entity e);
-extern void genCeiling(Entity e);
-extern void genWalls(Entity n, Entity s, Entity e, Entity w);
-
 /* GenerateRoom creates a new room and attaches it to e.  It then adds a number
  * of additional entities (influenced by the given room type). */
 void GenerateRoom(Entity e, enum RoomType type) {
@@ -225,5 +222,32 @@ void GenerateRoom(Entity e, enum RoomType type) {
 		float y = -1;
 		float z = rand() / (float)(RAND_MAX / (size * 2)) - size;
 		Snake(monsters + i, x, y, z);
+	}
+}
+
+/* GenerateOverworldRoom creates an overworld (2D) room. */
+void GenerateOverworldRoom(Entity e, enum RoomType type) {
+	const int size = 10;
+	int i;
+
+	AddRoom(e, "GENERATED ROOM", "This test room was generated", -size,
+	        -size, -size, size * 2, size * 2, size * 2);
+
+	switch (type) {
+	case FLOOR:
+		break;
+	case CANOPY:
+		break;
+	}
+
+	genOverworld(E_ROOM);
+
+	/* add some trees */
+	int trees = E_ROOM + 5;
+	for (i = 0; i < 10; ++i) {
+		float x = rand() / (float)(RAND_MAX / (size * 2)) - size;
+		float y = rand() / (float)(RAND_MAX / (size * 2)) - size;
+		float z = 1;
+		Tree1(trees + i, x, y, z);
 	}
 }

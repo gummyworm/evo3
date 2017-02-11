@@ -44,5 +44,6 @@ const char *GetRoomDescription(Entity);
 
 int ThingsInRoom(Entity, Entity *);
 void GenerateRoom(Entity, enum RoomType);
+void GenerateOverworldRoom(Entity, enum RoomType);
 
 #endif
