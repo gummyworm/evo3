@@ -62,7 +62,7 @@ static void lmouse(Entity e, int action) {
 			    GetSpritesInBounds(c->selected, MAX_SELECTION,
 			                       center, dim, SelectUnit);
 			for (i = 0; i < c->numSelected; ++i) {
-				SetSpriteColor(c->selected[i], 0, 1, 0, 1);
+				SetSpriteColor(c->selected[i], 0, 1, 0, 0);
 			}
 		}
 		c->selection.selecting = false;

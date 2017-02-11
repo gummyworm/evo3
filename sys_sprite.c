@@ -167,11 +167,18 @@ Entity SpritePick(Entity e, int px, int py) {
 	return picked;
 }
 
-/* contains returns true if pt lies within the given bounds. */
-static bool contains(vec2 pt, vec2 center, vec2 dim) {
-	vec2 llnCorner = {center[0] - dim[0] / 2.f, center[1] - dim[1] / 2.f};
-	return (pt[0] > llnCorner[0]) && (pt[0] < llnCorner[0] + dim[0]) &&
-	       (pt[1] > llnCorner[1]) && (pt[1] < llnCorner[1] + dim[1]);
+/* contains returns true if pt-(pt+sdim) overlaps the given bounds. */
+static bool contains(vec2 l1, vec2 sdim, vec2 center, vec2 dim) {
+	vec2 r1, r2;
+	vec2 l2 = {center[0] - dim[0] / 2.f, center[1] - dim[1] / 2.f};
+	vec2_add(r1, l1, sdim);
+	vec2_add(r2, l2, dim);
+
+	if ((l1[0] > r2[0]) || (l2[0] > r1[0]))
+		return false;
+	if ((l2[1] > r1[1]) || (r1[1] < l2[1]))
+		return false;
+	return true;
 }
 
 /* GetSpritesInBounds sets up to max entities found in the bounds and returns
@@ -182,6 +189,7 @@ int GetSpritesInBounds(Entity *found, int max, vec2 center, vec2 dim,
 	int i, numFound;
 	for (i = 0, numFound = 0; i < numSprites && numFound < max; ++i) {
 		vec2 pos;
+		vec2 sdim;
 		int x, y;
 		float z;
 		int w, h;
@@ -189,7 +197,9 @@ int GetSpritesInBounds(Entity *found, int max, vec2 center, vec2 dim,
 		GetSpriteBounds(sprites[i].e, &x, &y, &z, &w, &h);
 		pos[0] = x;
 		pos[1] = y;
-		if (contains(pos, center, dim)) {
+		sdim[0] = w;
+		sdim[1] = h;
+		if (contains(pos, sdim, center, dim)) {
 			if (filter == NULL)
 				found[numFound++] = sprites[i].e;
 			else if (filter(sprites[i].e))
