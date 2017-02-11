@@ -83,6 +83,7 @@ GLuint GetSpriteTexture(Entity e) {
 void UpdateSpriteSystem() {
 	int i;
 	mat4x4 proj;
+	GLint loc;
 
 	GuiProjection(proj);
 
@@ -97,17 +98,16 @@ void UpdateSpriteSystem() {
 			TexRectZ(proj, getShadowProgram(), x + 5, y + 5, 0.9f,
 			         w, h, 0, 0, 1, 1, s->texture);
 	}
+	glUseProgram(getTextureProgram());
+	loc = glGetUniformLocation(getTextureProgram(), "color");
 	for (i = 0; i < numSprites; ++i) {
 		struct Sprite *s;
 		float z;
 		int x, y, w, h;
-		GLint loc;
 
 		s = sprites + i;
 		if (!GetSpriteBounds(s->e, &x, &y, &z, &w, &h))
 			continue;
-		glUseProgram(getTextureProgram());
-		loc = glGetUniformLocation(getTextureProgram(), "color");
 		if (loc >= 0)
 			glUniform4f(loc, s->r, s->g, s->b, s->a);
 		TexRectZ(proj, getTextureProgram(), x, y, 1.f, w, h, 0, 0, 1, 1,
