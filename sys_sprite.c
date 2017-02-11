@@ -174,6 +174,19 @@ static bool contains(vec2 l1, vec2 sdim, vec2 center, vec2 dim) {
 	vec2_add(r1, l1, sdim);
 	vec2_add(r2, l2, dim);
 
+	if (l2[0] > r2[0]) {
+		float t;
+		t = r2[0];
+		r2[0] = l2[0];
+		l2[0] = t;
+	}
+	if (l2[1] > r2[1]) {
+		float t;
+		t = r2[1];
+		r2[1] = l2[1];
+		l2[1] = t;
+	}
+
 	if ((l1[0] > r2[0]) || (l2[0] > r1[0]))
 		return false;
 	if ((l2[1] > r1[1]) || (r1[1] < l2[1]))
