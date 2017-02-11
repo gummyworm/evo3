@@ -1,6 +1,7 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
+#include <assert.h>
 #include <stdio.h>
 
 #define dprintf(...) printf(__VA_ARGS__)
@@ -27,5 +28,7 @@
 		fprintf(stderr, __VA_ARGS__);                                  \
 		fprintf(stderr, "\n");                                         \
 	} while (0)
+
+#define dassert(...) assert(__VA_ARGS__)
 
 #endif

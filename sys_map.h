@@ -13,7 +13,8 @@ struct TileMap {
 	Entity e;
 	int w, h;
 	GLuint tileset;
-	int tiles[];
+	int tilew, tileh;
+	int *tiles;
 };
 
 /* TileMapUpdate defines an update message that can be polled by interested

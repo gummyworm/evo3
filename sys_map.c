@@ -1,5 +1,7 @@
 #include "sys_map.h"
+#include "debug.h"
 #include "draw.h"
+#include "third-party/include/cJSON.h"
 #include "third-party/include/uthash.h"
 
 struct entityToTileMap {
@@ -16,9 +18,44 @@ int numTileMapUpdates;
 static struct TileMapUpdate updates[MAX_MAPS];
 
 /* parseMap reads the given json map (exported from Tiled) into m. */
-static void parseMap(struct TileMap *m, const char *json) {}
+static void parseMap(struct TileMap *m, const char *json) {
+	int i, numTiles;
+	char *contents;
+	long fsize;
+	cJSON *root, *layer;
+	FILE *f = fopen(json, "r");
 
-/* getTileMap returns the tileMap attached to entity e (if there is one). */
+	fseek(f, 0, SEEK_END);
+	fsize = ftell(f);
+	fseek(f, 0, SEEK_SET);
+
+	contents = malloc(fsize + 1);
+	fread(contents, fsize, 1, f);
+	fclose(f);
+	contents[fsize] = '\0';
+
+	root = cJSON_Parse(contents);
+
+	m->h = cJSON_GetObjectItem(root, "height")->valueint;
+	m->w = cJSON_GetObjectItem(root, "width")->valueint;
+	m->tileh = cJSON_GetObjectItem(root, "tileheight")->valueint;
+	m->tilew = cJSON_GetObjectItem(root, "tilewidth")->valueint;
+	m->tileset =
+	    GetTexture(cJSON_GetObjectItem(root, "image")->valuestring);
+
+	layer = cJSON_GetObjectItem(root, "layers");
+	layer = layer->child;
+
+	numTiles = cJSON_GetArraySize(layer);
+	dassert(numTiles == (m->w * m->h));
+	m->tiles = malloc(numTiles * sizeof(int));
+
+	for (i = 0; i < numTiles; i++)
+		m->tiles[i] = cJSON_GetArrayItem(layer, i)->valueint;
+}
+
+/* getTileMap returns the tileMap attached to entity e (if there is
+ * one). */
 static struct TileMap *getTileMap(Entity e) {
 	struct entityToTileMap *t;
 
@@ -72,6 +109,10 @@ void RemoveTileMap(Entity e) {
 	if (c != NULL) {
 		struct TileMap *sys = c->tileMap;
 		int sz = (tileMaps + numTileMaps) - sys;
+
+		if (sys->tiles)
+			free(sys->tiles);
+
 		memmove(sys, sys + 1, sz);
 		HASH_DEL(entitiesToTileMaps, c);
 		free(c);
