@@ -40,7 +40,7 @@ static void lmouse(Entity e, int action) {
 	if (action == GLFW_PRESS) {
 		int x, y;
 		InputGetMouse(&c->selection.x, &c->selection.y);
-		ScreenToGui(c->selection.x, c->selection.y, &x, &y);
+		WindowToGui(c->selection.x, c->selection.y, &x, &y);
 		c->selection.x = x;
 		c->selection.y = y;
 		c->selection.w = 0;
@@ -76,7 +76,7 @@ static void mousemove(Entity e, double x, double y) {
 		return;
 	if (c->selection.selecting) {
 		int gx, gy;
-		ScreenToGui(x, y, &gx, &gy);
+		WindowToGui(x, y, &gx, &gy);
 		c->selection.w = gx - c->selection.x;
 		c->selection.h = gy - c->selection.y;
 	}
