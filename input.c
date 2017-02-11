@@ -51,6 +51,15 @@ struct {
 } mouseButtonCallbacks[MAX_MOUSE_CALLBACKS];
 static int numMouseButtonCallbacks;
 
+/* mouseScrollCallbacks contains the callbacks to be executed on mouse scroll
+ * events. */
+struct {
+	Entity e;
+	MouseScrollEvent scroll;
+	uint32_t layer;
+} mouseScrollCallbacks[MAX_MOUSE_CALLBACKS];
+static int numMouseScrollCallbacks;
+
 /* getInput returns the input attached to entity e (if there is one). */
 static struct Input *getInput(Entity e) {
 	struct entityToInput *t;
@@ -186,6 +195,19 @@ void mouseButton(GLFWwindow *window, int button, int action, int mods) {
 	}
 }
 
+/* mouseScroll is the GLFW callback to handle mouse scrolling. */
+static void mouseScroll(GLFWwindow *window, double x, double y) {
+	UNUSED(window);
+	int i;
+
+	for (i = 0; i < numMouseScrollCallbacks; ++i) {
+		if ((mouseScrollCallbacks[i].layer & enabled) != 0) {
+			Entity e = mouseScrollCallbacks[i].e;
+			mouseScrollCallbacks[i].scroll(e, x, y);
+		}
+	}
+}
+
 /* InitInput initializes the engine for input related events. */
 void InitInput(GLFWwindow *win) {
 	enabled = 0xffffffff;
@@ -195,6 +217,7 @@ void InitInput(GLFWwindow *win) {
 	glfwSetKeyCallback(win, key);
 	glfwSetCursorPosCallback(win, mouseMove);
 	glfwSetMouseButtonCallback(win, mouseButton);
+	glfwSetScrollCallback(win, mouseScroll);
 }
 
 /* UpdateInput updates input related state. */
@@ -258,4 +281,13 @@ void InputRegisterMouseButtonEvent(Entity e, uint32_t layer, MouseButtonEvent l,
 	mouseButtonCallbacks[numMouseButtonCallbacks].left = l;
 	mouseButtonCallbacks[numMouseButtonCallbacks].right = r;
 	numMouseButtonCallbacks++;
+}
+
+/* InputRegisterMouseScrollEvent registers the given mouse scroll callback. */
+void InputRegisterMouseScrollEvent(Entity e, uint32_t layer,
+                                   MouseScrollEvent s) {
+	mouseScrollCallbacks[numMouseScrollCallbacks].e = e;
+	mouseScrollCallbacks[numMouseScrollCallbacks].layer = layer;
+	mouseScrollCallbacks[numMouseScrollCallbacks].scroll = s;
+	numMouseScrollCallbacks++;
 }

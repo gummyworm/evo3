@@ -17,6 +17,7 @@ enum { MAX_INPUTS = 1024,
 typedef void (*KeyEvent)(Entity, int key, int scancode, int action, int mods);
 typedef void (*MouseButtonEvent)(Entity, int action);
 typedef void (*MouseMotionEvent)(Entity, double x, double y);
+typedef void (*MouseScrollEvent)(Entity, double x, double y);
 
 /* Input is a struct that represents a receiver of user input. */
 struct Input {
@@ -51,5 +52,6 @@ void InputRegisterKeyEvent(Entity, uint32_t, KeyEvent);
 void InputRegisterMouseEvent(Entity, uint32_t, MouseMotionEvent);
 void InputRegisterMouseButtonEvent(Entity, uint32_t, MouseButtonEvent,
                                    MouseButtonEvent);
+void InputRegisterMouseScrollEvent(Entity, uint32_t, MouseScrollEvent);
 
 #endif

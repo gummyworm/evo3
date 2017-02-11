@@ -154,3 +154,35 @@ Entity SpritePick(Entity e, int px, int py) {
 
 	return picked;
 }
+
+/* contains returns true if pt lies within the given bounds. */
+static bool contains(vec2 pt, vec2 center, vec2 dim) {
+	vec2 llnCorner = {center[0] - dim[0] / 2.f, center[1] - dim[1] / 2.f};
+	return (pt[0] > llnCorner[0]) && (pt[0] < llnCorner[0] + dim[0]) &&
+	       (pt[1] > llnCorner[1]) && (pt[1] < llnCorner[1] + dim[1]);
+}
+
+/* GetSpritesInBounds sets up to max entities found in the bounds and returns
+ * the number found.  A function, filter, may be passed.  If not NULL, it should
+ * return true if an entity is to be included in found. */
+int GetSpritesInBounds(Entity *found, int max, vec2 center, vec2 dim,
+                       bool (*filter)(Entity)) {
+	int i, numFound;
+	for (i = 0, numFound = 0; i < numSprites && numFound < max; ++i) {
+		vec2 pos;
+		int x, y;
+		float z;
+		int w, h;
+
+		GetSpriteBounds(sprites[i].e, &x, &y, &z, &w, &h);
+		pos[0] = x;
+		pos[1] = y;
+		if (contains(pos, center, dim)) {
+			if (filter == NULL)
+				found[numFound++] = sprites[i].e;
+			else if (filter(sprites[i].e))
+				found[numFound++] = sprites[i].e;
+		}
+	}
+	return numFound;
+}

@@ -3,6 +3,7 @@
 
 #include "entity.h"
 #include "system.h"
+#include "third-party/include/linmath.h"
 #include <OpenGL/gl.h>
 
 enum { MAX_SPRITES = 4096 };
@@ -28,5 +29,6 @@ bool GetSpriteBounds(Entity, int *, int *, float *, int *, int *);
 GLuint GetSpriteTexture(Entity);
 Entity SpritePick(Entity, int, int);
 struct SpriteUpdate *GetSpriteUpdates(int *);
+int GetSpritesInBounds(Entity *, int, vec2, vec2, bool (*)(Entity));
 
 #endif

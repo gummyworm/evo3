@@ -31,8 +31,8 @@ static struct Unit *getUnit(Entity e) {
 /* addUpdate adds a new update for this frame. */
 static void addUpdate(struct UnitUpdate *u) { updates[numUpdates++] = *u; }
 
-/* NewUnit adds a unit component to the entity e. */
-void NewUnit(Entity e, const char *name, int hp) {
+/* AddUnit adds a unit component to the entity e. */
+void AddUnit(Entity e, const char *name, int hp) {
 	struct entityToUnit *item;
 
 	if (getUnit(e) != NULL)

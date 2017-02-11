@@ -48,6 +48,16 @@ static void lmouse(Entity e, int action) {
 		c->selection.selecting = true;
 	} else if (action == GLFW_RELEASE) {
 		if (c->selection.selecting) {
+			vec2 center, dim;
+			dim[0] = c->selection.w;
+			dim[1] = c->selection.h;
+			center[0] = c->selection.x + dim[0] / 2.f;
+			center[1] = c->selection.y + dim[1] / 2.f;
+			c->numSelected =
+			    GetSpritesInBounds(c->selected, MAX_SELECTION,
+			                       center, dim, SelectUnit);
+			if (c->numSelected > 0)
+				dinfof("%d selected", c->numSelected);
 		}
 		c->selection.selecting = false;
 	}
@@ -63,6 +73,20 @@ static void mousemove(Entity e, double x, double y) {
 		ScreenToGui(x, y, &gx, &gy);
 		c->selection.w = gx - c->selection.x;
 		c->selection.h = gy - c->selection.y;
+	}
+}
+
+/* scroll is the mouse scroll callback. */
+static void scroll(Entity e, double dx, double dy) {
+	UNUSED(dx);
+	struct Commander *c;
+	if ((c = getCommander(e)) == NULL)
+		return;
+	{
+		float x, y, z;
+		GetEye(e, &x, &y, &z);
+		z += dy * c->zoomSpeed * dt;
+		SetEye(e, x, y, z);
 	}
 }
 
@@ -111,9 +135,11 @@ void AddCommander(Entity e) {
 	commanders[numCommanders].e = e;
 	commanders[numCommanders].panSpeed[0] = 5.f;
 	commanders[numCommanders].panSpeed[1] = 5.f;
+	commanders[numCommanders].zoomSpeed = 5.f;
 	commanders[numCommanders].selection.selecting = false;
 	InputRegisterMouseButtonEvent(e, INPUT_LAYER_DEFAULT, lmouse, NULL);
 	InputRegisterMouseEvent(e, INPUT_LAYER_DEFAULT, mousemove);
+	InputRegisterMouseScrollEvent(e, INPUT_LAYER_DEFAULT, scroll);
 	InputRegisterKeyEvent(e, INPUT_LAYER_DEFAULT, key);
 	numCommanders++;
 }

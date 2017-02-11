@@ -247,7 +247,7 @@ void GenerateOverworldRoom(Entity e, enum RoomType type) {
 	for (i = 0; i < 10; ++i) {
 		float x = rand() / (float)(RAND_MAX / (size * 2)) - size;
 		float y = rand() / (float)(RAND_MAX / (size * 2)) - size;
-		float z = 1;
+		float z = 10;
 		Tree1(trees + i, x, y, z);
 	}
 }

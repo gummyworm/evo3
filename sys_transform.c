@@ -217,3 +217,30 @@ void SetScale(Entity e, float x, float y, float z) {
 	t->scale.y = y;
 	t->scale.z = z;
 }
+
+/* contains returns true if pt lies within the given bounds. */
+static bool contains(vec3 pt, vec3 center, vec3 dim) {
+	vec3 llnCorner = {center[0] - dim[0] / 2.f, center[1] - dim[1] / 2.f,
+	                  center[2] - dim[2] / 2.f};
+	return (pt[0] > llnCorner[0]) && (pt[0] < llnCorner[0] + dim[0]) &&
+	       (pt[1] > llnCorner[1]) && (pt[1] < llnCorner[1] + dim[1]) &&
+	       (pt[2] > llnCorner[2]) && (pt[2] < llnCorner[2] + dim[2]);
+}
+
+/* GetInArea sets up to max entities found in the selection area and returns
+ * the number found.  A function, filter, may be passed.  If not NULL, it should
+ * return true if an entity is to be included in found. */
+int GetInBounds(Entity *found, int max, vec3 center, vec3 dim,
+                bool (*filter)(Entity)) {
+	int i, numFound;
+	for (i = 0, numFound = 0; i < numTransforms && numFound < max; ++i) {
+		vec3 pos = {transforms[i].x, transforms[i].y, transforms[i].z};
+		if (contains(pos, center, dim)) {
+			if (filter == NULL)
+				found[numFound++] = transforms[i].e;
+			else if (filter(transforms[i].e))
+				found[numFound++] = transforms[i].e;
+		}
+	}
+	return numFound;
+}

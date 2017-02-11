@@ -46,6 +46,8 @@ bool GetPos(Entity, float *, float *, float *);
 bool GetRot(Entity, float *, float *, float *);
 bool GetScale(Entity, float *, float *, float *);
 
+int GetInBounds(Entity *, int, vec3, vec3, bool (*)(Entity));
+
 extern int numTransformUpdates;
 
 #endif
