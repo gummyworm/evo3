@@ -90,15 +90,22 @@ void UpdateSpriteSystem() {
 		struct Sprite *s;
 		float z;
 		int x, y, w, h;
+		s = sprites + i;
+		if (!GetSpriteBounds(s->e, &x, &y, &z, &w, &h))
+			continue;
+		if (s->castShadow)
+			TexRectZ(proj, getShadowProgram(), x + 5, y + 5, 0.9f,
+			         w, h, 0, 0, 1, 1, s->texture);
+	}
+	for (i = 0; i < numSprites; ++i) {
+		struct Sprite *s;
+		float z;
+		int x, y, w, h;
 		GLint loc;
 
 		s = sprites + i;
 		if (!GetSpriteBounds(s->e, &x, &y, &z, &w, &h))
 			continue;
-
-		if (s->castShadow)
-			TexRectZ(proj, getShadowProgram(), x + 5, y + 5, 0.9f,
-			         w, h, 0, 0, 1, 1, s->texture);
 		glUseProgram(getTextureProgram());
 		loc = glGetUniformLocation(getTextureProgram(), "color");
 		if (loc >= 0)
