@@ -54,5 +54,7 @@ int GetInventory(Entity, Entity **);
 const char *GetActorName(Entity);
 const char *GetActorDescription(Entity);
 void ActorRemark(Entity);
+int GetHP(Entity e);
+int GetMaxHP(Entity e);
 
 #endif

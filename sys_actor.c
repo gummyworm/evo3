@@ -156,3 +156,23 @@ void ActorRemark(Entity e) {
 	if ((t = getActor(e)) == NULL)
 		return;
 }
+
+/* GetHP gets the current HP of the actor attached to e. */
+int GetHP(Entity e) {
+	struct Actor *a;
+
+	a = getActor(e);
+	if (a == NULL)
+		return -1;
+	return a->currentStats.hp;
+}
+
+/* GetMaxHP gets the maximum HP of the actor attached to e. */
+int GetMaxHP(Entity e) {
+	struct Actor *a;
+
+	a = getActor(e);
+	if (a == NULL)
+		return -1;
+	return a->maximumStats.hp;
+}

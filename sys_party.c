@@ -43,6 +43,7 @@ void UpdatePartySystem() {
 	static GLuint overlay;
 	int i;
 	int x, y, w, h;
+	int hpw, manaw;
 	mat4x4 proj;
 
 	if (overlay == 0)
@@ -54,11 +55,45 @@ void UpdatePartySystem() {
 	h = 33;
 	x = 0;
 	y = 0;
+	hpw = 2;
+	manaw = 2;
 	for (i = 0; i < 5; ++i) {
 		Rect(proj, x, y, w, h, 0x000000ff);
-		if (i < numPartyMembers)
+		if (i < numPartyMembers) {
+			int currHp, maxHp;
 			TexRect(proj, TEXTURE_PROGRAM, x, y, w, h, 0.f, 0.f,
 			        1.f, 1.f, partyMembers[i].portraitTexture);
+
+			currHp = GetHP(partyMembers[i].e);
+			maxHp = GetMaxHP(partyMembers[i].e);
+			Rect(proj, x + w, y, hpw, h, 0x000000ff);
+			Rect(proj, x + w, y, hpw, (float)(currHp / maxHp) * h,
+			     0xf00000ff);
+		}
+		TexRect(proj, TEXTURE_PROGRAM, x, y, w, h, 0.f, 0.f, 1.f, 1.f,
+		        overlay);
+		y += h;
+	}
+
+	w = 30;
+	h = 33;
+	x = GUI_WIDTH - w;
+	y = 0;
+	hpw = 2;
+	manaw = 2;
+	for (i = 0; i < 5; ++i) {
+		Rect(proj, x, y, w, h, 0x000000ff);
+		if ((i + 5) < numPartyMembers) {
+			int currHp, maxHp;
+			TexRect(proj, TEXTURE_PROGRAM, x, y, w, h, 0.f, 0.f,
+			        1.f, 1.f, partyMembers[i].portraitTexture);
+
+			currHp = GetHP(partyMembers[i].e);
+			maxHp = GetMaxHP(partyMembers[i].e);
+			Rect(proj, x - hpw, y, hpw, h, 0x000000ff);
+			Rect(proj, x - hpw, y, hpw, (float)(currHp / maxHp) * h,
+			     0xf00000ff);
+		}
 		TexRect(proj, TEXTURE_PROGRAM, x, y, w, h, 0.f, 0.f, 1.f, 1.f,
 		        overlay);
 		y += h;
