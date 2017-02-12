@@ -305,8 +305,8 @@ void Rect(mat4x4 mvp, unsigned x, unsigned y, unsigned w, unsigned h,
 }
 
 /* TexRectZRot draws a wxh rectangle @ (x,y,z) rotated by angle radians.  */
-void TexRectZRot(mat4x4 mvp, GLint program, int x, int y, float z, int w, int h,
-                 float clipx, float clipy, float clipw, float cliph,
+void TexRectZRot(mat4x4 mvp, GLint program, float x, float y, float z, float w,
+                 float h, float clipx, float clipy, float clipw, float cliph,
                  float angle, GLuint tex) {
 	static GLuint vao;
 	static struct { GLuint texco, pos; } buffs;
@@ -402,15 +402,16 @@ void TexRectZRot(mat4x4 mvp, GLint program, int x, int y, float z, int w, int h,
 }
 
 /* TexRectZ draws a w x h rectangle @ (x,y,z). */
-void TexRectZ(mat4x4 mvp, GLint program, int x, int y, float z, int w, int h,
-              float clipx, float clipy, float clipw, float cliph, GLuint tex) {
+void TexRectZ(mat4x4 mvp, GLint program, float x, float y, float z, float w,
+              float h, float clipx, float clipy, float clipw, float cliph,
+              GLuint tex) {
 	TexRectZRot(mvp, program, x, y, z, w, h, clipx, clipy, clipw, cliph,
 	            0.f, tex);
 }
 
 /* TexRect draws a w x h rectangle @ (x,y). */
-void TexRect(mat4x4 mvp, GLint program, int x, int y, int w, int h, float clipx,
-             float clipy, float clipw, float cliph, GLuint tex) {
+void TexRect(mat4x4 mvp, GLint program, float x, float y, float w, float h,
+             float clipx, float clipy, float clipw, float cliph, GLuint tex) {
 	TexRectZ(mvp, program, x, y, 1.f, w, h, clipx, clipy, clipw, cliph,
 	         tex);
 }

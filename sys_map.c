@@ -35,7 +35,6 @@ static void parseMap(struct TileMap *m, const char *json) {
 	fread(contents, fsize, 1, f);
 	fclose(f);
 	contents[fsize] = '\0';
-	dinfof("OK");
 
 	root = cJSON_Parse(contents);
 
@@ -76,16 +75,20 @@ static void drawMap(struct TileMap *m) {
 	int i, j;
 	mat4x4 proj;
 
-	GetProjection(E_PLAYER, proj);
+	GetViewProjection(E_PLAYER, proj);
 
 	for (i = 0; i < m->h; ++i) {
 		for (j = 0; j < m->w; ++j) {
 			int t = m->tiles[i * m->w + j];
-			float u = 1.f / (t % m->tilesetW);
-			float v = 1.f / (t / m->tilesetW);
-			TexRect(proj, getTextureProgram(), j * TILE_W,
-			        i * TILE_H, TILE_W, TILE_H, u, v, m->tilew,
-			        m->tileh, m->tileset);
+			float u = m->tilew * (float)(t % m->tilesetW);
+			float v = m->tileh * (float)(t / m->tilesetW);
+			float ch = m->tilew;
+			float cw = m->tileh;
+			float x = TILE_W * (float)(m->w - j);
+			float y = TILE_H * (float)(m->h - i);
+
+			TexRect(proj, getTextureProgram(), x, y, TILE_W, TILE_H,
+			        u, v, cw, ch, m->tileset);
 		}
 	}
 }

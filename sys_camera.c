@@ -53,7 +53,7 @@ static struct Camera *getCamera(Entity e) {
 }
 
 /* getView sets the view matrix v appropriately. */
-static void getView(struct Camera *c, mat4x4 *v) {
+static void getView(struct Camera *c, mat4x4 v) {
 	vec3 eye, center, up;
 
 	GetViewPos(c->e, &eye[0], &eye[1], &eye[2]);
@@ -63,7 +63,7 @@ static void getView(struct Camera *c, mat4x4 *v) {
 	up[1] = 1;
 	up[2] = 0;
 
-	mat4x4_look_at(*v, eye, center, up);
+	mat4x4_look_at(v, eye, center, up);
 }
 
 /* addUpdate adds a new update for this frame. */
@@ -474,6 +474,7 @@ bool GetViewPos(Entity e, float *x, float *y, float *z) {
 	*x = c->eye[0] + tx;
 	*y = c->eye[1] + ty;
 	*z = c->eye[2] + tz;
+	return true;
 }
 
 /* WorldToScreen sets (sx, sy) to the screen coordiantes of the given (x, y, z)
@@ -563,7 +564,20 @@ void GetProjection(Entity e, mat4x4 projection) {
 	if (c == NULL)
 		return;
 
-	memcpy(projection, c->projection, sizeof(*projection));
+	mat4x4_dup(projection, c->projection);
+}
+
+/* GetViewProjection sets proj to e's view * projection matrix. */
+void GetViewProjection(Entity e, mat4x4 proj) {
+	struct Camera *c;
+	mat4x4 v;
+
+	c = getCamera(e);
+	if (c == NULL)
+		return;
+
+	getView(c, v);
+	mat4x4_mul(proj, c->projection, v);
 }
 
 /* lmouse is the left mouse button callback. */

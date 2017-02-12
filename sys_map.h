@@ -8,9 +8,8 @@
 
 enum { MAX_MAPS = 1024 };
 
-enum { TILE_W = 4,
-       TILE_H = 4,
-};
+#define TILE_W 0.5f
+#define TILE_H 0.5f
 
 /* TileMap is a struct that represents a tile-based map. */
 struct TileMap {

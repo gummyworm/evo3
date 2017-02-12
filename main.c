@@ -83,6 +83,7 @@ static void test() {
 	// Player(E_PLAYER);
 	OverworldCommander(E_PLAYER);
 
+	/*
 	AddTransform(E_APPLE, 0, 0, -7.0f);
 	AddRender(E_APPLE, "person.obj");
 	AddLabel(E_APPLE, "apple", 1.0f);
@@ -94,9 +95,10 @@ static void test() {
 	AddRender(E_ORANGE, "person.obj");
 	AddLabel(E_ORANGE, "orange", 1.0f);
 	AddToContainer(E_APPLE, E_ORANGE);
+	*/
 
 	Weather(E_WEATHER, 0, 0, 0);
-	Worm(E_WORM, 0, 0, 29.f);
+	// Worm(E_WORM, 0, 0, 29.f);
 }
 
 /* ClearUpdates resets all systems' updates. */
@@ -142,7 +144,6 @@ int main() {
 		}
 
 		glfwGetFramebufferSize(window, &width, &height);
-		mat4x4_ortho(proj, 0, width, height, 0, 1.f, -1.f);
 		glViewport(0, 0, width, height);
 		glClearColor(1, 1, 1, 1);
 		glClear(GL_COLOR_BUFFER_BIT);

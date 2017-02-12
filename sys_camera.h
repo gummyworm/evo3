@@ -87,6 +87,7 @@ bool GetViewPos(Entity, float *, float *, float *);
 
 void WorldToScreen(Entity, float, float, float, int *, int *);
 void GetProjection(Entity, mat4x4);
+void GetViewProjection(Entity, mat4x4);
 bool Raycast(Entity, int, int, vec3, vec3);
 
 #endif
