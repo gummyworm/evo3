@@ -68,7 +68,7 @@ static void drawWindow(struct Widget *w) {
 	w->data.window.render(w->e, proj, w->width, w->height);
 
 	GuiProjection(proj);
-	TexRect(proj, getTextureProgram(), w->x, w->y, w->width, w->height, 0.f,
+	TexRect(proj, TEXTURE_PROGRAM, w->x, w->y, w->width, w->height, 0.f,
 	        0.f, 1.f, 1.f, skin.overlay);
 
 	glDisable(GL_SCISSOR_TEST);

@@ -3,7 +3,9 @@
 
 #include "base.h"
 
+#include "shaders.h"
 #include "third-party/include/linmath.h"
+#include <stdbool.h>
 #include <stdint.h>
 
 void DrawInit();
@@ -16,11 +18,6 @@ void TexRectZRot(mat4x4, GLint, float, float, float, float, float, float, float,
                  float, float, float, GLuint);
 void Text(mat4x4, int, int, unsigned, const char *);
 GLuint GetTexture(const char *filename);
-
 GLint makeProgram(GLchar const *, GLchar const *);
-GLint getTextureProgram();
-GLint getShadowProgram();
-GLint getColorProgram();
-GLint getBayerProgram();
 
 #endif

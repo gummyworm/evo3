@@ -430,7 +430,7 @@ static void draw(struct Console *console) {
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	TexRect(mvp, getTextureProgram(), CONSOLE_BSTART_X, CONSOLE_BSTART_Y,
+	TexRect(mvp, TEXTURE_PROGRAM, CONSOLE_BSTART_X, CONSOLE_BSTART_Y,
 	        CONSOLE_BWIDTH, CONSOLE_BHEIGHT, 0, 0, 1, 1,
 	        console->overlayTex);
 }

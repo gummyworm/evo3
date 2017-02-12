@@ -48,8 +48,8 @@ static void drawWeatherUI(struct Weather *w) {
 	GuiProjection(proj);
 
 	sprintf(temp, "%f", w->temp);
-	TexRectZRot(proj, getTextureProgram(), VANE_X, VANE_Y, 0.f, VANE_W,
-	            VANE_H, 0.f, 0.f, 1.f, 1.f, w->windAngle, vane);
+	TexRectZRot(proj, TEXTURE_PROGRAM, VANE_X, VANE_Y, 0.f, VANE_W, VANE_H,
+	            0.f, 0.f, 1.f, 1.f, w->windAngle, vane);
 	Text(proj, VANE_X + VANE_W, 0, 8, temp);
 }
 

@@ -19,6 +19,7 @@ static void onError(int error, const char *description) {
 static void init(GLFWwindow *win) {
 	srand(time(NULL));
 
+	InitShaders();
 	DrawInit();
 	InitInput(win);
 	InitAudioSystem();

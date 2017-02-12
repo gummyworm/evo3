@@ -29,7 +29,7 @@ struct Camera {
 		GLuint color, depth;
 
 		GLuint vao;
-		GLuint program;
+		int program;
 	} passes[MAX_CAMERA_PASSES];
 	int numPasses;
 

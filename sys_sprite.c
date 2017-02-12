@@ -95,11 +95,10 @@ void UpdateSpriteSystem() {
 		if (!GetSpriteBounds(s->e, &x, &y, &z, &w, &h))
 			continue;
 		if (s->castShadow)
-			TexRectZ(proj, getShadowProgram(), x + 5, y + 5, 0.9f,
-			         w, h, 0, 0, 1, 1, s->texture);
+			TexRectZ(proj, SHADOW_PROGRAM, x + 5, y + 5, 0.9f, w, h,
+			         0, 0, 1, 1, s->texture);
 	}
-	glUseProgram(getTextureProgram());
-	loc = glGetUniformLocation(getTextureProgram(), "color");
+	UseProgram(TEXTURE_PROGRAM);
 	for (i = 0; i < numSprites; ++i) {
 		struct Sprite *s;
 		float z;
@@ -108,9 +107,8 @@ void UpdateSpriteSystem() {
 		s = sprites + i;
 		if (!GetSpriteBounds(s->e, &x, &y, &z, &w, &h))
 			continue;
-		if (loc >= 0)
-			glUniform4f(loc, s->r, s->g, s->b, s->a);
-		TexRectZ(proj, getTextureProgram(), x, y, 1.f, w, h, 0, 0, 1, 1,
+		SetUColor(TEXTURE_PROGRAM, s->r, s->g, s->b, s->a);
+		TexRectZ(proj, TEXTURE_PROGRAM, x, y, 1.f, w, h, 0, 0, 1, 1,
 		         s->texture);
 		if (loc >= 0)
 			glUniform4f(loc, 0, 0, 0, 0);

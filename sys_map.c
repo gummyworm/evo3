@@ -87,8 +87,8 @@ static void drawMap(struct TileMap *m) {
 			float x = TILE_W * (float)(m->w - j);
 			float y = TILE_H * (float)(m->h - i);
 
-			TexRect(proj, getTextureProgram(), x, y, TILE_W, TILE_H,
-			        u, v, cw, ch, m->tileset);
+			TexRect(proj, TEXTURE_PROGRAM, x, y, TILE_W, TILE_H, u,
+			        v, cw, ch, m->tileset);
 		}
 	}
 }

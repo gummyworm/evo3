@@ -145,7 +145,7 @@ void UpdateCameraSystem() {
 			           c->passes[0].height);
 			program = c->passes[0].program;
 		} else {
-			program = getColorProgram();
+			program = COLOR_PROGRAM;
 		}
 		glUseProgram(program);
 
@@ -262,8 +262,8 @@ void AddCamera(Entity e, uint32_t layers) {
 
 	int w, h;
 	glfwGetFramebufferSize(win, &w, &h);
-	addPass(cameras + numCameras, getBayerProgram(), 256, 256);
-	addPass(cameras + numCameras, getTextureProgram(), 256, 256);
+	addPass(cameras + numCameras, BAYER_PROGRAM, 256, 256);
+	addPass(cameras + numCameras, TEXTURE_PROGRAM, 256, 256);
 
 	InputRegisterMouseButtonEvent(e, INPUT_LAYER_DEFAULT, lmouse, NULL);
 

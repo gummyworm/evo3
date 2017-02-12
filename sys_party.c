@@ -57,10 +57,10 @@ void UpdatePartySystem() {
 	for (i = 0; i < 5; ++i) {
 		Rect(proj, x, y, w, h, 0x000000ff);
 		if (i < numPartyMembers)
-			TexRect(proj, getTextureProgram(), x, y, w, h, 0.f, 0.f,
+			TexRect(proj, TEXTURE_PROGRAM, x, y, w, h, 0.f, 0.f,
 			        1.f, 1.f, partyMembers[i].portraitTexture);
-		TexRect(proj, getTextureProgram(), x, y, w, h, 0.f, 0.f, 1.f,
-		        1.f, overlay);
+		TexRect(proj, TEXTURE_PROGRAM, x, y, w, h, 0.f, 0.f, 1.f, 1.f,
+		        overlay);
 		y += h;
 	}
 }

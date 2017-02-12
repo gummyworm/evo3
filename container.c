@@ -27,8 +27,8 @@ static void drawContents(Entity e, mat4x4 proj, int w, int h) {
 				y = 0;
 				x += itemW;
 			}
-			TexRect(proj, getTextureProgram(), x, y, itemW, itemH,
-			        0, 0, 1, 1, tex);
+			TexRect(proj, TEXTURE_PROGRAM, x, y, itemW, itemH, 0, 0,
+			        1, 1, tex);
 			y += itemH;
 		}
 	}
