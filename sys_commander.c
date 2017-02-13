@@ -143,10 +143,10 @@ void AddCommander(Entity e) {
 
 	HASH_ADD_INT(entitiesToCommanders, e, item);
 	commanders[numCommanders].e = e;
-	commanders[numCommanders].panSpeed[0] = 5.f;
-	commanders[numCommanders].panSpeed[1] = 5.f;
+	commanders[numCommanders].panSpeed[0] = 15.f;
+	commanders[numCommanders].panSpeed[1] = 15.f;
 	commanders[numCommanders].zoomSpeed = 5.f;
-	commanders[numCommanders].zoomLimits[0] = -10.f;
+	commanders[numCommanders].zoomLimits[0] = -20.f;
 	commanders[numCommanders].zoomLimits[1] = 20.f;
 	commanders[numCommanders].selection.selecting = false;
 	InputRegisterMouseButtonEvent(e, INPUT_LAYER_DEFAULT, lmouse, NULL);

@@ -84,44 +84,46 @@ static void bufferMap(struct TileMap *m) {
 			float cy = m->tileh * (float)(id / m->tilesetW);
 			float cw = m->tilew;
 			float ch = m->tileh;
+			int vi = 18 * (i * m->w + j);
+			int ti = 12 * (i * m->w + j);
 
-			v[18 * (i * m->w + j) + 0] = j;
-			v[18 * (i * m->w + j) + 1] = i;
-			v[18 * (i * m->w + j) + 2] = 0;
+			v[vi + 0] = -j;
+			v[vi + 1] = -i;
+			v[vi + 2] = 0;
 
-			v[18 * (i * m->w + j) + 3] = j + 1;
-			v[18 * (i * m->w + j) + 4] = i;
-			v[18 * (i * m->w + j) + 5] = 0;
+			v[vi + 3] = -j - 1;
+			v[vi + 4] = -i;
+			v[vi + 5] = 0;
 
-			v[18 * (i * m->w + j) + 6] = j + 1;
-			v[18 * (i * m->w + j) + 7] = i + 1;
-			v[18 * (i * m->w + j) + 8] = 0;
+			v[vi + 6] = -j - 1;
+			v[vi + 7] = -i - 1;
+			v[vi + 8] = 0;
 
-			v[18 * (i * m->w + j) + 9] = j;
-			v[18 * (i * m->w + j) + 10] = i;
-			v[24 * (i * m->w + j) + 11] = 0;
+			v[vi + 9] = -j;
+			v[vi + 10] = -i;
+			v[vi + 11] = 0;
 
-			v[18 * (i * m->w + j) + 12] = j + 1;
-			v[18 * (i * m->w + j) + 13] = i + 1;
-			v[18 * (i * m->w + j) + 14] = 0;
+			v[vi + 12] = -j - 1;
+			v[vi + 13] = -i - 1;
+			v[vi + 14] = 0;
 
-			v[18 * (i * m->w + j) + 15] = j;
-			v[18 * (i * m->w + j) + 16] = i + 1;
-			v[18 * (i * m->w + j) + 17] = 0;
+			v[vi + 15] = -j;
+			v[vi + 16] = -i - 1;
+			v[vi + 17] = 0;
 
-			t[12 * (i * m->w + j) + 0] = cx;
-			t[12 * (i * m->w + j) + 1] = cy;
-			t[12 * (i * m->w + j) + 2] = cx + cw;
-			t[12 * (i * m->w + j) + 3] = cy;
-			t[12 * (i * m->w + j) + 4] = cx + cw;
-			t[12 * (i * m->w + j) + 5] = cy + ch;
+			t[ti + 0] = cx;
+			t[ti + 1] = cy;
+			t[ti + 2] = cx + cw;
+			t[ti + 3] = cy;
+			t[ti + 4] = cx + cw;
+			t[ti + 5] = cy + ch;
 
-			t[12 * (i * m->w + j) + 6] = cx;
-			t[12 * (i * m->w + j) + 7] = cy;
-			t[12 * (i * m->w + j) + 8] = cx + cw;
-			t[12 * (i * m->w + j) + 9] = cy + ch;
-			t[12 * (i * m->w + j) + 10] = cx;
-			t[12 * (i * m->w + j) + 11] = cy + ch;
+			t[ti + 6] = cx;
+			t[ti + 7] = cy;
+			t[ti + 8] = cx + cw;
+			t[ti + 9] = cy + ch;
+			t[ti + 10] = cx;
+			t[ti + 11] = cy + ch;
 		}
 	}
 	m->numVertices = m->w * m->h * 6;
