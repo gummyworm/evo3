@@ -52,7 +52,7 @@ static void parseMap(struct TileMap *m, const char *json) {
 		m->tilesetW = imgw / tw;
 		m->tilesetH = imgh / th;
 		m->tilew = 1.f / m->tilesetW;
-		m->tileh = 1.f / m->tilesetW;
+		m->tileh = 1.f / m->tilesetH;
 
 		m->tileset = GetTexture(
 		    cJSON_GetObjectItem(tileset, "image")->valuestring);
@@ -70,27 +70,110 @@ static void parseMap(struct TileMap *m, const char *json) {
 		m->tiles[i] = cJSON_GetArrayItem(data, i)->valueint;
 }
 
+/* bufferMap buffers the tile data for batched rendering. */
+static void bufferMap(struct TileMap *m) {
+	int i, j;
+	float *v, *t;
+
+	v = malloc(sizeof(float) * 18 * m->w * m->h);
+	t = malloc(sizeof(float) * 12 * m->w * m->h);
+	for (i = 0; i < m->h; ++i) {
+		for (j = 0; j < m->w; ++j) {
+			int id = m->tiles[i * m->w + j];
+			float cx = m->tilew * (float)(id % m->tilesetW);
+			float cy = m->tileh * (float)(id / m->tilesetW);
+			float cw = m->tilew;
+			float ch = m->tileh;
+
+			v[18 * (i * m->w + j) + 0] = j;
+			v[18 * (i * m->w + j) + 1] = i;
+			v[18 * (i * m->w + j) + 2] = 0;
+
+			v[18 * (i * m->w + j) + 3] = j + 1;
+			v[18 * (i * m->w + j) + 4] = i;
+			v[18 * (i * m->w + j) + 5] = 0;
+
+			v[18 * (i * m->w + j) + 6] = j + 1;
+			v[18 * (i * m->w + j) + 7] = i + 1;
+			v[18 * (i * m->w + j) + 8] = 0;
+
+			v[18 * (i * m->w + j) + 9] = j;
+			v[18 * (i * m->w + j) + 10] = i;
+			v[24 * (i * m->w + j) + 11] = 0;
+
+			v[18 * (i * m->w + j) + 12] = j + 1;
+			v[18 * (i * m->w + j) + 13] = i + 1;
+			v[18 * (i * m->w + j) + 14] = 0;
+
+			v[18 * (i * m->w + j) + 15] = j;
+			v[18 * (i * m->w + j) + 16] = i + 1;
+			v[18 * (i * m->w + j) + 17] = 0;
+
+			t[12 * (i * m->w + j) + 0] = cx;
+			t[12 * (i * m->w + j) + 1] = cy;
+			t[12 * (i * m->w + j) + 2] = cx + cw;
+			t[12 * (i * m->w + j) + 3] = cy;
+			t[12 * (i * m->w + j) + 4] = cx + cw;
+			t[12 * (i * m->w + j) + 5] = cy + ch;
+
+			t[12 * (i * m->w + j) + 6] = cx;
+			t[12 * (i * m->w + j) + 7] = cy;
+			t[12 * (i * m->w + j) + 8] = cx + cw;
+			t[12 * (i * m->w + j) + 9] = cy + ch;
+			t[12 * (i * m->w + j) + 10] = cx;
+			t[12 * (i * m->w + j) + 11] = cy + ch;
+		}
+	}
+	m->numVertices = m->w * m->h * 6;
+
+	m->program = TEXTURE_PROGRAM;
+	UseProgram(m->program);
+	glGenVertexArrays(1, &m->vao);
+	glBindVertexArray(m->vao);
+
+	glGenBuffers(1, &m->vbos.pos);
+	glBindBuffer(GL_ARRAY_BUFFER, m->vbos.pos);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 3 * m->numVertices, v,
+	             GL_STATIC_DRAW);
+	free(v);
+
+	glGenBuffers(1, &m->vbos.tex);
+	glBindBuffer(GL_ARRAY_BUFFER, m->vbos.tex);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 2 * m->numVertices, t,
+	             GL_STATIC_DRAW);
+	free(t);
+
+	m->attrs.pos = glGetAttribLocation(GetProgram(m->program), "vPos");
+	m->attrs.tex = glGetAttribLocation(GetProgram(m->program), "vTexco");
+
+	glEnableVertexAttribArray(m->attrs.pos);
+	glBindBuffer(GL_ARRAY_BUFFER, m->vbos.pos);
+	glVertexAttribPointer(m->attrs.pos, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glEnableVertexAttribArray(m->attrs.tex);
+	glBindBuffer(GL_ARRAY_BUFFER, m->vbos.tex);
+	glVertexAttribPointer(m->attrs.tex, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
 /* drawMap renders the given map. */
 static void drawMap(struct TileMap *m) {
-	int i, j;
 	mat4x4 proj;
 
 	GetViewProjection(E_PLAYER, proj);
 
-	for (i = 0; i < m->h; ++i) {
-		for (j = 0; j < m->w; ++j) {
-			int t = m->tiles[i * m->w + j];
-			float u = m->tilew * (float)(t % m->tilesetW);
-			float v = m->tileh * (float)(t / m->tilesetW);
-			float ch = m->tilew;
-			float cw = m->tileh;
-			float x = TILE_W * (float)(m->w - j);
-			float y = TILE_H * (float)(m->h - i);
+	UseProgram(m->program);
+	SetUMVP(m->program, proj);
+	SetUTex(m->program, 0);
 
-			TexRect(proj, TEXTURE_PROGRAM, x, y, TILE_W, TILE_H, u,
-			        v, cw, ch, m->tileset);
-		}
-	}
+	glBindVertexArray(m->vao);
+	glEnable(GL_TEXTURE_2D);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m->tileset);
+	glDrawArrays(GL_TRIANGLES, 0, m->numVertices);
+	glBindVertexArray(0);
 }
 
 /* getTileMap returns the tileMap attached to entity e (if there is
@@ -136,6 +219,7 @@ void AddTileMap(Entity e, const char *file) {
 
 	tileMaps[numTileMaps].e = e;
 	parseMap(tileMaps + numTileMaps, file);
+	bufferMap(tileMaps + numTileMaps);
 
 	HASH_ADD_INT(entitiesToTileMaps, e, item);
 	numTileMaps++;

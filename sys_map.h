@@ -19,6 +19,16 @@ struct TileMap {
 	float tilew, tileh;
 	int tilesetW, tilesetH;
 	int *tiles;
+
+	int program;
+	struct {
+		GLuint pos, tex;
+	} attrs;
+	struct {
+		GLuint pos, tex;
+	} vbos;
+	int numVertices;
+	GLuint vao;
 };
 
 /* TileMapUpdate defines an update message that can be polled by interested
