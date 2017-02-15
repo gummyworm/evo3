@@ -99,7 +99,7 @@ static void test() {
 	*/
 
 	Weather(E_WEATHER, 0, 0, 0);
-	// Worm(E_WORM, 0, 0, 29.f);
+	Worm(E_WORM, 0.f, 0.f, -1.f);
 }
 
 /* ClearUpdates resets all systems' updates. */

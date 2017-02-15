@@ -1,4 +1,7 @@
 #include "sys_transform.h"
+#include "entities.h"
+#include "sys_actor.h"
+#include "sys_camera.h"
 #include "third-party/include/uthash.h"
 
 struct entityToTransform {
@@ -227,7 +230,15 @@ static bool contains(vec3 pt, vec3 center, vec3 dim) {
 	       (pt[2] > llnCorner[2]) && (pt[2] < llnCorner[2] + dim[2]);
 }
 
-/* GetInArea sets up to max entities found in the selection area and returns
+/* contains returns true if pt lies within the given 2D bounds. */
+static bool contains2d(vec2 pt, vec2 center, vec2 dim) {
+	vec3 llnCorner = {center[0] - dim[0] / 2.f, center[1] - dim[1] / 2.f,
+	                  center[2] - dim[2] / 2.f};
+	return (pt[0] > llnCorner[0]) && (pt[0] < llnCorner[0] + dim[0]) &&
+	       (pt[1] > llnCorner[1]) && (pt[1] < llnCorner[1] + dim[1]);
+}
+
+/* GetInBounds sets up to max entities found in the selection area and returns
  * the number found.  A function, filter, may be passed.  If not NULL, it should
  * return true if an entity is to be included in found. */
 int GetInBounds(Entity *found, int max, vec3 center, vec3 dim,
@@ -236,6 +247,26 @@ int GetInBounds(Entity *found, int max, vec3 center, vec3 dim,
 	for (i = 0, numFound = 0; i < numTransforms && numFound < max; ++i) {
 		vec3 pos = {transforms[i].x, transforms[i].y, transforms[i].z};
 		if (contains(pos, center, dim)) {
+			if (filter == NULL)
+				found[numFound++] = transforms[i].e;
+			else if (filter(transforms[i].e))
+				found[numFound++] = transforms[i].e;
+		}
+	}
+	return numFound;
+}
+
+int GetIn2DBounds(Entity *found, int max, vec2 center, vec2 dim,
+                  bool (*filter)(Entity)) {
+	int i, numFound;
+	for (i = 0, numFound = 0; i < numTransforms && numFound < max; ++i) {
+		int x, y;
+		vec3 pos = {transforms[i].x, transforms[i].y, transforms[i].z};
+		WorldToScreen(E_PLAYER, pos[0], pos[1], pos[2], &x, &y);
+		printf("%s %d %d\n", GetActorName(transforms[i].e), x, y);
+
+		vec2 pos2d = {x, y};
+		if (contains2d(pos2d, center, dim)) {
 			if (filter == NULL)
 				found[numFound++] = transforms[i].e;
 			else if (filter(transforms[i].e))

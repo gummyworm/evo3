@@ -47,6 +47,7 @@ bool GetRot(Entity, float *, float *, float *);
 bool GetScale(Entity, float *, float *, float *);
 
 int GetInBounds(Entity *, int, vec3, vec3, bool (*)(Entity));
+int GetIn2DBounds(Entity *, int, vec2, vec2, bool (*)(Entity));
 
 extern int numTransformUpdates;
 

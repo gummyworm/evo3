@@ -83,35 +83,32 @@ GLuint GetSpriteTexture(Entity e) {
 void UpdateSpriteSystem() {
 	int i;
 	mat4x4 proj;
-	GLint loc;
 
-	GuiProjection(proj);
+	GetViewProjection(E_PLAYER, proj);
+	// GuiProjection(proj);
 
 	for (i = 0; i < numSprites; ++i) {
 		struct Sprite *s;
-		float z;
-		int x, y, w, h;
+		float x, y, z;
 		s = sprites + i;
-		if (!GetSpriteBounds(s->e, &x, &y, &z, &w, &h))
-			continue;
+		if (!GetPos(s->e, &x, &y, &z))
+			return;
 		if (s->castShadow)
-			TexRectZ(proj, SHADOW_PROGRAM, x + 5, y + 5, 0.9f, w, h,
-			         0, 0, 1, 1, s->texture);
+			TexRectZ(proj, SHADOW_PROGRAM, x, y, 0, s->w, -s->h, 0,
+			         0, 1, 1, s->texture);
 	}
 	UseProgram(TEXTURE_PROGRAM);
 	for (i = 0; i < numSprites; ++i) {
 		struct Sprite *s;
-		float z;
-		int x, y, w, h;
+		float x, y, z;
 
 		s = sprites + i;
-		if (!GetSpriteBounds(s->e, &x, &y, &z, &w, &h))
-			continue;
+		if (!GetPos(s->e, &x, &y, &z))
+			return;
 		SetUColor(TEXTURE_PROGRAM, s->r, s->g, s->b, s->a);
-		TexRectZ(proj, TEXTURE_PROGRAM, x, y, 1.f, w, h, 0, 0, 1, 1,
-		         s->texture);
-		if (loc >= 0)
-			glUniform4f(loc, 0, 0, 0, 0);
+		TexRectZ(proj, TEXTURE_PROGRAM, x, y, z, s->w, -s->h, 0, 0, 1,
+		         1, s->texture);
+		SetUColor(TEXTURE_PROGRAM, 0, 0, 0, 0);
 	}
 }
 
@@ -127,8 +124,8 @@ void AddSprite(Entity e, const char *filename, float xscale, float yscale) {
 	item->e = e;
 
 	sprites[numSprites].e = e;
-	sprites[numSprites].w = xscale * 128;
-	sprites[numSprites].h = yscale * 128;
+	sprites[numSprites].w = xscale;
+	sprites[numSprites].h = yscale;
 	sprites[numSprites].texture = GetTexture(filename);
 	sprites[numSprites].castShadow = true;
 

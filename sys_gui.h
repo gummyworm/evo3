@@ -62,6 +62,7 @@ void AddRenderWindow(Entity, int, int, DrawEvent, MouseButtonEvent,
 void GuiProjection(mat4x4);
 void ScreenToGui(int, int, int *, int *);
 void WindowToGui(int, int, int *, int *);
+void GuiToWindow(int, int, int *, int *);
 
 bool GetWidgetPos(Entity, int *, int *);
 bool GetRelWidgetPos(Entity, int, int, int *, int *);

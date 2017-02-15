@@ -509,7 +509,8 @@ void WorldToScreen(Entity e, float x, float y, float z, int *sx, int *sy) {
 
 	{
 		int width, height;
-		glfwGetFramebufferSize(win, &width, &height);
+		// glfwGetFramebufferSize(win, &width, &height);
+		glfwGetWindowSize(win, &width, &height);
 		*sx = (projected[0] + 1.f) / 2.f * (float)width;
 		*sy = (1.f - projected[1]) / 2.f * (float)height;
 	}

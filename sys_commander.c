@@ -49,18 +49,23 @@ static void lmouse(Entity e, int action) {
 	} else if (action == GLFW_RELEASE) {
 		if (c->selection.selecting) {
 			int i;
+			int x, y;
 			vec2 center, dim;
-			dim[0] = c->selection.w;
-			dim[1] = c->selection.h;
 			center[0] = c->selection.x + dim[0] / 2.f;
 			center[1] = c->selection.y + dim[1] / 2.f;
+			GuiToWindow(c->selection.w, c->selection.h, &x, &y);
+			dim[0] = x;
+			dim[1] = y;
+			GuiToWindow(c->selection.x, c->selection.y, &x, &y);
+			center[0] = x + dim[0] / 2.f;
+			center[1] = y + dim[1] / 2.f;
 
 			for (i = 0; i < c->numSelected; ++i) {
 				SetSpriteColor(c->selected[i], 0, 0, 0, 0);
 			}
 			c->numSelected =
-			    GetSpritesInBounds(c->selected, MAX_SELECTION,
-			                       center, dim, SelectUnit);
+			    GetIn2DBounds(c->selected, MAX_SELECTION, center,
+			                  dim, SelectUnit);
 			for (i = 0; i < c->numSelected; ++i) {
 				SetSpriteColor(c->selected[i], 0, 1, 0, 0);
 			}

@@ -269,6 +269,16 @@ void WindowToGui(int sx, int sy, int *x, int *y) {
 	*y = (int)(sy * ((float)GUI_HEIGHT / (float)h));
 }
 
+/* GuiToWindow sets (x, y) to the window coordinates that correspond to the
+ * given
+ * GUI coordiantes (sx, sy). */
+void GuiToWindow(int sx, int sy, int *x, int *y) {
+	int w, h;
+	glfwGetWindowSize(win, &w, &h);
+	*x = (int)(sx * ((float)w / GUI_WIDTH));
+	*y = (int)(sy * ((float)h / GUI_HEIGHT));
+}
+
 /* GetWidgetPos sets x and y to the (x, y) coordinates of the widget attached to
  * e. */
 bool GetWidgetPos(Entity e, int *x, int *y) {
