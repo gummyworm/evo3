@@ -9,5 +9,8 @@ SRC_THIRD_PARTY=$(wildcard third-party/src/*.c)
 game: $(SRC) $(SRC_THIRD_PARTY) $(PREFABS)
 	gcc -o $@ $^ $(CFLAGS) $(INCLUDE) $(LIBS)
 
+test:
+	./game
+
 clean:
 	rm game
