@@ -19,6 +19,8 @@ static void onError(int error, const char *description) {
 static void init(GLFWwindow *win) {
 	srand(time(NULL));
 
+	dinstallhandlers();
+
 	InitShaders();
 	DrawInit();
 	InitInput(win);
@@ -65,9 +67,9 @@ static void update() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDisable(GL_DEPTH_TEST);
-	UpdateTileMapSystem();
-	UpdatePartySystem();
-	UpdateWeatherSystem();
+	// UpdateTileMapSystem();
+	// UpdatePartySystem();
+	// UpdateWeatherSystem();
 	UpdateCommanderSystem();
 	UpdateConsoleSystem();
 	UpdateWidgetSystem();
@@ -77,14 +79,13 @@ static void update() {
 /* test spawns test entities. */
 extern void TestRoom(int);
 static void test() {
-	// TestRoom(E_TEST_ROOM);
-	// GenerateRoom(E_TEST_ROOM, CANOPY);
+	TestRoom(E_TEST_ROOM);
+	GenerateRoom(E_TEST_ROOM, CANOPY);
 	// GenerateOverworldRoom(E_TEST_ROOM, CANOPY);
 	TestMap(E_TEST_ROOM, 0.f, 0.f, 0.f);
-	// Player(E_PLAYER);
-	OverworldCommander(E_PLAYER);
+	Player(E_PLAYER);
+	// OverworldCommander(E_PLAYER);
 
-	/*
 	AddTransform(E_APPLE, 0, 0, -7.0f);
 	AddRender(E_APPLE, "person.obj");
 	AddLabel(E_APPLE, "apple", 1.0f);
@@ -96,7 +97,6 @@ static void test() {
 	AddRender(E_ORANGE, "person.obj");
 	AddLabel(E_ORANGE, "orange", 1.0f);
 	AddToContainer(E_APPLE, E_ORANGE);
-	*/
 
 	Weather(E_WEATHER, 0, 0, 0);
 	Worm(E_WORM, 0.f, 0.f, -1.f);

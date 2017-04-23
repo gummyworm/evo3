@@ -1,6 +1,6 @@
 LIBS  = -lm -lSOIL -lglfw -framework OpenGL -framework CoreFoundation -lassimp -lportaudio
 INCLUDE = -I. -Ithird-party/include 
-CFLAGS = -Wall --std=c11
+CFLAGS = -Wall --std=c11 -DDEBUG
 
 SRC=$(wildcard *.c)
 PREFABS=$(wildcard prefabs/*.c)

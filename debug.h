@@ -31,4 +31,6 @@
 
 #define dassert(...) assert(__VA_ARGS__)
 
+void dinstallhandlers();
+
 #endif

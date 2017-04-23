@@ -67,6 +67,8 @@ void UpdatePartySystem() {
 			currHp = GetHP(partyMembers[i].e);
 			maxHp = GetMaxHP(partyMembers[i].e);
 			Rect(proj, x + w, y, hpw, h, 0x000000ff);
+			if (maxHp == 0)
+				maxHp = currHp;
 			Rect(proj, x + w, y, hpw, (float)(currHp / maxHp) * h,
 			     0xf00000ff);
 		}
@@ -90,6 +92,8 @@ void UpdatePartySystem() {
 
 			currHp = GetHP(partyMembers[i].e);
 			maxHp = GetMaxHP(partyMembers[i].e);
+			if (maxHp == 0)
+				maxHp = currHp;
 			Rect(proj, x - hpw, y, hpw, h, 0x000000ff);
 			Rect(proj, x - hpw, y, hpw, (float)(currHp / maxHp) * h,
 			     0xf00000ff);
