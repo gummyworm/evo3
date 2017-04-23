@@ -83,7 +83,7 @@ static void addUpdate(struct InputUpdate *u) {
 void InitInputSystem() {}
 
 /* UpdateInputSystem updates all inputs that have been created. */
-void UpdateInputSystem() {}
+void UpdateInputSystem() { numKeysPressed = 0; }
 
 void TransformSystemClearUpdates() { numInputUpdates = 0; }
 
@@ -219,9 +219,6 @@ void InitInput(GLFWwindow *win) {
 	glfwSetMouseButtonCallback(win, mouseButton);
 	glfwSetScrollCallback(win, mouseScroll);
 }
-
-/* UpdateInput updates input related state. */
-void UpdateInput() { numKeysPressed = 0; }
 
 /* InputGetUpdates returns any updates that have occurred since the last
  * update

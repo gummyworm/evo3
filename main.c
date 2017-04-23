@@ -33,7 +33,6 @@ static void init(GLFWwindow *win) {
 	InitTransformSystem();
 	InitCommanderSystem();
 	InitFPSControllerSystem();
-	InitConsoleSystem(win);
 	InitWeatherSystem();
 	InitTileMapSystem();
 
@@ -52,7 +51,7 @@ static void deinit(GLFWwindow *win) {
 static void update() {
 	/* pre render updates */
 	UpdateTransformSystem();
-	UpdateInput();
+	UpdateInputSystem();
 	UpdateFPSControllerSystem();
 
 	/* render */
@@ -62,14 +61,12 @@ static void update() {
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	UpdateSpriteSystem();
+	UpdateWeatherSystem();
 
 	/* post main render updates */
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDisable(GL_DEPTH_TEST);
-	// UpdateTileMapSystem();
-	// UpdatePartySystem();
-	// UpdateWeatherSystem();
 	UpdateCommanderSystem();
 	UpdateConsoleSystem();
 	UpdateWidgetSystem();
@@ -81,10 +78,8 @@ extern void TestRoom(int);
 static void test() {
 	TestRoom(E_TEST_ROOM);
 	GenerateRoom(E_TEST_ROOM, CANOPY);
-	// GenerateOverworldRoom(E_TEST_ROOM, CANOPY);
 	TestMap(E_TEST_ROOM, 0.f, 0.f, 0.f);
 	Player(E_PLAYER);
-	// OverworldCommander(E_PLAYER);
 
 	AddTransform(E_APPLE, 0, 0, -7.0f);
 	AddRender(E_APPLE, "person.obj");
