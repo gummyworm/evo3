@@ -11,9 +11,6 @@ static struct entityToActor *entitiesToActors;
 static struct Actor actors[MAX_ACTORS];
 static int numActors;
 
-int numActorUpdates;
-static struct ActorUpdate updates[MAX_ACTORS];
-
 static float dt;
 
 /* getActor returns the actor attached to entity e (if there is one). */
@@ -28,11 +25,6 @@ static struct Actor *getActor(Entity e) {
 		return NULL;
 
 	return t->actor;
-}
-
-/* addUpdate adds a new update for this frame. */
-static void addUpdate(struct ActorUpdate *u) {
-	updates[numActorUpdates++] = *u;
 }
 
 /* InitActorSystem initializes the actor system. */

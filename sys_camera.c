@@ -15,14 +15,13 @@ struct entityToCamera {
 	struct Camera *camera;
 	UT_hash_handle hh;
 };
-static mat4x4 proj;
 
 static struct entityToCamera *entitiesToCameras;
 static struct Camera cameras[MAX_CAMERAS];
 static int numCameras;
 
-static int numUpdates;
 static struct CameraUpdate updates[MAX_CAMERAS];
+static int numUpdates;
 
 struct entityToRender {
 	Entity e;
@@ -65,9 +64,6 @@ static void getView(struct Camera *c, mat4x4 v) {
 
 	mat4x4_look_at(v, eye, center, up);
 }
-
-/* addUpdate adds a new update for this frame. */
-static void addUpdate(struct CameraUpdate *u) { updates[numUpdates++] = *u; }
 
 /* InitCameraSystem initializes the camera system. */
 void InitCameraSystem(GLFWwindow *window) { win = window; }
@@ -495,7 +491,7 @@ void WorldToScreen(Entity e, float x, float y, float z, int *sx, int *sy) {
 		mat4x4 v, pv;
 		vec4 pt = {x, y, z, 1};
 
-		getView(cam, &v);
+		getView(cam, v);
 		mat4x4_mul(pv, cam->projection, v);
 		mat4x4_mul_vec4(projected, pv, pt);
 	}
@@ -514,6 +510,34 @@ void WorldToScreen(Entity e, float x, float y, float z, int *sx, int *sy) {
 		*sx = (projected[0] + 1.f) / 2.f * (float)width;
 		*sy = (1.f - projected[1]) / 2.f * (float)height;
 	}
+}
+
+void ScreenToWorld(Entity e, float x, float y, float *wx, float *wy,
+                   float *wz) {
+	mat4x4 vp, ivp;
+	GetViewProjection(e, vp);
+	mat4x4_invert(ivp, vp);
+	vec4 pos;
+
+	vec4 in;
+	int screenW, screenH;
+	float winZ = 0.f;
+
+	glfwGetFramebufferSize(win, &screenW, &screenH);
+
+	in[0] = (2.f * ((float)(x - 0.f) / (screenW - 0.f))) - 1.f,
+	in[1] = 1.f - (2.0f * ((float)(y - 0) / (screenH - 0)));
+	in[2] = 2.f * winZ - 1.f;
+	in[3] = 1.f;
+
+	{
+		mat4x4_mul_vec4(pos, ivp, in);
+		pos[3] = 1.0 / pos[3];
+	}
+
+	*wx = pos[0] * pos[3];
+	*wy = pos[1] * pos[3];
+	*wz = pos[2] * pos[3];
 }
 
 /* Raycast casts a ray from the camera at the given screen coordinates. */

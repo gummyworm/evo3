@@ -1,6 +1,7 @@
 #include "entities.h"
 #include "sys_camera.h"
 #include "sys_collision.h"
+#include "sys_transform.h"
 #include "third-party/include/uthash.h"
 
 struct entityToCollider {
@@ -16,6 +17,15 @@ static int numColliders;
 int numColliderUpdates;
 static struct ColliderUpdate updates[MAX_COLLIDERS];
 
+/* dist returns the distance between the colliders. */
+static float dist(struct Collider *c1, struct Collider *c2) {
+	float x1, x2, y1, y2, z1, z2;
+	if (GetPos(c1->e, &x1, &y1, &z1) && GetPos(c2->e, &x2, &y2, &z2))
+		return sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) +
+		            (z1 - z2) * (z1 - z2));
+	return -1.f;
+}
+
 /* getCollider returns the collider attached to entity e (if there is one). */
 static struct Collider *getCollider(Entity e) {
 	struct entityToCollider *t;
@@ -30,16 +40,33 @@ static struct Collider *getCollider(Entity e) {
 	return t->collider;
 }
 
-/* addUpdate adds a new update for this frame. */
-static void addUpdate(struct ColliderUpdate *u) {
-	updates[numColliderUpdates++] = *u;
-}
-
 /* InitColliderSystem initializes the collider system. */
 void InitColliderSystem() {}
 
 /* UpdateColliderSystem updates all colliders that have been created. */
-void UpdateColliderSystem() {}
+void UpdateColliderSystem() {
+	int i;
+	/* XXX: sort */
+
+	for (i = 0; i < numColliders; ++i) {
+		int j;
+		struct Collider *c1;
+		c1 = &colliders[i];
+
+		for (j = 0; j < numColliders; ++j) {
+			struct Collider *c2;
+			if (i == j)
+				continue;
+			c2 = &colliders[j];
+			if (dist(c1, c2) < (c1->radius + c2->radius)) {
+				/* collision between c1 and c2 */
+				updates[numColliderUpdates++] =
+				    (struct ColliderUpdate){.e = c1->e,
+				                            .into = c2->e};
+			}
+		}
+	}
+}
 
 /* AddCollider adds a collider component to the entity e. */
 void AddCollider(Entity e, float r) {

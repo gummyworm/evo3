@@ -227,7 +227,9 @@ bool InitShaders() {
 		    programs[BAYER_PROGRAM].program, "tex0");
 		programs[BAYER_PROGRAM].color = -1;
 	}
+	return true;
 }
+
 /* GetUMVP returns the ID of the MVP uniform for the provided program. */
 GLint GetUMVP(int program) { return programs[program].mvp; }
 bool SetUMVP(int program, mat4x4 mvp) {

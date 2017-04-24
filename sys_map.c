@@ -193,11 +193,6 @@ static struct TileMap *getTileMap(Entity e) {
 	return t->tileMap;
 }
 
-/* addUpdate adds a new update for this frame. */
-static void addUpdate(struct TileMapUpdate *u) {
-	updates[numTileMapUpdates++] = *u;
-}
-
 /* InitTileMapSystem initializes the tileMap system. */
 void InitTileMapSystem() {}
 

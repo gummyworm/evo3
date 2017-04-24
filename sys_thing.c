@@ -24,9 +24,6 @@ static struct entityToThing *entitiesToThings;
 static struct Thing things[MAX_THINGS];
 static int numThings;
 
-static int numUpdates;
-static struct ThingUpdate updates[MAX_THINGS];
-
 /* getThing returns the thing attached to entity e (if there is one). */
 struct Thing *getThing(Entity e) {
 	struct entityToThing *t;
@@ -41,14 +38,11 @@ struct Thing *getThing(Entity e) {
 	return t->thing;
 }
 
-/* addUpdate adds a new update for this frame. */
-static void addUpdate(struct ThingUpdate *u) { updates[numUpdates++] = *u; }
-
 /* InitThingSystem initializes the thing system. */
 void InitThingSystem() {}
 
 /* UpdateThingSystem updates all things that have been created. */
-void UpdateThingSystem() { numUpdates = 0; }
+void UpdateThingSystem() {}
 
 /* AddThing adds a thing component to the entity e. */
 void AddThing(Entity e, const char *name, const char *desc) {

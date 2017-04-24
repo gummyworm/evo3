@@ -14,11 +14,10 @@ struct Collider {
 	float radius;
 };
 
-/* ColliderUpdate defines the collider update message. */
+/* ColliderUpdate defines a collider update message. */
 struct ColliderUpdate {
 	Entity e;
 	Entity into;
-	float r;
 };
 
 void InitColliderSystem();

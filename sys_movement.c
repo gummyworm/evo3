@@ -29,9 +29,6 @@ static struct Movement *getMovement(Entity e) {
 	return m->movement;
 }
 
-/* addUpdate adds a new update for this frame. */
-static void addUpdate(struct MovementUpdate *u) { updates[numUpdates++] = *u; }
-
 /* InitMovementSystem initializes the movement system. */
 void InitMovementSystem() {}
 

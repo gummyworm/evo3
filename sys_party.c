@@ -13,9 +13,6 @@ static struct entityToPartyMember *entitiesToPartyMembers;
 static struct PartyMember partyMembers[MAX_PARTY_MEMBERS];
 static int numPartyMembers;
 
-int numPartyUpdates;
-static struct PartyUpdate updates[MAX_PARTY_MEMBERS];
-
 /* getParty returns the party attached to entity e (if there is one). */
 static struct PartyMember *getParty(Entity e) {
 	struct entityToPartyMember *t;
@@ -28,11 +25,6 @@ static struct PartyMember *getParty(Entity e) {
 		return NULL;
 
 	return t->member;
-}
-
-/* addUpdate adds a new update for this frame. */
-static void addUpdate(struct PartyUpdate *u) {
-	updates[numPartyUpdates++] = *u;
 }
 
 /* InitPartySystem initializes the party system. */

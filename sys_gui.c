@@ -88,9 +88,6 @@ static struct Widget *getWidget(Entity e) {
 	return t->widget;
 }
 
-/* addUpdate adds a new update for this frame. */
-static void addUpdate(struct WidgetUpdate *u) { updates[numUpdates++] = *u; }
-
 /* addWidget is a helper function that copies w to the GUI system. */
 static void addWidget(Entity e, struct Widget *w) {
 	struct entityToWidget *item;

@@ -104,7 +104,6 @@ int main() {
 	int frame;
 	float t;
 	GLFWwindow *window;
-	mat4x4 proj;
 
 	glfwSetErrorCallback(onError);
 

@@ -8,6 +8,7 @@
 #include "sys_actor.h"
 #include "sys_audio.h"
 #include "sys_camera.h"
+#include "sys_collision.h"
 #include "sys_commander.h"
 #include "sys_console.h"
 #include "sys_console.h"

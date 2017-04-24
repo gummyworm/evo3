@@ -100,11 +100,6 @@ static struct FPSController *getFPSController(Entity e) {
 	return f->fpsController;
 }
 
-/* addUpdate adds a new update for this frame. */
-static void addUpdate(struct FPSControllerUpdate *u) {
-	updates[numUpdates++] = *u;
-}
-
 /* InitFPSControllerSystem initializes the fpsController system. */
 void InitFPSControllerSystem() {}
 

@@ -14,9 +14,6 @@ static struct entityToLabel *entitiesToLabels;
 static struct Label labels[MAX_LABELS];
 static int numLabels;
 
-int numLabelUpdates;
-static struct LabelUpdate updates[MAX_LABELS];
-
 /* getLabel returns the label attached to entity e (if there is one). */
 static struct Label *getLabel(Entity e) {
 	struct entityToLabel *t;
@@ -29,11 +26,6 @@ static struct Label *getLabel(Entity e) {
 		return NULL;
 
 	return t->label;
-}
-
-/* addUpdate adds a new update for this frame. */
-static void addUpdate(struct LabelUpdate *u) {
-	updates[numLabelUpdates++] = *u;
 }
 
 /* InitLabelSystem initializes the label system. */

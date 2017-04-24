@@ -31,9 +31,6 @@ static struct Sprite *getSprite(Entity e) {
 	return s->sprite;
 }
 
-/* addUpdate adds a new update for this frame. */
-static void addUpdate(struct SpriteUpdate *u) { updates[numUpdates++] = *u; }
-
 /* InitSpriteSystem initializes the sprite system. */
 void InitSpriteSystem() {}
 

@@ -31,9 +31,6 @@ static struct Weather *getWeather(Entity e) {
 	return m->weather;
 }
 
-/* addUpdate adds a new update for this frame. */
-static void addUpdate(struct WeatherUpdate *u) { updates[numUpdates++] = *u; }
-
 /* drawWeatherUI renders the GUI that displays weather information. */
 static void drawWeatherUI(struct Weather *w) {
 	static GLuint vane;

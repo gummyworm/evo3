@@ -1,5 +1,6 @@
 #include "base.h"
 #include "draw.h"
+#include "entities.h"
 #include "systems.h"
 #include "third-party/include/uthash.h"
 
@@ -12,9 +13,6 @@ struct entityToCommander {
 static struct entityToCommander *entitiesToCommanders;
 static struct Commander commanders[MAX_COMMANDERS];
 static int numCommanders;
-
-static int numUpdates;
-static struct CommanderUpdate updates[MAX_COMMANDERS];
 
 static float dt;
 
@@ -38,6 +36,7 @@ static void lmouse(Entity e, int action) {
 	if ((c = getCommander(e)) == NULL)
 		return;
 	if (action == GLFW_PRESS) {
+		float wx, wy, wz;
 		int x, y;
 		InputGetMouse(&c->selection.x, &c->selection.y);
 		WindowToGui(c->selection.x, c->selection.y, &x, &y);
@@ -46,6 +45,10 @@ static void lmouse(Entity e, int action) {
 		c->selection.w = 0;
 		c->selection.h = 0;
 		c->selection.selecting = true;
+
+		ScreenToWorld(E_PLAYER, c->selection.x, c->selection.y, &wx,
+		              &wy, &wz);
+		dinfof("%f %f %f", wx, wy, wz);
 	} else if (action == GLFW_RELEASE) {
 		if (c->selection.selecting) {
 			int i;
@@ -131,9 +134,6 @@ static void key(Entity e, int key, int scancode, int action, int mods) {
 
 	SetEye(e, x, y, z);
 }
-
-/* addUpdate adds a new update for this frame. */
-static void addUpdate(struct CommanderUpdate *u) { updates[numUpdates++] = *u; }
 
 /* AddCommander adds a commander component to the entity e. */
 void AddCommander(Entity e) {

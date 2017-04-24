@@ -70,9 +70,6 @@ static struct entityToConsole *entitiesToConsoles;
 static struct Console consoles[MAX_COMMANDERS];
 static int numConsoles;
 
-static int numUpdates;
-static struct ConsoleUpdate updates[MAX_CONSOLES];
-
 static struct GLFWwindow *win;
 
 /* addChar adds the character ch to the console and updates the col/row etc.
@@ -496,9 +493,6 @@ static struct Console *getConsole(Entity e) {
 	return c->console;
 }
 
-/* addUpdate adds a new update for this frame. */
-static void addUpdate(struct ConsoleUpdate *u) { updates[numUpdates++] = *u; }
-
 /* AddConsole adds a console component to the entity e. */
 void AddConsole(Entity e) {
 	struct entityToConsole *item;
@@ -556,6 +550,4 @@ void UpdateConsoleSystem() {
 
 	for (i = 0; i < numConsoles; ++i)
 		update(consoles + i);
-
-	numUpdates = 0;
 }

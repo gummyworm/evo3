@@ -74,11 +74,6 @@ static struct Input *getInput(Entity e) {
 	return t->input;
 }
 
-/* addUpdate adds a new update for this frame. */
-static void addUpdate(struct InputUpdate *u) {
-	updates[numInputUpdates++] = *u;
-}
-
 /* InitInputSystem initializes the input system. */
 void InitInputSystem() {}
 
@@ -123,7 +118,10 @@ void RemoveInput(Entity e) {
 }
 
 /* GetInputUpdate returns any input updates for the entity e. */
-struct InputUpdate *GetInputUpdate(Entity e) {}
+struct InputUpdate *GetInputUpdate(Entity e) {
+	UNUSED(e);
+	return updates;
+}
 
 /* GetInputUpdates returns the input updates this frame. */
 struct InputUpdate *GetInputUpdates(int *num) {

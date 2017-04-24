@@ -18,9 +18,6 @@ static struct entityToRoom *entitiesToRooms;
 static struct Room rooms[MAX_ROOMS];
 static int numRooms;
 
-static int numUpdates;
-static struct RoomUpdate updates[MAX_ROOMS];
-
 /* getRoom returns the room attached to entity e (if there is one). */
 static struct Room *getRoom(Entity e) {
 	struct entityToRoom *t;
@@ -35,14 +32,11 @@ static struct Room *getRoom(Entity e) {
 	return t->room;
 }
 
-/* addUpdate adds a new update for this frame. */
-static void addUpdate(struct RoomUpdate *u) { updates[numUpdates++] = *u; }
-
 /* InitRoomSystem initializes the room system. */
 void InitRoomSystem() {}
 
 /* UpdateRoomSystem updates all rooms that have been created. */
-void UpdateRoomSystem() { numUpdates = 0; }
+void UpdateRoomSystem() {}
 
 /* AddRoom adds a room component to the entity e. */
 void AddRoom(Entity e, const char *name, const char *desc, float x, float y,
