@@ -30,6 +30,22 @@ static struct Actor *getActor(Entity e) {
 /* InitActorSystem initializes the actor system. */
 void InitActorSystem() {}
 
+/* HandleActorCollisions updates the actor system according to any collisions
+ * that occured between actors. */
+static void handleActorCollisions() {
+	int i, num;
+	struct ColliderUpdate *updates;
+
+	updates = GetColliderUpdates(&num);
+	for (i = 0; i < num; ++i) {
+		struct Actor *a1, *a2;
+		a1 = getActor(updates[i].e);
+		a2 = getActor(updates[i].into);
+		if (a1 != NULL && a2 != NULL)
+			dinfof("collision between entities detected");
+	}
+}
+
 /* UpdateActorSystem updates all actors that have been created. */
 void UpdateActorSystem() {
 	static float lastUpdate;
@@ -45,6 +61,7 @@ void UpdateActorSystem() {
 			a->remarkTmr = a->remarkInterval;
 		}
 	}
+	handleActorCollisions();
 }
 
 /* AddActor adds a actor component to the entity e. */
