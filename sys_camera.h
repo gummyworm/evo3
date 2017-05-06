@@ -8,8 +8,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-enum { MAX_CAMERAS = 16,
-       MAX_CAMERA_PASSES = 2,
+enum { MAX_CAMERA_PASSES = 2,
        MAX_RENDERS = 1024,
        TARGET_RES_X = 256,
        TARGET_RES_Y = 256,

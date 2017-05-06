@@ -4,8 +4,7 @@
 #include "entity.h"
 #include "thing.h"
 
-enum { MAX_LABELS = 8192,
-       LABEL_MAX_FONT_SIZE = 8,
+enum { LABEL_MAX_FONT_SIZE = 8,
        LABEL_MAX_CONTENT = 16,
 };
 

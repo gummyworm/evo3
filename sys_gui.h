@@ -7,8 +7,7 @@
 
 #include "entity.h"
 
-enum { MAX_WIDGETS = 8192,
-       GUI_MAX_CHILDREN = 32,
+enum { GUI_MAX_CHILDREN = 32,
 };
 
 enum { GUI_WIDTH = 320,

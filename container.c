@@ -90,15 +90,6 @@ static void rmouse(Entity e, int action) {
 
 	HandleAction(e, 0, E_PLAYER, (char *)ACTION_CLOSE, NULL);
 }
-/* mouseHandler is called when the OPEN dialog receives a mouse event. */
-static void mouseHandler(Entity self, int action) {
-	struct Thing *t;
-
-	if (action != GLFW_PRESS)
-		return;
-	if ((t = getThing(self)) == NULL)
-		return;
-}
 
 /* handleOpenBox provides default behavior for the OPEN action for
  * containers.

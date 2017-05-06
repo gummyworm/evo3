@@ -6,8 +6,6 @@
 #include "entity.h"
 #include <stdbool.h>
 
-enum { MAX_MAPS = 1024 };
-
 #define TILE_W 0.5f
 #define TILE_H 0.5f
 

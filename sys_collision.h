@@ -5,8 +5,6 @@
 #include "third-party/include/linmath.h"
 #include <stdbool.h>
 
-enum { MAX_COLLIDERS = 8192 };
-
 /* Collider is a struct that represents a bounds that can be collided with.
  */
 struct Collider {

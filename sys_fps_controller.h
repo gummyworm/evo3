@@ -4,8 +4,6 @@
 #include "entity.h"
 #include <stdint.h>
 
-enum { MAX_FPS_CONTROLLERS = 16 };
-
 struct FPSController {
 	Entity e;
 	float speed;

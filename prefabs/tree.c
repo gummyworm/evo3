@@ -8,5 +8,6 @@ int Tree1(Entity e, float x, float y, float z) {
 	// AddColorRender(e, "tree.obj", 0.f, 1.f, 0.3f, 1.f);
 	AddSprite(e, "res/tree.png", scale, scale);
 	AddLabel(e, "TREE", 5.f);
+	AddCollider(e, 1.f);
 	return 0;
 }

@@ -5,8 +5,6 @@
 #include "third-party/include/linmath.h"
 #include <stdbool.h>
 
-enum { MAX_TRANSFORMS = 8192 };
-
 /* Transform is a struct that represents the position/orientation of something.
  */
 struct Transform {

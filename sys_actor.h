@@ -6,8 +6,7 @@
 #include "entity.h"
 #include <stdbool.h>
 
-enum { MAX_ACTORS = 8192,
-       MAX_INVENTORY_SIZE = 1024,
+enum { MAX_INVENTORY_SIZE = 1024,
 };
 
 struct ActorStats {

@@ -1,10 +1,8 @@
 #ifndef SYS_MOVEMENT_H
 #define SYS_MOVEMENT_H
 
+#include "base.h"
 #include "entity.h"
-
-enum { MAX_MOVEMENTS = 8192,
-};
 
 /* Movement is a component that represents the movement capabilities of an
  * entity. */

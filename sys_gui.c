@@ -27,8 +27,6 @@ static int numWidgets;
 static int numUpdates;
 static struct WidgetUpdate updates[MAX_WIDGETS];
 
-static void DrawWidget(struct Widget *);
-
 static GLFWwindow *win;
 
 static struct { GLuint overlay; } skin;
@@ -177,7 +175,7 @@ struct WidgetUpdate *GetWidgetUpdates(int *num) {
 }
 
 /* DrawWidget renders the widget w. */
-static void DrawWidget(struct Widget *w) {
+void DrawWidget(struct Widget *w) {
 	mat4x4 proj;
 	mat4x4_identity(proj);
 	GuiProjection(proj);

@@ -84,6 +84,7 @@ static void test() {
 	AddTransform(E_APPLE, 0, 0, -7.0f);
 	AddRender(E_APPLE, "person.obj");
 	AddLabel(E_APPLE, "apple", 1.0f);
+	AddCollider(E_APPLE, 1.f);
 	AddContainer(E_APPLE, "APPLE", "It's a juicy red apple");
 
 	AddTransform(E_ORANGE, 1, 0, -6.0f);

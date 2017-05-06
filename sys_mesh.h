@@ -6,9 +6,6 @@
 #include "entity.h"
 #include "third-party/include/linmath.h"
 
-enum { MAX_MESHES = 8192,
-};
-
 struct Mesh {
 	Entity e;
 	GLuint vao, program;

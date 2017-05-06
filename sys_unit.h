@@ -1,11 +1,11 @@
 #ifndef SYS_UNIT_H
 #define SYS_UNIT_H
 
+#include "base.h"
 #include "entity.h"
 #include "thing.h"
 
-enum { MAX_UNITS = 8192,
-       UNIT_MAX_ITEMS_CARRIED = 36,
+enum { UNIT_MAX_ITEMS_CARRIED = 36,
 };
 
 /* UnitUpdate is a struct that describes actions a unit has taken this frame. */
