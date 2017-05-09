@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 typedef int Entity;
+typedef int (*Prefab)(Entity);
 
 void RemoveEntity(Entity);
 void DisableEntity(Entity);

@@ -13,5 +13,6 @@ enum { MAX_UNITS = 8192,
        MAX_CAMERAS = 16,
        MAX_ACTORS = 8192,
        MAX_PROJECTILES = 1024,
+       MAX_GUNS = 256,
 };
 #endif

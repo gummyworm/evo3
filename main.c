@@ -37,6 +37,7 @@ static void init(GLFWwindow *win) {
 	InitWeatherSystem();
 	InitTileMapSystem();
 	InitProjectileSystem();
+	InitGunSystem();
 
 	InitWidgetSystem(win);
 	InitCameraSystem(win);
@@ -65,6 +66,7 @@ static void update() {
 	UpdateSpriteSystem();
 	UpdateWeatherSystem();
 	UpdateProjectileSystem();
+	UpdateGunSystem();
 
 	/* post main render updates */
 	glEnable(GL_BLEND);

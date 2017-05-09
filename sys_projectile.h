@@ -20,6 +20,7 @@ struct Projectile {
 struct ProjectileUpdate {
 	Entity e;
 	float vel;
+	float time;
 };
 
 void InitProjectileSystem();
