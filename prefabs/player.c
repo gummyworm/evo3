@@ -2,6 +2,7 @@
 #include "../systems.h"
 
 int Player(Entity e) {
+	AddConsole(e);
 	AddTransform(e, 0, 0, 0);
 	AddCamera(e, 0);
 	AddCollider(e, 1.0f);

@@ -26,6 +26,7 @@ static void init(GLFWwindow *win) {
 	InitInput(win);
 	InitAudioSystem();
 
+	InitConsoleSystem(win);
 	InitUnitSystem();
 	InitSpriteSystem();
 	InitPartySystem();
@@ -35,6 +36,7 @@ static void init(GLFWwindow *win) {
 	InitFPSControllerSystem();
 	InitWeatherSystem();
 	InitTileMapSystem();
+	InitProjectileSystem();
 
 	InitWidgetSystem(win);
 	InitCameraSystem(win);
@@ -62,6 +64,7 @@ static void update() {
 	glEnable(GL_BLEND);
 	UpdateSpriteSystem();
 	UpdateWeatherSystem();
+	UpdateProjectileSystem();
 
 	/* post main render updates */
 	glEnable(GL_BLEND);

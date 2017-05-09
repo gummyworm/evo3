@@ -300,7 +300,7 @@ void CameraPerspective(Entity e, float fov, float aspect) {
 		return;
 	}
 
-	near = 0.5f;
+	near = 0.05f;
 	far = 100.f;
 
 	c->type = CAMERA_PERSPECTIVE;
@@ -544,33 +544,37 @@ void ScreenToWorld(Entity e, float x, float y, float *wx, float *wy,
 bool Raycast(Entity e, int x, int y, vec3 start, vec3 stop) {
 	struct Camera *c;
 	int width, height;
-	mat4x4 v, pv, invPV;
+	mat4x4 pv, invVP;
 
 	if ((c = getCamera(e)) == NULL)
 		return false;
 
 	glfwGetFramebufferSize(win, &width, &height);
-	mat4x4_mul(pv, c->projection, v);
-	mat4x4_invert(invPV, pv);
+	GetViewProjection(e, pv);
+	mat4x4_invert(invVP, pv);
+
+	{
+		vec4 res, norm;
+		x = width / 2;
+		y = height / 2;
+		vec4 scr = {(float)x / width * 0.5f - 1.f,
+		            (float)y / height * 0.5f - 1.f, 1.f, 1.f};
+		mat4x4_mul_vec4(res, invVP, scr);
+
+		vec4_norm(norm, res);
+		if (norm[3] == 0.f)
+			return false;
+		start[0] = norm[0];
+		start[1] = norm[1];
+		start[2] = norm[2];
+	}
 
 	{
 		vec4 res;
-		float z = 0.f;
+		float z = 100.f;
 		vec4 in = {(float)x / width * 2.f - 1.f,
 		           (float)y / height * 2.f - 1.f, 2.f * z - 1.f, 1.f};
-		mat4x4_mul_vec4(res, invPV, in);
-		if (res[3] == 0.f)
-			return false;
-		start[0] = res[0];
-		start[1] = res[1];
-		start[2] = res[2];
-	}
-	{
-		vec4 res;
-		float z = 1.f;
-		vec4 in = {(float)x / width * 2.f - 1.f,
-		           (float)y / height * 2.f - 1.f, 2.f * z - 1.f, 1.f};
-		mat4x4_mul_vec4(res, invPV, in);
+		mat4x4_mul_vec4(res, invVP, in);
 		if (res[3] == 0.f)
 			return false;
 		stop[0] = res[0];
@@ -607,8 +611,6 @@ void GetViewProjection(Entity e, mat4x4 proj) {
 
 /* lmouse is the left mouse button callback. */
 void lmouse(Entity e, int action) {
-	return;
-
 	if (action == GLFW_PRESS) {
 		double x, y;
 		vec3 start, stop;

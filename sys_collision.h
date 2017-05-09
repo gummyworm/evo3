@@ -5,17 +5,17 @@
 #include "third-party/include/linmath.h"
 #include <stdbool.h>
 
+/* ColliderUpdate defines a collider update message. */
+struct ColliderUpdate {
+	Entity into;
+};
+
 /* Collider is a struct that represents a bounds that can be collided with.
  */
 struct Collider {
 	Entity e;
 	float radius;
-};
-
-/* ColliderUpdate defines a collider update message. */
-struct ColliderUpdate {
-	Entity e;
-	Entity into;
+	struct ColliderUpdate update;
 };
 
 void InitColliderSystem();

@@ -60,9 +60,8 @@ void UpdateColliderSystem() {
 			c2 = &colliders[j];
 			if (dist(c1, c2) < (c1->radius + c2->radius)) {
 				/* collision between c1 and c2 */
-				updates[numColliderUpdates++] =
-				    (struct ColliderUpdate){.e = c1->e,
-				                            .into = c2->e};
+				c1->update =
+				    (struct ColliderUpdate){.into = c2->e};
 				dinfof("collision: distance %f", dist(c1, c2));
 			}
 		}
@@ -106,12 +105,10 @@ void RemoveCollider(Entity e) {
 
 /* GetColliderUpdate returns any collider updates for the entity e. */
 struct ColliderUpdate *GetColliderUpdate(Entity e) {
-	int i;
+	struct Collider *c;
 
-	for (i = 0; i < numColliderUpdates; ++i) {
-		if (updates[i].e == e)
-			return updates + i;
-	}
+	if ((c = getCollider(e)))
+		return &c->update;
 
 	return NULL;
 }

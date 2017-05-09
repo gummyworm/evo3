@@ -18,6 +18,7 @@
 #include "sys_map.h"
 #include "sys_mesh.h"
 #include "sys_party.h"
+#include "sys_projectile.h"
 #include "sys_room.h"
 #include "sys_sprite.h"
 #include "sys_time.h"

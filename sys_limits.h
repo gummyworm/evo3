@@ -12,5 +12,6 @@ enum { MAX_UNITS = 8192,
        MAX_COLLIDERS = 8192,
        MAX_CAMERAS = 16,
        MAX_ACTORS = 8192,
+       MAX_PROJECTILES = 1024,
 };
 #endif

@@ -329,6 +329,7 @@ static void key(Entity e, int key, int button, int action, int mods) {
 
 /* lmouse is the left mouse button callback. */
 static void lmouse(Entity e, int action) {
+	UNUSED(e);
 	struct Console *c;
 
 	if (numConsoles <= 0)
@@ -365,6 +366,7 @@ static void lmouse(Entity e, int action) {
 
 /* rmouse is the right mouse button callback. */
 static void rmouse(Entity e, int action) {
+	UNUSED(e);
 	struct Console *c;
 	char *desc;
 
