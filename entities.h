@@ -2,6 +2,7 @@
 #define ENTITIES_H
 
 enum { E_PLAYER = 1,
+       E_GUN,
        E_OVERWORLD_PLAYER,
        E_APPLE,
        E_ORANGE,

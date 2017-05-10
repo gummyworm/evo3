@@ -56,8 +56,7 @@ void AddGun(Entity e, Prefab projectile, float rate) {
 	numGuns++;
 }
 
-/* RemoveGun removes the gun attached to e from the Gun
- * system. */
+/* RemoveGun removes the gun attached to e from the Gun system. */
 void RemoveGun(Entity e) {
 	struct entityToGun *c;
 

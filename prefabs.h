@@ -14,10 +14,12 @@ int Floor2(Entity, float, float, float);
 int WallEW(Entity, float, float, float);
 int WallNS(Entity, float, float, float);
 int OverworldBG(Entity, float, float, float);
+int Bullet(Entity);
+int Gun(Entity, Entity);
 void Chest(Entity, float, float, float);
 void Snake(Entity, float, float, float);
 void Weather(Entity, float, float, float);
 void Worm(Entity, float, float, float);
-void TestMap(Entity e, float, float, float);
+void TestMap(Entity, float, float, float);
 
 #endif

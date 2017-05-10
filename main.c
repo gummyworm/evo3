@@ -85,6 +85,7 @@ static void test() {
 	GenerateRoom(E_TEST_ROOM, CANOPY);
 	TestMap(E_TEST_ROOM, 0.f, 0.f, 0.f);
 	Player(E_PLAYER);
+	Gun(E_GUN, E_PLAYER);
 
 	AddTransform(E_APPLE, 0, 0, -7.0f);
 	AddRender(E_APPLE, "person.obj");
