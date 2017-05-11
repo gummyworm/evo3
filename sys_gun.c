@@ -1,6 +1,5 @@
 
 #include "sys_gun.h"
-#include "sys_projectile.h"
 #include "sys_transform.h"
 #include "third-party/include/uthash.h"
 
@@ -15,7 +14,7 @@ static struct Gun guns[MAX_PROJECTILES];
 static int numGuns;
 
 int numGunUpdates;
-static struct GunUpdate updates[MAX_PROJECTILES];
+static struct GunUpdate updates[MAX_GUNS];
 
 /* getGun returns the gun attached to entity e (if there is one).
  */
@@ -91,8 +90,6 @@ struct GunUpdate *GetGunUpdates(int *num) {
 /* GunFire spawns the projectile of the gun attached to e. */
 void GunFire(Entity e) {
 	struct Gun *g;
-	struct ProjectileUpdate *oldest;
-	int i;
 
 	if ((g = getGun(e)) == NULL)
 		return;
@@ -101,16 +98,5 @@ void GunFire(Entity e) {
 		return;
 
 	/* find/replace the oldest bullet */
-	oldest = GetProjectileUpdate(g->update.bullets[0]);
-	for (i = 1; i < GUN_MAX_BULLETS_ALIVE; ++i) {
-		struct ProjectileUpdate *u;
-		u = GetProjectileUpdate(g->update.bullets[i]);
-		if (u == NULL)
-			continue;
-		if (oldest->time > u->time)
-			oldest = u;
-	}
-
-	g->projectile(oldest->e);
 	g->update.cooldown = g->rate;
 }

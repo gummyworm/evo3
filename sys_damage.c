@@ -1,5 +1,7 @@
 #include "sys_damage.h"
-#include "sys_transform.h"
+#include "sys_collision.h"
+#include "sys_damage.h"
+#include "sys_unit.h"
 #include "third-party/include/uthash.h"
 
 struct entityToDamage {
@@ -38,13 +40,13 @@ void UpdateDamageSystem() {
 	int i;
 	for (i = 0; i < numDamages; ++i) {
 		struct ColliderUpdate *u = GetColliderUpdate(damages[i].e);
-		if (u->into != NULL)
-			UnitHarm(u->into, damages[i].value;
+		if (u->into != 0)
+			UnitHarm(u->into, damages[i].value);
 	}
 }
 
 /* AddDamage adds a damage component to the entity e. */
-void AddDamage(Entity e, vec3 dir, float vel) {
+void AddDamage(Entity e, float value) {
 	struct entityToDamage *item;
 
 	if (getDamage(e) != NULL)
@@ -54,10 +56,7 @@ void AddDamage(Entity e, vec3 dir, float vel) {
 	item->e = e;
 
 	damages[numDamages].e = e;
-	damages[numDamages].vel = vel;
-	damages[numDamages].dir[0] = dir[0];
-	damages[numDamages].dir[1] = dir[1];
-	damages[numDamages].dir[2] = dir[2];
+	damages[numDamages].value = value;
 
 	HASH_ADD_INT(entitiesToDamages, e, item);
 	numDamages++;

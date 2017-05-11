@@ -15,5 +15,6 @@ enum { MAX_UNITS = 8192,
        MAX_PROJECTILES = 1024,
        MAX_GUNS = 256,
        MAX_CHILDS = 1024,
+       MAX_DAMAGES = 1024,
 };
 #endif

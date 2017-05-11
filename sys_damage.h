@@ -16,13 +16,11 @@ struct Damage {
  * systems. */
 struct DamageUpdate {
 	Entity e;
-	float vel;
-	float time;
 };
 
 void InitDamageSystem();
 void UpdateDamageSystem();
-void AddDamage(Entity, vec3, float);
+void AddDamage(Entity, float);
 void RemoveDamage(Entity);
 void DamageSystemClearUpdates();
 struct DamageUpdate *GetDamageUpdates(int *);
