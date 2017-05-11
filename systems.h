@@ -13,6 +13,7 @@
 #include "sys_commander.h"
 #include "sys_console.h"
 #include "sys_console.h"
+#include "sys_damage.h"
 #include "sys_fps_controller.h"
 #include "sys_gui.h"
 #include "sys_gun.h"

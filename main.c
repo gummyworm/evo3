@@ -26,6 +26,7 @@ static void init(GLFWwindow *win) {
 	InitInput(win);
 	InitAudioSystem();
 
+	InitDamageSystem();
 	InitConsoleSystem(win);
 	InitUnitSystem();
 	InitSpriteSystem();
@@ -38,6 +39,7 @@ static void init(GLFWwindow *win) {
 	InitTileMapSystem();
 	InitProjectileSystem();
 	InitGunSystem();
+	InitChildSystem();
 
 	InitWidgetSystem(win);
 	InitCameraSystem(win);
@@ -53,9 +55,11 @@ static void deinit(GLFWwindow *win) {
 /* update updates the game. */
 static void update() {
 	/* pre render updates */
+	UpdateChildSystem();
 	UpdateTransformSystem();
 	UpdateInputSystem();
 	UpdateFPSControllerSystem();
+	UpdateDamageSystem();
 
 	/* render */
 	glDepthFunc(GL_LEQUAL);
