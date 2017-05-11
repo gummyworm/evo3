@@ -72,7 +72,6 @@ void RemoveRender(Entity);
 void InitCameraSystem();
 void UpdateCameraSystem();
 void AddCamera(Entity, uint32_t);
-struct CameraUpdate *GetCameraUpdate(int *);
 
 void AddCamera(Entity, uint32_t);
 void RemoveCamera(Entity);

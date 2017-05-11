@@ -14,11 +14,7 @@ static struct entityToDamage *entitiesToDamages;
 static struct Damage damages[MAX_DAMAGES];
 static int numDamages;
 
-int numDamageUpdates;
-static struct DamageUpdate updates[MAX_PROJECTILES];
-
-/* getDamage returns the damage attached to entity e (if there is one).
- */
+/* getDamage returns the damage attached to entity e (if there is one). */
 static struct Damage *getDamage(Entity e) {
 	struct entityToDamage *t;
 
@@ -78,22 +74,4 @@ void RemoveDamage(Entity e) {
 		HASH_DEL(entitiesToDamages, c);
 		free(c);
 	}
-}
-
-/* GetDamageUpdate returns any damage updates for the entity e. */
-struct DamageUpdate *GetDamageUpdate(Entity e) {
-	int i;
-
-	for (i = 0; i < numDamageUpdates; ++i) {
-		if (updates[i].e == e)
-			return updates + i;
-	}
-
-	return NULL;
-}
-
-/* GetDamageUpdates returns the damage updates this frame. */
-struct DamageUpdate *GetDamageUpdates(int *num) {
-	*num = numDamageUpdates;
-	return updates;
 }

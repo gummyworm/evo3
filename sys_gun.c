@@ -10,14 +10,10 @@ struct entityToGun {
 };
 
 static struct entityToGun *entitiesToGuns;
-static struct Gun guns[MAX_PROJECTILES];
+static struct Gun guns[MAX_GUNS];
 static int numGuns;
 
-int numGunUpdates;
-static struct GunUpdate updates[MAX_GUNS];
-
-/* getGun returns the gun attached to entity e (if there is one).
- */
+/* getGun returns the gun attached to entity e (if there is one). */
 static struct Gun *getGun(Entity e) {
 	struct entityToGun *t;
 
@@ -50,6 +46,7 @@ void AddGun(Entity e, Prefab projectile, float rate) {
 	guns[numGuns].e = e;
 	guns[numGuns].projectile = projectile;
 	guns[numGuns].rate = rate;
+	guns[numGuns].update.cooldown = rate;
 
 	HASH_ADD_INT(entitiesToGuns, e, item);
 	numGuns++;
@@ -72,22 +69,8 @@ void RemoveGun(Entity e) {
 	}
 }
 
-/* GetGunUpdate returns any gun updates for the entity e. */
-struct GunUpdate *GetGunUpdate(Entity e) {
-	struct Gun *g;
-
-	if ((g = getGun(e)))
-		return &g->update;
-	return NULL;
-}
-
-/* GetGunUpdates returns the gun updates this frame. */
-struct GunUpdate *GetGunUpdates(int *num) {
-	*num = numGunUpdates;
-	return updates;
-}
-
-/* GunFire spawns the projectile of the gun attached to e. */
+/* GunFire spawns the projectile of the gun attached to e if the gun
+ * attached to e is off cooldown. */
 void GunFire(Entity e) {
 	struct Gun *g;
 
@@ -97,6 +80,5 @@ void GunFire(Entity e) {
 	if (g->update.cooldown > 0)
 		return;
 
-	/* find/replace the oldest bullet */
 	g->update.cooldown = g->rate;
 }

@@ -25,11 +25,6 @@ struct Weather {
 	float uv;
 };
 
-/* WeatherUpdate is the update message used to communicate weather changes. */
-struct WeatherUpdate {
-	Entity e;
-};
-
 void InitWeatherSystem();
 void UpdateWeatherSystem();
 void AddWeather(Entity, float, float);

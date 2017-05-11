@@ -30,6 +30,5 @@ struct CommanderUpdate {
 void InitCommanderSystem();
 void UpdateCommanderSystem();
 void AddCommander(Entity);
-struct CommanderUpdate *GetCommanderUpdates(int *);
 
 #endif

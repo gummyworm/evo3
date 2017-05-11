@@ -14,9 +14,6 @@ static struct entityToWeather *entitiesToWeathers;
 static struct Weather weathers[MAX_WEATHERS];
 static int numWeathers;
 
-static int numUpdates;
-static struct WeatherUpdate updates[MAX_WEATHERS];
-
 /* getWeather returns the weather attached to entity e (if there is one). */
 static struct Weather *getWeather(Entity e) {
 	struct entityToWeather *m;
@@ -59,7 +56,6 @@ void UpdateWeatherSystem() {
 		return;
 
 	drawWeatherUI(weathers + 0);
-	numUpdates = 0;
 }
 
 /* AddWeather adds a weather component to the entity e. */
@@ -99,10 +95,4 @@ void RemoveWeather(Entity e) {
 		HASH_DEL(entitiesToWeathers, c);
 		free(c);
 	}
-}
-
-/* GetWeatherUpdates returns the weather updates this frame. */
-struct WeatherUpdate *GetWeatherUpdates(int *num) {
-	*num = numUpdates;
-	return updates;
 }

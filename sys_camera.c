@@ -20,9 +20,6 @@ static struct entityToCamera *entitiesToCameras;
 static struct Camera cameras[MAX_CAMERAS];
 static int numCameras;
 
-static struct CameraUpdate updates[MAX_CAMERAS];
-static int numUpdates;
-
 struct entityToRender {
 	Entity e;
 	struct Render *render;
@@ -185,8 +182,6 @@ void UpdateCameraSystem() {
 			doPass(c, j);
 		}
 	}
-
-	numUpdates = 0;
 }
 
 static void addPass(struct Camera *c, GLint program, int w, int h) {
@@ -281,12 +276,6 @@ void RemoveCamera(Entity e) {
 		HASH_DEL(entitiesToCameras, c);
 		free(c);
 	}
-}
-
-/* GetCameraUpdates returns the camera updates this frame. */
-struct CameraUpdate *GetCameraUpdates(int *num) {
-	*num = numUpdates;
-	return updates;
 }
 
 /* CameraPerspective sets the parameters of the camera attached to e. */

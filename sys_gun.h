@@ -16,7 +16,6 @@ enum { GUN_MAX_BULLETS_ALIVE = 2,
 struct GunUpdate {
 	Entity e;
 	float cooldown;
-	Entity bullets[GUN_MAX_BULLETS_ALIVE];
 };
 
 /* Gun is a struct that represents the position/orientation of something.
@@ -33,9 +32,6 @@ void InitGunSystem();
 void UpdateGunSystem();
 void AddGun(Entity, Prefab, float);
 void RemoveGun(Entity);
-void GunSystemClearUpdates();
-struct GunUpdate *GetGunUpdates(int *);
-struct GunUpdate *GetGunUpdate(Entity);
 
 void GunFire(Entity);
 
