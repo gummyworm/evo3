@@ -19,10 +19,10 @@ void testChildSystem() {
 	/* assert the child is updated to the parent's position. */
 	UpdateChildSystem();
 	{
-		float x, y, z;
-		GetPos(c, &x, &y, &z);
-		assert(x == px);
-		assert(y == px);
-		assert(z == px);
+		vec3 pos;
+		GetPos(c, pos);
+		assert(pos[0] == px);
+		assert(pos[1] == px);
+		assert(pos[2] == px);
 	}
 }

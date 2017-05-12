@@ -83,18 +83,18 @@ static void doPass(struct Camera *c, int pass) {
  * matrices. */
 void drawRender(mat4x4 v, mat4x4 p, int i) {
 	mat4x4 m, mv, mvp, tmp;
-	float x, y, z;
+	vec3 pos;
 	float sx, sy, sz;
 
 	if (!Enabled(renders[i].e))
 		return;
-	if (!GetPos(renders[i].e, &x, &y, &z))
+	if (!GetPos(renders[i].e, pos))
 		return;
 	if (!GetScale(renders[i].e, &sx, &sy, &sz))
 		return;
 
 	mat4x4_identity(m);
-	mat4x4_translate(tmp, x, y, z);
+	mat4x4_translate(tmp, pos[0], pos[1], pos[2]);
 	mat4x4_scale_aniso(m, tmp, sx, sy, sz);
 	mat4x4_mul(mv, v, m);
 	mat4x4_mul(mvp, p, mv);
@@ -109,9 +109,7 @@ void UpdateCameraSystem() {
 	struct Camera *c;
 	int i, j;
 	mat4x4 v;
-	struct {
-		float x, y, z;
-	} pos;
+	vec3 pos;
 	struct {
 		float x, y, z;
 	} rot;
@@ -123,7 +121,7 @@ void UpdateCameraSystem() {
 		c = cameras + i;
 		if (!Enabled(c->e))
 			continue;
-		if (!GetPos(c->e, &pos.x, &pos.y, &pos.z))
+		if (!GetPos(c->e, pos))
 			return;
 		if (!GetViewDir(c->e, &rot.x, &rot.y, &rot.z))
 			return;
@@ -152,7 +150,7 @@ void UpdateCameraSystem() {
 
 		{
 			vec3 eye, center, up;
-			GetPos(c->e, &eye[0], &eye[1], &eye[2]);
+			GetPos(c->e, eye);
 			vec3_add(eye, eye, c->eye);
 			GetViewDir(c->e, &up[0], &up[1], &up[2]);
 			vec3_add(center, eye, up);
@@ -446,19 +444,16 @@ void SetEye(Entity e, float x, float y, float z) {
  * transform of the entity that it is attached to. */
 bool GetViewPos(Entity e, float *x, float *y, float *z) {
 	struct Camera *c;
-	float tx, ty, tz;
+	vec3 t = {0, 0, 0};
 
 	if ((c = getCamera(e)) == NULL)
 		return false;
 
-	tx = 0;
-	ty = 0;
-	tz = 0;
-	GetPos(e, &tx, &ty, &tz);
+	GetPos(e, t);
 
-	*x = c->eye[0] + tx;
-	*y = c->eye[1] + ty;
-	*z = c->eye[2] + tz;
+	*x = c->eye[0] + t[0];
+	*y = c->eye[1] + t[1];
+	*z = c->eye[2] + t[2];
 	return true;
 }
 

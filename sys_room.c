@@ -99,22 +99,22 @@ bool RoomContains(Entity e, float x, float y, float z) {
 /* RoomContainsEntity returns true if target's transform resides within the room
  * attached to e. */
 bool RoomContainsEntity(Entity e, Entity target) {
-	float x, y, z;
-	if (!GetPos(target, &x, &y, &z))
+	vec3 pos;
+	if (!GetPos(target, pos))
 		return false;
-	return RoomContains(e, x, y, z);
+	return RoomContains(e, pos[0], pos[1], pos[2]);
 }
 
 /* GetRoom returns the room that contains e (or -1 if no room does). */
 Entity GetRoom(Entity e) {
 	int i;
-	float x, y, z;
+	vec3 pos;
 
-	if ((GetPos(e, &x, &y, &z) == false))
+	if ((GetPos(e, pos) == false))
 		return -1;
 
 	for (i = 0; i < numRooms; ++i) {
-		if (RoomContains(rooms[i].e, x, y, z))
+		if (RoomContains(rooms[i].e, pos[0], pos[1], pos[2]))
 			return rooms[i].e;
 	}
 
@@ -140,9 +140,10 @@ int ThingsInRoom(Entity e, Entity *found) {
 
 	things = GetThings(&num);
 	for (i = 0, count = 0; i < num; ++i) {
-		float x, y, z;
+		vec3 pos;
 
-		if (GetPos(things[i].e, &x, &y, &z) && RoomContains(e, x, y, z))
+		if (GetPos(things[i].e, pos) &&
+		    RoomContains(e, pos[0], pos[1], pos[2]))
 			found[count++] = things[i].e;
 	}
 	return count;

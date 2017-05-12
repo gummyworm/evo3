@@ -7,7 +7,7 @@ extern struct Thing *getThing(Entity e);
 static bool handleDrop(Entity self, Entity prop, Entity actor, char *out) {
 	UNUSED(prop);
 	struct Thing *t;
-	float x, y, z;
+	vec3 pos;
 	float dx, dy, dz;
 
 	if ((t = getThing(self)) == NULL)
@@ -15,8 +15,8 @@ static bool handleDrop(Entity self, Entity prop, Entity actor, char *out) {
 	if (t->owner != actor)
 		return false;
 
-	if (GetPos(actor, &x, &y, &z) && GetViewDir(actor, &dx, &dy, &dz))
-		TransformSet(self, x + (dx * 2), -1, z + (dz * 2));
+	if (GetPos(actor, pos) && GetViewDir(actor, &dx, &dy, &dz))
+		TransformSet(self, pos[0] + (dx * 2), -1, pos[2] + (dz * 2));
 
 	t->owner = 0;
 	EnableEntity(self);

@@ -172,14 +172,14 @@ void TransformSetRotation(Entity e, float x, float y, float z) {
 /* GetPos sets x, y, and z to the position of entity e and returns the
  * success
  * of the operation. */
-bool GetPos(Entity e, float *x, float *y, float *z) {
+bool GetPos(Entity e, vec3 pos) {
 	struct Transform *t;
 	if ((t = getTransform(e)) == NULL)
 		return false;
 
-	*x = t->x;
-	*y = t->y;
-	*z = t->z;
+	pos[0] = t->x;
+	pos[1] = t->y;
+	pos[2] = t->z;
 	return true;
 }
 

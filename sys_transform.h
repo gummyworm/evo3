@@ -40,7 +40,7 @@ void TransformSetRotation(Entity, float, float, float);
 
 void SetScale(Entity, float, float, float);
 
-bool GetPos(Entity, float *, float *, float *);
+bool GetPos(Entity, vec3);
 bool GetRot(Entity, float *, float *, float *);
 bool GetScale(Entity, float *, float *, float *);
 

@@ -1,5 +1,6 @@
 #include "sys_movement.h"
-#include "sys_movement.h"
+#include "sys_time.h"
+#include "sys_transform.h"
 #include "third-party/include/uthash.h"
 
 struct entityToMovement {
@@ -33,10 +34,25 @@ static struct Movement *getMovement(Entity e) {
 void InitMovementSystem() {}
 
 /* UpdateMovementSystem updates all movements that have been created. */
-void UpdateMovementSystem() { numUpdates = 0; }
+void UpdateMovementSystem() {
+	static float dt = 0.f;
+	int i;
+	vec3 newPos;
+
+	dt = GetTime() - dt;
+	for (i = 0; i < numMovements; ++i) {
+		if (GetPos(movements[i].e, newPos)) {
+			vec3 dpos;
+			vec3_scale(dpos, movements[i].dir, dt);
+			vec3_add(newPos, newPos, dpos);
+			TransformSet(movements[i].e, newPos[0], newPos[1],
+			             newPos[2]);
+		}
+	}
+}
 
 /* AddMovement adds a movement component to the entity e. */
-void AddMovement(Entity e, float speed) {
+void AddMovement(Entity e, float vel, vec3 dir) {
 	struct entityToMovement *item;
 
 	if (getMovement(e) != NULL)
@@ -46,7 +62,10 @@ void AddMovement(Entity e, float speed) {
 	item->movement = movements + numMovements;
 	item->e = e;
 
-	movements[numMovements].speed = speed;
+	movements[numMovements].vel = vel;
+	movements[numMovements].dir[0] = dir[0];
+	movements[numMovements].dir[1] = dir[1];
+	movements[numMovements].dir[2] = dir[2];
 
 	HASH_ADD_INT(entitiesToMovements, e, item);
 	numMovements++;
@@ -74,17 +93,4 @@ void RemoveMovement(Entity e) {
 struct MovementUpdate *GetMovementUpdates(int *num) {
 	*num = numUpdates;
 	return updates;
-}
-
-/* MovementMoveTo moves the entity e to (x, y, z). */
-void MovementMoveTo(Entity e, float x, float y, float z) {
-	struct Movement *m;
-	m = getMovement(e);
-
-	if (m == NULL)
-		return;
-
-	m->dest.x = x;
-	m->dest.y = y;
-	m->dest.z = z;
 }

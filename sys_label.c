@@ -42,7 +42,7 @@ void drawLabel(struct Label *l) {
 
 	if (!Enabled(l->e))
 		return;
-	if (!GetPos(l->e, &lpos[0], &lpos[1], &lpos[2]))
+	if (!GetPos(l->e, lpos))
 		return;
 
 	lpos[1] += l->offset;

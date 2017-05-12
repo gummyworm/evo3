@@ -3,6 +3,7 @@
 
 int main() {
 	testChildSystem();
+	testMovementSystem();
 
 	puts("passed");
 	return 0;

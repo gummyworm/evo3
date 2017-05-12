@@ -41,13 +41,12 @@ void UpdateChildSystem() {
 	/* move each child relative to its parent. */
 	for (i = 0; i < numChilds; ++i) {
 		vec3 pos;
-		vec3 offset;
-		if (GetPos(childs[i].parent, &pos[0], &pos[1], &pos[2])) {
-			offset[0] = offset[1] = offset[2] = 0.f;
-			GetPos(childs[i].e, &offset[0], &offset[1], &offset[2]);
-			vec3_add(pos, pos, offset);
-			TransformSet(childs[i].e, pos[0], pos[1], pos[2]);
-		}
+		vec3 offset = {0, 0, 0};
+		if (!GetPos(childs[i].parent, pos))
+			continue;
+		GetPos(childs[i].e, offset);
+		vec3_add(pos, pos, offset);
+		TransformSet(childs[i].e, pos[0], pos[1], pos[2]);
 	}
 }
 
