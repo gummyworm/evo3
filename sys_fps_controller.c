@@ -101,7 +101,17 @@ static struct FPSController *getFPSController(Entity e) {
 }
 
 /* InitFPSControllerSystem initializes the fpsController system. */
-void InitFPSControllerSystem() {}
+void InitFPSControllerSystem() {
+	if (entitiesToFPSControllers != NULL) {
+		struct entityToFPSController *f, *tmp;
+		HASH_ITER(hh, entitiesToFPSControllers, f, tmp) {
+			HASH_DEL(entitiesToFPSControllers,
+			         f); /* delete; users advances to next */
+			free(f);     /* optional- if you want to free  */
+		}
+	}
+	numFPSControllers = 0;
+}
 
 /* UpdateFPSControllerSystem updates all fpsControllers that have been created.
  */

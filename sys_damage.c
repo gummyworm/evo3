@@ -29,7 +29,17 @@ static struct Damage *getDamage(Entity e) {
 }
 
 /* InitDamageSystem initializes the damage system. */
-void InitDamageSystem() {}
+void InitDamageSystem() {
+	if (entitiesToDamages != NULL) {
+		struct entityToDamage *d, *tmp;
+		HASH_ITER(hh, entitiesToDamages, d, tmp) {
+			HASH_DEL(entitiesToDamages,
+			         d); /* delete; users advances to next */
+			free(d);     /* optional- if you want to free  */
+		}
+	}
+	numDamages = 0;
+}
 
 /* UpdateDamageSystem updates all damages that have been created. */
 void UpdateDamageSystem() {

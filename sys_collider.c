@@ -42,7 +42,17 @@ static struct Collider *getCollider(Entity e) {
 }
 
 /* InitColliderSystem initializes the collider system. */
-void InitColliderSystem() {}
+void InitColliderSystem() {
+	if (entitiesToColliders != NULL) {
+		struct entityToCollider *c, *tmp;
+		HASH_ITER(hh, entitiesToColliders, c, tmp) {
+			HASH_DEL(entitiesToColliders,
+			         c); /* delete; users advances to next */
+			free(c);     /* optional- if you want to free  */
+		}
+	}
+	numColliders = 0;
+}
 
 /* UpdateColliderSystem updates all colliders that have been created. */
 void UpdateColliderSystem() {

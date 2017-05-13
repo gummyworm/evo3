@@ -53,6 +53,8 @@ static void deinit(GLFWwindow *win) {
 
 /* update updates the game. */
 static void update() {
+	UpdateTimeSystem();
+
 	/* pre render updates */
 	UpdateChildSystem();
 	UpdateTransformSystem();

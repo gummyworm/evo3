@@ -63,7 +63,18 @@ static void getView(struct Camera *c, mat4x4 v) {
 }
 
 /* InitCameraSystem initializes the camera system. */
-void InitCameraSystem(GLFWwindow *window) { win = window; }
+void InitCameraSystem(GLFWwindow *window) {
+	if (entitiesToCameras != NULL) {
+		struct entityToCamera *c, *tmp;
+		HASH_ITER(hh, entitiesToCameras, c, tmp) {
+			HASH_DEL(entitiesToCameras,
+			         c); /* delete; users advances to next */
+			free(c);     /* optional- if you want to free  */
+		}
+	}
+	win = window;
+	numCameras = 0;
+}
 
 /* doPass renders the given post-render pass for the camera c. */
 static void doPass(struct Camera *c, int pass) {
