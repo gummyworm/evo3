@@ -1,7 +1,8 @@
 #include "../systems.h"
+#include "tests.h"
 #include <assert.h>
 
-void testChildSystem() {
+void testChildSystem(struct Test *t) {
 	Entity c = 1;
 	Entity p = 2;
 
@@ -21,8 +22,8 @@ void testChildSystem() {
 	{
 		vec3 pos;
 		GetPos(c, pos);
-		assert(pos[0] == px);
-		assert(pos[1] == px);
-		assert(pos[2] == px);
+		tassert(t, pos[0] == px);
+		tassert(t, pos[1] == px);
+		tassert(t, pos[2] == px);
 	}
 }

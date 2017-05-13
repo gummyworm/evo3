@@ -5,6 +5,14 @@
 #include "../debug.h"
 #include <stdbool.h>
 
+#define ANSI_COLOR_RED "\x1b[31m"
+#define ANSI_COLOR_GREEN "\x1b[32m"
+#define ANSI_COLOR_YELLOW "\x1b[33m"
+#define ANSI_COLOR_BLUE "\x1b[34m"
+#define ANSI_COLOR_MAGENTA "\x1b[35m"
+#define ANSI_COLOR_CYAN "\x1b[36m"
+#define ANSI_COLOR_RESET "\x1b[0m"
+
 struct Test {
 	int err;
 };
@@ -13,10 +21,12 @@ struct Test {
 	do {                                                                   \
 		T.err = 0;                                                     \
 		X(&T);                                                         \
+		printf("[%s]:", #X);                                           \
 		if (T.err != 0)                                                \
-			dinfof("FAIL");                                        \
+			printf(ANSI_COLOR_RED "FAIL" ANSI_COLOR_RESET "\n");   \
 		else                                                           \
-			dinfof("PASSED");                                      \
+			printf(ANSI_COLOR_GREEN "PASSED" ANSI_COLOR_RESET      \
+			                        "\n");                         \
 	} while (0);
 
 #define tassert(t, condition)                                                  \

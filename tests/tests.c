@@ -8,6 +8,5 @@ int main() {
 	RUNTEST(testMovementSystem);
 	RUNTEST(testTransformSystem);
 
-	puts("passed");
 	return 0;
 }
