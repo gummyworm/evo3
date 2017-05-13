@@ -17,6 +17,7 @@ struct FPSController {
 		int right;
 		int turnL;
 		int turnR;
+		int fire;
 	} keyCodes;
 };
 

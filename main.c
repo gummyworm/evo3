@@ -39,6 +39,7 @@ static void init(GLFWwindow *win) {
 	InitTileMapSystem();
 	InitGunSystem();
 	InitChildSystem();
+	InitGunControllerSystem();
 
 	InitWidgetSystem(win);
 	InitCameraSystem(win);
@@ -60,6 +61,7 @@ static void update() {
 	UpdateTransformSystem();
 	UpdateInputSystem();
 	UpdateFPSControllerSystem();
+	UpdateGunSystem();
 	UpdateDamageSystem();
 
 	/* render */

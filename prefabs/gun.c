@@ -5,5 +5,6 @@
 int Gun(Entity e, Entity holder) {
 	AddChild(e, holder);
 	AddGun(e, Bullet, 0.5f);
+	AddGunController(e);
 	return 0;
 }

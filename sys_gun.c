@@ -1,5 +1,5 @@
-
 #include "sys_gun.h"
+#include "sys_time.h"
 #include "sys_transform.h"
 #include "third-party/include/uthash.h"
 
@@ -31,7 +31,12 @@ static struct Gun *getGun(Entity e) {
 void InitGunSystem() {}
 
 /* UpdateGunSystem updates all guns that have been created. */
-void UpdateGunSystem() {}
+void UpdateGunSystem() {
+	int i;
+	for (i = 0; i < numGuns; ++i) {
+		guns[i].update.cooldown -= GetTimeDelta();
+	}
+}
 
 /* AddGun adds a gun component to the entity e. */
 void AddGun(Entity e, Prefab projectile, float rate) {
@@ -46,7 +51,7 @@ void AddGun(Entity e, Prefab projectile, float rate) {
 	guns[numGuns].e = e;
 	guns[numGuns].projectile = projectile;
 	guns[numGuns].rate = rate;
-	guns[numGuns].update.cooldown = rate;
+	guns[numGuns].update.cooldown = 0.f;
 
 	HASH_ADD_INT(entitiesToGuns, e, item);
 	numGuns++;
@@ -76,7 +81,6 @@ void GunFire(Entity e) {
 
 	if ((g = getGun(e)) == NULL)
 		return;
-
 	if (g->update.cooldown > 0)
 		return;
 
