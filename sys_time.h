@@ -4,9 +4,7 @@
 void InitTimeSystem();
 void UpdateTimeSystem();
 float GetTime();
-
-#ifdef MOCK_TIME
+float GetTimeDelta();
 void SetTime(float);
-#endif
 
 #endif

@@ -37,7 +37,17 @@ static void addUpdate(struct TransformUpdate *u) {
 }
 
 /* InitTransformSystem initializes the transform system. */
-void InitTransformSystem() {}
+void InitTransformSystem() {
+	if (entitiesToTransforms != NULL) {
+		struct entityToTransform *t, *tmp;
+		HASH_ITER(hh, entitiesToTransforms, t, tmp) {
+			HASH_DEL(entitiesToTransforms,
+			         t); /* delete; users advances to next */
+			free(t);     /* optional- if you want to free  */
+		}
+	}
+	numTransforms = 0;
+}
 
 /* UpdateTransformSystem updates all transforms that have been created. */
 void UpdateTransformSystem() {}
@@ -169,9 +179,8 @@ void TransformSetRotation(Entity e, float x, float y, float z) {
 	t->rot.z = z;
 }
 
-/* GetPos sets x, y, and z to the position of entity e and returns the
- * success
- * of the operation. */
+/* GetPos sets pos to the position of entity e and returns the success of the
+ * operation. */
 bool GetPos(Entity e, vec3 pos) {
 	struct Transform *t;
 	if ((t = getTransform(e)) == NULL)
@@ -263,7 +272,6 @@ int GetIn2DBounds(Entity *found, int max, vec2 center, vec2 dim,
 		int x, y;
 		vec3 pos = {transforms[i].x, transforms[i].y, transforms[i].z};
 		WorldToScreen(E_PLAYER, pos[0], pos[1], pos[2], &x, &y);
-		printf("%s %d %d\n", GetActorName(transforms[i].e), x, y);
 
 		vec2 pos2d = {x, y};
 		if (contains2d(pos2d, center, dim)) {

@@ -32,7 +32,17 @@ static struct Child *getChild(Entity e) {
 }
 
 /* InitChildSystem initializes the child system. */
-void InitChildSystem() {}
+void InitChildSystem() {
+	if (entitiesToChilds != NULL) {
+		struct entityToChild *t, *tmp;
+		HASH_ITER(hh, entitiesToChilds, t, tmp) {
+			HASH_DEL(entitiesToChilds,
+			         t); /* delete; users advances to next */
+			free(t);     /* optional- if you want to free  */
+		}
+	}
+	numChilds = 0;
+}
 
 /* UpdateChildSystem updates all childs that have been created. */
 void UpdateChildSystem() {

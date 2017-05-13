@@ -31,20 +31,30 @@ static struct Movement *getMovement(Entity e) {
 }
 
 /* InitMovementSystem initializes the movement system. */
-void InitMovementSystem() {}
+void InitMovementSystem() {
+	if (entitiesToMovements != NULL) {
+		struct entityToMovement *t, *tmp;
+		HASH_ITER(hh, entitiesToMovements, t, tmp) {
+			HASH_DEL(entitiesToMovements,
+			         t); /* delete; users advances to next */
+			free(t);     /* optional- if you want to free  */
+		}
+	}
+	numMovements = 0;
+}
 
 /* UpdateMovementSystem updates all movements that have been created. */
 void UpdateMovementSystem() {
-	static float dt = 0.f;
 	int i;
-	vec3 newPos;
 
-	dt = GetTime() - dt;
 	for (i = 0; i < numMovements; ++i) {
-		if (GetPos(movements[i].e, newPos)) {
+		vec3 currPos;
+		if (GetPos(movements[i].e, currPos)) {
 			vec3 dpos;
-			vec3_scale(dpos, movements[i].dir, dt);
-			vec3_add(newPos, newPos, dpos);
+			vec3 newPos;
+			vec3_scale(dpos, movements[i].dir,
+			           movements[i].vel * GetTimeDelta());
+			vec3_add(newPos, currPos, dpos);
 			TransformSet(movements[i].e, newPos[0], newPos[1],
 			             newPos[2]);
 		}
@@ -66,6 +76,7 @@ void AddMovement(Entity e, float vel, vec3 dir) {
 	movements[numMovements].dir[0] = dir[0];
 	movements[numMovements].dir[1] = dir[1];
 	movements[numMovements].dir[2] = dir[2];
+	movements[numMovements].e = e;
 
 	HASH_ADD_INT(entitiesToMovements, e, item);
 	numMovements++;
