@@ -17,7 +17,6 @@ static struct entityToFPSController *entitiesToFPSControllers;
 static struct FPSController fpsControllers[MAX_FPS_CONTROLLERS];
 static int numFPSControllers;
 
-static float dt;
 static int numUpdates;
 static struct FPSControllerUpdate updates[MAX_FPS_CONTROLLERS];
 
@@ -51,32 +50,41 @@ static void key(Entity e, int key, int scancode, int action, int mods) {
 		dpos[1] = 0;
 		dpos[2] = -cosa;
 		translate = true;
-	} else if (key == f->keyCodes.backward) {
+	}
+	if (key == f->keyCodes.backward) {
 		dpos[0] = sina;
 		dpos[1] = 0;
 		dpos[2] = cosa;
 		translate = true;
-	} else if (key == f->keyCodes.left) {
+	}
+	if (key == f->keyCodes.left) {
 		dpos[0] = -cosa;
 		dpos[1] = 0;
 		dpos[2] = sina;
 		translate = true;
-	} else if (key == f->keyCodes.right) {
+	}
+	if (key == f->keyCodes.right) {
 		dpos[0] = cosa;
 		dpos[1] = 0;
 		dpos[2] = -sina;
 		translate = true;
-	} else if (key == f->keyCodes.turnL) {
-		f->angle += f->turnSpeed * dt;
+	}
+	if (key == f->keyCodes.turnL) {
+		f->angle += f->turnSpeed * GetTimeDelta();
 		rotate = true;
-	} else if (key == f->keyCodes.turnR) {
-		f->angle -= f->turnSpeed * dt;
+	}
+	if (key == f->keyCodes.turnR) {
+		f->angle -= f->turnSpeed * GetTimeDelta();
 		rotate = true;
+	}
+	if (key == f->keyCodes.jump && f->canJump) {
+		f->jumpTime = 0.f;
+		f->canJump = false;
 	}
 
 	if (translate) {
 		vec3 dposn;
-		float tscale = dt * f->speed;
+		float tscale = GetTimeDelta() * f->speed;
 		vec3_norm(dposn, dpos);
 		vec3_scale(dpos, dposn, tscale);
 		TransformMove(f->e, dpos[0], dpos[1], dpos[2]);
@@ -116,10 +124,19 @@ void InitFPSControllerSystem() {
 /* UpdateFPSControllerSystem updates all fpsControllers that have been created.
  */
 void UpdateFPSControllerSystem() {
-	static float lastUpdate = 0.0f;
-	dt = GetTime() - lastUpdate;
-	lastUpdate = GetTime();
-	numUpdates = 0;
+	int i;
+	for (i = 0; i < numFPSControllers; ++i) {
+		struct FPSController *f = &fpsControllers[i];
+		if (f->jumpTime < f->timeToJumpApex) {
+			TransformMove(f->e, 0.0f, f->jumpSpeed, 0.f);
+		} else {
+			vec3 pos;
+			TransformMove(f->e, 0.0f, -f->jumpSpeed, 0.f);
+			if (GetPos(f->e, pos) && pos[1] == TRANSFORM_MIN_Y)
+				f->canJump = true;
+		}
+		f->jumpTime += GetTimeDelta();
+	}
 }
 
 /* AddFPSController adds a fpsController component to the entity e. */
@@ -137,12 +154,16 @@ void AddFPSController(Entity e, float speed) {
 	fpsControllers[numFPSControllers].e = e;
 	fpsControllers[numFPSControllers].speed = speed;
 	fpsControllers[numFPSControllers].turnSpeed = 3.0f;
+	fpsControllers[numFPSControllers].jumpSpeed = 0.2f;
+	fpsControllers[numFPSControllers].timeToJumpApex = 0.4f;
+	fpsControllers[numFPSControllers].canJump = true;
 	fpsControllers[numFPSControllers].keyCodes.forward = GLFW_KEY_UP;
 	fpsControllers[numFPSControllers].keyCodes.backward = GLFW_KEY_DOWN;
 	fpsControllers[numFPSControllers].keyCodes.left = GLFW_KEY_COMMA;
 	fpsControllers[numFPSControllers].keyCodes.right = GLFW_KEY_PERIOD;
 	fpsControllers[numFPSControllers].keyCodes.turnL = GLFW_KEY_LEFT;
 	fpsControllers[numFPSControllers].keyCodes.turnR = GLFW_KEY_RIGHT;
+	fpsControllers[numFPSControllers].keyCodes.jump = GLFW_KEY_SPACE;
 
 	InputRegisterKeyEvent(e, INPUT_LAYER_DEFAULT, key);
 	numFPSControllers++;

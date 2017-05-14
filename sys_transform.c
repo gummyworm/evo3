@@ -125,6 +125,9 @@ void TransformMove(Entity e, float dx, float dy, float dz) {
 	t->y += dy;
 	t->z += dz;
 
+	if (t->y < TRANSFORM_MIN_Y)
+		t->y = TRANSFORM_MIN_Y;
+
 	{
 		struct TransformUpdate u = {
 		    .e = e, .x = t->x, .y = t->y, .z = t->z};

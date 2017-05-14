@@ -5,6 +5,10 @@
 #include "third-party/include/linmath.h"
 #include <stdbool.h>
 
+/* TRANSFORM_MIN_Y is the minimum value that relative movement will position
+ * a transform (via TransformMove). */
+#define TRANSFORM_MIN_Y 1.f
+
 /* Transform is a struct that represents the position/orientation of something.
  */
 struct Transform {

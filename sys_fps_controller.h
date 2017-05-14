@@ -9,6 +9,11 @@ struct FPSController {
 	float speed;
 	float turnSpeed;
 
+	float jumpSpeed;
+	float jumpTime;
+	float timeToJumpApex;
+	bool canJump;
+
 	float angle;
 	struct {
 		int forward;
@@ -17,12 +22,11 @@ struct FPSController {
 		int right;
 		int turnL;
 		int turnR;
-		int fire;
+		int jump;
 	} keyCodes;
 };
 
 struct FPSControllerUpdate {};
-
 void InitFPSControllerSystem();
 void UpdateFPSControllerSystem();
 void AddFPSController(Entity, float);

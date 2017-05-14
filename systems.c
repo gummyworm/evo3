@@ -15,6 +15,15 @@ void RemoveEntity(Entity e) {
 	RemoveRoom(e);
 	RemoveThing(e);
 	RemovePartyMember(e);
+	RemoveMovement(e);
+	RemoveMesh(e);
+	RemoveDamage(e);
+	RemoveCollider(e);
+	RemoveGunController(e);
+	RemoveFPSController(e);
+	RemoveGun(e);
+	RemoveChild(e);
+	RemoveRoom(e);
 }
 
 /* DisableEntity notifies systems that e is not to be updated. */

@@ -84,5 +84,6 @@ void GunFire(Entity e) {
 	if (g->update.cooldown > 0)
 		return;
 
+	g->projectile(NewEntity());
 	g->update.cooldown = g->rate;
 }

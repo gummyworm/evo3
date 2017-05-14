@@ -58,6 +58,7 @@ static void update() {
 
 	/* pre render updates */
 	UpdateChildSystem();
+	UpdateMovementSystem();
 	UpdateTransformSystem();
 	UpdateInputSystem();
 	UpdateFPSControllerSystem();
