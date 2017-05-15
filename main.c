@@ -64,6 +64,7 @@ static void update() {
 	UpdateFPSControllerSystem();
 	UpdateGunSystem();
 	UpdateDamageSystem();
+	UpdateUnitSystem();
 
 	/* render */
 	glDepthFunc(GL_LEQUAL);

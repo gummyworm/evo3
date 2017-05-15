@@ -17,6 +17,11 @@ struct Test {
 	int err;
 };
 
+void testChildSystem(struct Test *t);
+void testMovementSystem(struct Test *t);
+void testTransformSystem(struct Test *t);
+void testUnitSystem(struct Test *t);
+
 #define RUNTEST(X)                                                             \
 	do {                                                                   \
 		T.err = 0;                                                     \
@@ -31,13 +36,14 @@ struct Test {
 
 #define tassert(t, condition)                                                  \
 	if (!(condition)) {                                                    \
+		derrorf("assertion failed");                                   \
 		t->err = -1;                                                   \
 	}
 
 #define tassertf(t, expected, actual)                                          \
 	do {                                                                   \
 		if ((actual) != (expected)) {                                  \
-			derrorf("expected %f but received %f\n", expected,     \
+			derrorf("expected %f but received %f", expected,       \
 			        actual);                                       \
 			t->err = -1;                                           \
 		}                                                              \
@@ -49,16 +55,12 @@ struct Test {
 		    (actual[1] != expected[1]) ||                              \
 		    (actual[2] != expected[2])) {                              \
 			derrorf("expected <%f, %f, %f> but received <%f, %f, " \
-			        "%f>\n",                                       \
+			        "%f>",                                         \
 			        expected[0], expected[1], expected[2],         \
 			        actual[0], actual[1], actual[2]);              \
 			t->err = -1;                                           \
 		}                                                              \
 	} while (0)
-
-void testChildSystem(struct Test *t);
-void testMovementSystem(struct Test *t);
-void testTransformSystem(struct Test *t);
 
 #define TEST(NAME) bool NAME(struct Test *T)
 

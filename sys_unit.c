@@ -69,7 +69,41 @@ void UnitHarm(Entity e, int damage) {
 void InitUnitSystem() {}
 
 /* Updateunitsystem updates all units that have been created. */
-void UpdateUnitSystem() { numUpdates = 0; }
+void UpdateUnitSystem() {
+	int i;
+	for (i = 0; i < numUnits; ++i) {
+		struct Unit *u = units + i;
+
+		if (u->hp <= 0) {
+			if (u->deathPrefab != NULL)
+				u->deathPrefab(NewEntity());
+			RemoveEntity(u->e);
+		}
+	}
+}
+
+/* Remove unit removes the unit attached to e from the Unit system. */
+void RemoveUnit(Entity e) {
+	struct entityToUnit *c;
+
+	if (entitiesToUnits == NULL)
+		return;
+
+	HASH_FIND_INT(entitiesToUnits, &e, c);
+	if (c != NULL) {
+		struct Unit *sys = c->unit;
+		int sz = (units + numUnits) - sys;
+		memmove(sys, sys + 1, sz);
+		HASH_DEL(entitiesToUnits, c);
+		free(c);
+	}
+	numUnits--;
+}
+
+struct Unit *GetUnits(int *num) {
+	*num = numUnits;
+	return units;
+}
 
 /* SelectUnit returns true if the entity e can be selected. */
 bool SelectUnit(Entity e) { return getUnit(e) != NULL; }
