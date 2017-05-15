@@ -241,6 +241,7 @@ void RemoveTileMap(Entity e) {
 		memmove(sys, sys + 1, sz);
 		HASH_DEL(entitiesToTileMaps, c);
 		free(c);
+		numTileMaps--;
 	}
 }
 

@@ -92,6 +92,7 @@ void RemoveTransform(Entity e) {
 		memmove(sys, sys + 1, sz);
 		HASH_DEL(entitiesToTransforms, c);
 		free(c);
+		numTransforms--;
 	}
 }
 
@@ -285,4 +286,11 @@ int GetIn2DBounds(Entity *found, int max, vec2 center, vec2 dim,
 		}
 	}
 	return numFound;
+}
+
+/* GetTransforms returns the system's array of transforms ands sets num to the
+ * length of the array. */
+struct Transform *GetTransforms(int *num) {
+	*num = numTransforms;
+	return transforms;
 }

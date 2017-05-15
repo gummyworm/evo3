@@ -92,6 +92,7 @@ void RemoveActor(Entity e) {
 		memmove(sys, sys + 1, sz);
 		HASH_DEL(entitiesToActors, c);
 		free(c);
+		numActors--;
 	}
 }
 

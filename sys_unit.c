@@ -96,8 +96,8 @@ void RemoveUnit(Entity e) {
 		memmove(sys, sys + 1, sz);
 		HASH_DEL(entitiesToUnits, c);
 		free(c);
+		numUnits--;
 	}
-	numUnits--;
 }
 
 struct Unit *GetUnits(int *num) {

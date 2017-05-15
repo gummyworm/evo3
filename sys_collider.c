@@ -111,6 +111,7 @@ void RemoveCollider(Entity e) {
 		memmove(sys, sys + 1, sz);
 		HASH_DEL(entitiesToColliders, c);
 		free(c);
+		numColliders--;
 	}
 }
 

@@ -127,6 +127,7 @@ void RemoveLabel(Entity e) {
 		memmove(sys, sys + 1, sz);
 		HASH_DEL(entitiesToLabels, c);
 		free(c);
+		numLabels--;
 	}
 }
 

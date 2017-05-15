@@ -71,6 +71,7 @@ void RemoveGun(Entity e) {
 		memmove(sys, sys + 1, sz);
 		HASH_DEL(entitiesToGuns, c);
 		free(c);
+		numGuns--;
 	}
 }
 

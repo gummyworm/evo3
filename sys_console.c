@@ -540,6 +540,7 @@ void RemoveConsole(Entity e) {
 		memmove(sys, sys + 1, sz);
 		HASH_DEL(entitiesToConsoles, c);
 		free(c);
+		numConsoles--;
 	}
 }
 

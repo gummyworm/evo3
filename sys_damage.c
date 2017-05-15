@@ -83,5 +83,6 @@ void RemoveDamage(Entity e) {
 		memmove(sys, sys + 1, sz);
 		HASH_DEL(entitiesToDamages, c);
 		free(c);
+		numDamages--;
 	}
 }

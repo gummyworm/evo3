@@ -92,6 +92,7 @@ void RemoveChild(Entity e) {
 		memmove(sys, sys + 1, sz);
 		HASH_DEL(entitiesToChilds, c);
 		free(c);
+		numChilds--;
 	}
 }
 

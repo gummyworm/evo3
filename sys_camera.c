@@ -284,6 +284,7 @@ void RemoveCamera(Entity e) {
 		memmove(sys, sys + 1, sz);
 		HASH_DEL(entitiesToCameras, c);
 		free(c);
+		numCameras--;
 	}
 }
 

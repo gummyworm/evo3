@@ -37,6 +37,8 @@ void TransformSystemClearUpdates();
 struct TransformUpdate *GetTransformUpdates(int *);
 struct TransformUpdate *GetTransformUpdate(Entity);
 
+struct Transform *GetTransforms(int *);
+
 void TransformMove(Entity, float, float, float);
 void TransformSet(Entity, float, float, float);
 void TransformRotate(Entity, float, float, float);
