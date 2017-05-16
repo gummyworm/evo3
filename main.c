@@ -53,38 +53,7 @@ static void deinit(GLFWwindow *win) {
 }
 
 /* update updates the game. */
-static void update() {
-	UpdateTimeSystem();
-
-	/* pre render updates */
-	UpdateChildSystem();
-	UpdateMovementSystem();
-	UpdateTransformSystem();
-	UpdateInputSystem();
-	UpdateFPSControllerSystem();
-	UpdateGunSystem();
-	UpdateDamageSystem();
-	UpdateUnitSystem();
-
-	/* render */
-	glDepthFunc(GL_LEQUAL);
-	glEnable(GL_DEPTH_TEST);
-	UpdateCameraSystem();
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
-	UpdateSpriteSystem();
-	UpdateWeatherSystem();
-	UpdateGunSystem();
-
-	/* post main render updates */
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDisable(GL_DEPTH_TEST);
-	UpdateCommanderSystem();
-	UpdateConsoleSystem();
-	UpdateWidgetSystem();
-	UpdateLabelSystem();
-}
+static void update() { UpdateSystems(); }
 
 /* test spawns test entities. */
 extern void TestRoom(int);

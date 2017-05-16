@@ -44,6 +44,7 @@ void AddUnit(Entity e, const char *name, int hp) {
 
 	units[numUnits].name = name;
 	units[numUnits].hp = hp;
+	units[numUnits].e = e;
 
 	HASH_ADD_INT(entitiesToUnits, e, item);
 	numUnits++;
