@@ -1,4 +1,5 @@
 #include "system.h"
+#include "systems.h"
 
 /* uncomment to log system update's durations */
 #define PROFILE
@@ -38,7 +39,28 @@
 #endif
 
 /* InitSystems initializes all the systems. */
-void StartSystems() { UpdateSpriteSystem(); }
+void InitSystems(struct GLFWwindow *win) {
+	InitInput(win);
+	InitAudioSystem();
+
+	InitDamageSystem();
+	InitConsoleSystem(win);
+	InitUnitSystem();
+	InitSpriteSystem();
+	InitPartySystem();
+	InitTimeSystem();
+	InitTransformSystem();
+	InitCommanderSystem();
+	InitFPSControllerSystem();
+	InitWeatherSystem();
+	InitTileMapSystem();
+	InitGunSystem();
+	InitChildSystem();
+	InitGunControllerSystem();
+
+	InitWidgetSystem(win);
+	InitCameraSystem(win);
+}
 
 /* UpdateSystems updates all the systems. */
 void UpdateSystems() {

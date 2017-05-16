@@ -12,37 +12,16 @@
 
 /* onError is the GLFW callback for error handling. */
 static void onError(int error, const char *description) {
-	fprintf(stderr, "Error (%d): %s\n", error, description);
+	derrorf("Error (%d): %s", error, description);
 }
 
 /* init initializes the various systems used in the game. */
 static void init(GLFWwindow *win) {
 	srand(time(NULL));
-
 	dinstallhandlers();
-
-	InitShaders();
 	DrawInit();
-	InitInput(win);
-	InitAudioSystem();
-
-	InitDamageSystem();
-	InitConsoleSystem(win);
-	InitUnitSystem();
-	InitSpriteSystem();
-	InitPartySystem();
-	InitTimeSystem();
-	InitTransformSystem();
-	InitCommanderSystem();
-	InitFPSControllerSystem();
-	InitWeatherSystem();
-	InitTileMapSystem();
-	InitGunSystem();
-	InitChildSystem();
-	InitGunControllerSystem();
-
-	InitWidgetSystem(win);
-	InitCameraSystem(win);
+	InitShaders();
+	InitSystems(win);
 }
 
 /* deinit deinitializes the various systems used in the game. */
