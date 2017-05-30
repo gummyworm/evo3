@@ -5,31 +5,33 @@
 #include "third-party/include/uthash.h"
 
 SYSDEF(Transform, float x, float y, float z)
-	C->x = x;
-	C->y = y;
-	C->z = z;
-	C->rot.x = 0;
-	C->rot.y = 0;
-	C->rot.z = 0;
-	C->scale.x = 1;
-	C->scale.y = 1;
-	C->scale.z = 1;
+C->x = x;
+C->y = y;
+C->z = z;
+C->rot.x = 0;
+C->rot.y = 0;
+C->rot.z = 0;
+C->scale.x = 1;
+C->scale.y = 1;
+C->scale.z = 1;
 }
 
 /* TransformMove moves the given entity by (dx, dy, dz) units. */
-void SYSFUNC(Transform, Move, float dx, float dy, float dz)
+void SYSFUNC(Transform, Move, float dx, float dy, float dz) {
+	COMPONENT(Transform, C);
 	if ((C->y + dy) < TRANSFORM_MIN_Y)
 		dy = 0.f;
 	C->x += dx;
 	C->y += dy;
 	C->z += dz;
-	C->dp[0] =dx;
+	C->dp[0] = dx;
 	C->dp[1] = dy;
 	C->dp[2] = dz;
 }
 
 /* TransformSet sets the given entity to the position (x, y, z). */
-void SYSFUNC(Transform, Set, float x, float y, float z)
+void SYSFUNC(Transform, Set, float x, float y, float z) {
+	COMPONENT(Transform, C);
 	C->dp[0] = C->x - x;
 	C->dp[1] = C->y - y;
 	C->dp[2] = C->z - z;
@@ -40,7 +42,8 @@ void SYSFUNC(Transform, Set, float x, float y, float z)
 }
 
 /* TransformRotate rotates the transform attached to e by dr degrees. */
-void SYSFUNC(Transform, Rotate, float dx, float dy, float dz)
+void SYSFUNC(Transform, Rotate, float dx, float dy, float dz) {
+	COMPONENT(Transform, C);
 	C->rot.x += dx;
 	C->rot.y += dy;
 	C->rot.z += dz;
@@ -48,7 +51,8 @@ void SYSFUNC(Transform, Rotate, float dx, float dy, float dz)
 
 /* TransformSetRotation sets the rotation of the transform attached to e
  * to r degrees. */
-void SYSFUNC(Transform, SetRotation, float x, float y, float z)
+void SYSFUNC(Transform, SetRotation, float x, float y, float z) {
+	COMPONENT(Transform, C);
 	C->rot.x = x;
 	C->rot.y = y;
 	C->rot.z = z;
@@ -56,8 +60,9 @@ void SYSFUNC(Transform, SetRotation, float x, float y, float z)
 
 /* GetPos sets pos to the position of entity e and returns the success of the
  * operation. */
-bool SYSFUNC(Transform, GetPos, vec3 pos)
-	if(C == NULL)
+bool SYSFUNC(Transform, GetPos, vec3 pos) {
+	COMPONENT(Transform, C);
+	if (C == NULL)
 		return false;
 	pos[0] = C->x;
 	pos[1] = C->y;
@@ -67,8 +72,9 @@ bool SYSFUNC(Transform, GetPos, vec3 pos)
 
 /* GetRot sets the x, y, and z rotation of entity e and returns the
  * success. */
-bool SYSFUNC(Transform, GetRot, float *x, float *y, float *z)
-	if(C == NULL)
+bool SYSFUNC(Transform, GetRot, float *x, float *y, float *z) {
+	COMPONENT(Transform, C);
+	if (C == NULL)
 		return false;
 	*x = C->rot.x;
 	*y = C->rot.y;
@@ -78,8 +84,9 @@ bool SYSFUNC(Transform, GetRot, float *x, float *y, float *z)
 
 /* GetScale sets the x, y, and z scale of entity e and returns the
  * success. */
-bool SYSFUNC(Transform, GetScale, float *x, float *y, float *z)
-	if(C == NULL)
+bool SYSFUNC(Transform, GetScale, float *x, float *y, float *z) {
+	COMPONENT(Transform, C);
+	if (C == NULL)
 		return false;
 	*x = C->scale.x;
 	*y = C->scale.y;
@@ -88,7 +95,8 @@ bool SYSFUNC(Transform, GetScale, float *x, float *y, float *z)
 }
 
 /* SetScale sets the transform attached to e's scale to {x, y, z}. */
-void SYSFUNC(Transform, SetScale, float x, float y, float z)
+void SYSFUNC(Transform, SetScale, float x, float y, float z) {
+	COMPONENT(Transform, C);
 	if (C == NULL)
 		return;
 	C->scale.x = x;
