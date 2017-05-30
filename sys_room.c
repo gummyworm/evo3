@@ -101,7 +101,7 @@ bool RoomContains(Entity e, float x, float y, float z) {
  * attached to e. */
 bool RoomContainsEntity(Entity e, Entity target) {
 	vec3 pos;
-	if (!GetPos(target, pos))
+	if (!TransformGetPos(target, pos))
 		return false;
 	return RoomContains(e, pos[0], pos[1], pos[2]);
 }
@@ -111,7 +111,7 @@ Entity GetRoom(Entity e) {
 	int i;
 	vec3 pos;
 
-	if ((GetPos(e, pos) == false))
+	if ((TransformGetPos(e, pos) == false))
 		return -1;
 
 	for (i = 0; i < numRooms; ++i) {
@@ -143,7 +143,7 @@ int ThingsInRoom(Entity e, Entity *found) {
 	for (i = 0, count = 0; i < num; ++i) {
 		vec3 pos;
 
-		if (GetPos(things[i].e, pos) &&
+		if (TransformGetPos(things[i].e, pos) &&
 		    RoomContains(e, pos[0], pos[1], pos[2]))
 			found[count++] = things[i].e;
 	}

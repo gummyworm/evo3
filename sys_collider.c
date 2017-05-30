@@ -20,7 +20,7 @@ static struct ColliderUpdate updates[MAX_COLLIDERS];
 /* dist returns the distance between the colliders. */
 static float dist(struct Collider *c1, struct Collider *c2) {
 	vec3 p1, p2;
-	if (GetPos(c1->e, p1) && GetPos(c2->e, p2))
+	if (TransformGetPos(c1->e, p1) && TransformGetPos(c2->e, p2))
 		return sqrt((p1[0] - p2[0]) * (p1[0] - p2[0]) +
 		            (p1[1] - p2[0]) * (p1[1] - p2[1]) +
 		            (p1[2] - p2[2]) * (p2[2] - p2[2]));

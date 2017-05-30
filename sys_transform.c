@@ -4,234 +4,105 @@
 #include "sys_camera.h"
 #include "third-party/include/uthash.h"
 
-struct entityToTransform {
-	Entity e;
-	struct Transform *transform;
-	UT_hash_handle hh;
-};
-
-static struct entityToTransform *entitiesToTransforms;
-static struct Transform transforms[MAX_TRANSFORMS];
-static int numTransforms;
-
-int numTransformUpdates;
-static struct TransformUpdate updates[MAX_TRANSFORMS];
-
-/* getTransform returns the transform attached to entity e (if there is one). */
-static struct Transform *getTransform(Entity e) {
-	struct entityToTransform *t;
-
-	if (entitiesToTransforms == NULL)
-		return NULL;
-
-	HASH_FIND_INT(entitiesToTransforms, &e, t);
-	if (t == NULL)
-		return NULL;
-
-	return t->transform;
-}
-
-/* addUpdate adds a new update for this frame. */
-static void addUpdate(struct TransformUpdate *u) {
-	updates[numTransformUpdates++] = *u;
-}
-
-/* InitTransformSystem initializes the transform system. */
-void InitTransformSystem() {
-	if (entitiesToTransforms != NULL) {
-		struct entityToTransform *t, *tmp;
-		HASH_ITER(hh, entitiesToTransforms, t, tmp) {
-			HASH_DEL(entitiesToTransforms,
-			         t); /* delete; users advances to next */
-			free(t);     /* optional- if you want to free  */
-		}
-	}
-	numTransforms = 0;
-}
-
-/* UpdateTransformSystem updates all transforms that have been created. */
-void UpdateTransformSystem() {}
-
-/* AddTransform adds a transform component to the entity e. */
-void AddTransform(Entity e, float x, float y, float z) {
-	struct entityToTransform *item;
-
-	if (getTransform(e) != NULL)
-		return;
-	item = malloc(sizeof(struct entityToTransform));
-	item->transform = transforms + numTransforms;
-	item->e = e;
-
-	transforms[numTransforms].e = e;
-	transforms[numTransforms].x = x;
-	transforms[numTransforms].y = y;
-	transforms[numTransforms].z = z;
-	transforms[numTransforms].rot.x = 0;
-	transforms[numTransforms].rot.y = 0;
-	transforms[numTransforms].rot.z = 0;
-	transforms[numTransforms].scale.x = 1;
-	transforms[numTransforms].scale.y = 1;
-	transforms[numTransforms].scale.z = 1;
-
-	HASH_ADD_INT(entitiesToTransforms, e, item);
-	numTransforms++;
-}
-
-/* RemoveTransform removes the transform attached to e from the Transform
- * system. */
-void RemoveTransform(Entity e) {
-	struct entityToTransform *c;
-
-	if (entitiesToTransforms == NULL)
-		return;
-
-	HASH_FIND_INT(entitiesToTransforms, &e, c);
-	if (c != NULL) {
-		struct Transform *sys = c->transform;
-		int sz = (transforms + numTransforms) - sys;
-		memmove(sys, sys + 1, sz);
-		HASH_DEL(entitiesToTransforms, c);
-		free(c);
-		numTransforms--;
-	}
-}
-
-/* GetTransformUpdate returns any transform updates for the entity e. */
-struct TransformUpdate *GetTransformUpdate(Entity e) {
-	int i;
-
-	for (i = 0; i < numTransformUpdates; ++i) {
-		if (updates[i].e == e)
-			return updates + i;
-	}
-
-	return NULL;
-}
-
-/* GetTransformUpdates returns the transform updates this frame. */
-struct TransformUpdate *GetTransformUpdates(int *num) {
-	*num = numTransformUpdates;
-	return updates;
+SYSDEF(Transform, float x, float y, float z)
+	C->x = x;
+	C->y = y;
+	C->z = z;
+	C->rot.x = 0;
+	C->rot.y = 0;
+	C->rot.z = 0;
+	C->scale.x = 1;
+	C->scale.y = 1;
+	C->scale.z = 1;
 }
 
 /* TransformMove moves the given entity by (dx, dy, dz) units. */
-void TransformMove(Entity e, float dx, float dy, float dz) {
-	struct Transform *t;
-
-	t = getTransform(e);
-	if (t == NULL)
-		return;
-
-	t->x += dx;
-	t->y += dy;
-	t->z += dz;
-
-	if (t->y < TRANSFORM_MIN_Y)
-		t->y = TRANSFORM_MIN_Y;
-
-	{
-		struct TransformUpdate u = {
-		    .e = e, .x = t->x, .y = t->y, .z = t->z};
-		addUpdate(&u);
-	}
+void SYSFUNC(Transform, Move, float dx, float dy, float dz)
+	if ((C->y + dy) < TRANSFORM_MIN_Y)
+		dy = 0.f;
+	C->x += dx;
+	C->y += dy;
+	C->z += dz;
+	C->dp[0] =dx;
+	C->dp[1] = dy;
+	C->dp[2] = dz;
 }
 
 /* TransformSet sets the given entity to the position (x, y, z). */
-void TransformSet(Entity e, float x, float y, float z) {
-	struct Transform *t;
+void SYSFUNC(Transform, Set, float x, float y, float z)
+	C->dp[0] = C->x - x;
+	C->dp[1] = C->y - y;
+	C->dp[2] = C->z - z;
 
-	t = getTransform(e);
-	if (t == NULL)
-		return;
-
-	{
-		struct TransformUpdate u = {
-		    .e = e, t->x - x, t->y - y, t->z - z};
-		addUpdate(&u);
-	}
-
-	t->x = x;
-	t->y = y;
-	t->z = z;
+	C->x = x;
+	C->y = y;
+	C->z = z;
 }
 
 /* TransformRotate rotates the transform attached to e by dr degrees. */
-void TransformRotate(Entity e, float dx, float dy, float dz) {
-	struct Transform *t;
-
-	t = getTransform(e);
-	if (t == NULL)
-		return;
-
-	t->rot.x += dx;
-	t->rot.y += dy;
-	t->rot.z += dz;
+void SYSFUNC(Transform, Rotate, float dx, float dy, float dz)
+	C->rot.x += dx;
+	C->rot.y += dy;
+	C->rot.z += dz;
 }
 
 /* TransformSetRotation sets the rotation of the transform attached to e
- * to r
- * degrees. */
-void TransformSetRotation(Entity e, float x, float y, float z) {
-	struct Transform *t;
-
-	t = getTransform(e);
-	if (t == NULL)
-		return;
-
-	t->rot.x = x;
-	t->rot.y = y;
-	t->rot.z = z;
+ * to r degrees. */
+void SYSFUNC(Transform, SetRotation, float x, float y, float z)
+	C->rot.x = x;
+	C->rot.y = y;
+	C->rot.z = z;
 }
 
 /* GetPos sets pos to the position of entity e and returns the success of the
  * operation. */
-bool GetPos(Entity e, vec3 pos) {
-	struct Transform *t;
-	if ((t = getTransform(e)) == NULL)
+bool SYSFUNC(Transform, GetPos, vec3 pos)
+	if(C == NULL)
 		return false;
-
-	pos[0] = t->x;
-	pos[1] = t->y;
-	pos[2] = t->z;
+	pos[0] = C->x;
+	pos[1] = C->y;
+	pos[2] = C->z;
 	return true;
 }
 
 /* GetRot sets the x, y, and z rotation of entity e and returns the
  * success. */
-bool GetRot(Entity e, float *x, float *y, float *z) {
-	struct Transform *t;
-	if ((t = getTransform(e)) == NULL)
+bool SYSFUNC(Transform, GetRot, float *x, float *y, float *z)
+	if(C == NULL)
 		return false;
-
-	*x = t->rot.x;
-	*y = t->rot.y;
-	*z = t->rot.z;
+	*x = C->rot.x;
+	*y = C->rot.y;
+	*z = C->rot.z;
 	return true;
 }
 
 /* GetScale sets the x, y, and z scale of entity e and returns the
  * success. */
-bool GetScale(Entity e, float *x, float *y, float *z) {
-	struct Transform *t;
-	if ((t = getTransform(e)) == NULL)
+bool SYSFUNC(Transform, GetScale, float *x, float *y, float *z)
+	if(C == NULL)
 		return false;
-
-	*x = t->scale.x;
-	*y = t->scale.y;
-	*z = t->scale.z;
+	*x = C->scale.x;
+	*y = C->scale.y;
+	*z = C->scale.z;
 	return true;
 }
 
 /* SetScale sets the transform attached to e's scale to {x, y, z}. */
-void SetScale(Entity e, float x, float y, float z) {
-	struct Transform *t;
-
-	if ((t = getTransform(e)) == NULL)
+void SYSFUNC(Transform, SetScale, float x, float y, float z)
+	if (C == NULL)
 		return;
+	C->scale.x = x;
+	C->scale.y = y;
+	C->scale.z = z;
+}
 
-	t->scale.x = x;
-	t->scale.y = y;
-	t->scale.z = z;
+/* init initializes the Transform system. */
+void init() {}
+
+/* update updates all Transform components that have been created. */
+void update(struct Transform *transforms, int num) {
+	UNUSED(transforms);
+	UNUSED(num);
 }
 
 /* contains returns true if pt lies within the given bounds. */
@@ -257,13 +128,13 @@ static bool contains2d(vec2 pt, vec2 center, vec2 dim) {
 int GetInBounds(Entity *found, int max, vec3 center, vec3 dim,
                 bool (*filter)(Entity)) {
 	int i, numFound;
-	for (i = 0, numFound = 0; i < numTransforms && numFound < max; ++i) {
-		vec3 pos = {transforms[i].x, transforms[i].y, transforms[i].z};
+	for (i = 0, numFound = 0; i < numComponents && numFound < max; ++i) {
+		vec3 pos = {components[i].x, components[i].y, components[i].z};
 		if (contains(pos, center, dim)) {
 			if (filter == NULL)
-				found[numFound++] = transforms[i].e;
-			else if (filter(transforms[i].e))
-				found[numFound++] = transforms[i].e;
+				found[numFound++] = components[i].e;
+			else if (filter(components[i].e))
+				found[numFound++] = components[i].e;
 		}
 	}
 	return numFound;
@@ -272,25 +143,18 @@ int GetInBounds(Entity *found, int max, vec3 center, vec3 dim,
 int GetIn2DBounds(Entity *found, int max, vec2 center, vec2 dim,
                   bool (*filter)(Entity)) {
 	int i, numFound;
-	for (i = 0, numFound = 0; i < numTransforms && numFound < max; ++i) {
+	for (i = 0, numFound = 0; i < numComponents && numFound < max; ++i) {
 		int x, y;
-		vec3 pos = {transforms[i].x, transforms[i].y, transforms[i].z};
+		vec3 pos = {components[i].x, components[i].y, components[i].z};
 		WorldToScreen(E_PLAYER, pos[0], pos[1], pos[2], &x, &y);
 
-		vec2 pos2d = {x, y};
+		vec2 pos2d = {(float)x, (float)y};
 		if (contains2d(pos2d, center, dim)) {
 			if (filter == NULL)
-				found[numFound++] = transforms[i].e;
-			else if (filter(transforms[i].e))
-				found[numFound++] = transforms[i].e;
+				found[numFound++] = components[i].e;
+			else if (filter(components[i].e))
+				found[numFound++] = components[i].e;
 		}
 	}
 	return numFound;
-}
-
-/* GetTransforms returns the system's array of transforms ands sets num to the
- * length of the array. */
-struct Transform *GetTransforms(int *num) {
-	*num = numTransforms;
-	return transforms;
 }

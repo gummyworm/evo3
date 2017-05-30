@@ -1,5 +1,5 @@
 LIBS  = -lm -lSOIL -lglfw -framework OpenGL -framework CoreFoundation -lassimp -lportaudio
-INCLUDE = -I. -Ithird-party/include 
+INCLUDE = -I. -Ithird-party/include
 CFLAGS = -Wall --std=c11 -DDEBUG
 
 SRC=$(filter-out main.c, $(wildcard *.c))

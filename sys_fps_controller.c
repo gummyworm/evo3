@@ -132,7 +132,7 @@ void UpdateFPSControllerSystem() {
 		} else {
 			vec3 pos;
 			TransformMove(f->e, 0.0f, -f->jumpSpeed, 0.f);
-			if (GetPos(f->e, pos) && pos[1] == TRANSFORM_MIN_Y)
+			if (TransformGetPos(f->e, pos) && pos[1] == TRANSFORM_MIN_Y)
 				f->canJump = true;
 		}
 		f->jumpTime += GetTimeDelta();

@@ -49,7 +49,7 @@ void UpdateMovementSystem() {
 
 	for (i = 0; i < numMovements; ++i) {
 		vec3 currPos;
-		if (GetPos(movements[i].e, currPos)) {
+		if (TransformGetPos(movements[i].e, currPos)) {
 			vec3 dpos;
 			vec3 newPos;
 			vec3_scale(dpos, movements[i].dir,

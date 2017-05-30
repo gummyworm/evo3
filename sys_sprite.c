@@ -46,7 +46,7 @@ bool GetSpriteBounds(Entity e, int *x, int *y, float *z, int *w, int *h) {
 		return false;
 	if ((s = getSprite(e)) == NULL)
 		return false;
-	if (!GetPos(e, lpos))
+	if (!TransformGetPos(e, lpos))
 		return false;
 
 	GetViewPos(E_PLAYER, &ppos[0], &ppos[1], &ppos[2]);
@@ -88,7 +88,7 @@ void UpdateSpriteSystem() {
 		struct Sprite *s;
 		vec3 pos;
 		s = sprites + i;
-		if (!GetPos(s->e, pos))
+		if (!TransformGetPos(s->e, pos))
 			return;
 		if (s->castShadow)
 			TexRectZ(proj, SHADOW_PROGRAM, pos[0], pos[1], 0, s->w,
@@ -100,7 +100,7 @@ void UpdateSpriteSystem() {
 		vec3 pos;
 
 		s = sprites + i;
-		if (!GetPos(s->e, pos))
+		if (!TransformGetPos(s->e, pos))
 			return;
 		SetUColor(TEXTURE_PROGRAM, s->r, s->g, s->b, s->a);
 		TexRectZ(proj, TEXTURE_PROGRAM, pos[0], pos[1], pos[2], s->w,

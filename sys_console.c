@@ -467,7 +467,7 @@ static void update(struct Console *console) {
 	}
 
 	/* if we've moved to a new room, display its description */
-	if (GetTransformUpdate(console->e) != NULL) {
+	if (GetTransform(console->e) != NULL) {
 		Entity room = GetRoom(console->e);
 		if (room != console->room) {
 			char *desc = (char *)GetRoomDescription(room);

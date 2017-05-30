@@ -40,6 +40,7 @@
 
 /* InitSystems initializes all the systems. */
 void InitSystems(struct GLFWwindow *win) {
+	Err = 0;
 	InitInput(win);
 	InitAudioSystem();
 
@@ -95,3 +96,5 @@ void UpdateSystems() {
 	update(UpdateWidgetSystem);
 	// update(UpdateLabelSystem);
 }
+
+int Err;

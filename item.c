@@ -15,7 +15,7 @@ static bool handleDrop(Entity self, Entity prop, Entity actor, char *out) {
 	if (t->owner != actor)
 		return false;
 
-	if (GetPos(actor, pos) && GetViewDir(actor, &dx, &dy, &dz))
+	if (TransformGetPos(actor, pos) && GetViewDir(actor, &dx, &dy, &dz))
 		TransformSet(self, pos[0] + (dx * 2), -1, pos[2] + (dz * 2));
 
 	t->owner = 0;

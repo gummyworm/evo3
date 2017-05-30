@@ -61,7 +61,7 @@ static void test() {
 }
 
 /* ClearUpdates resets all systems' updates. */
-void ClearUpdates() { numTransformUpdates = 0; }
+void ClearUpdates() {  }
 
 int main() {
 	int frame;

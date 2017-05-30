@@ -52,9 +52,10 @@ void UpdateChildSystem() {
 	for (i = 0; i < numChilds; ++i) {
 		vec3 pos;
 		vec3 offset = {0, 0, 0};
-		if (!GetPos(childs[i].parent, pos))
+		if (!TransformGetPos(childs[i].parent, pos))
 			continue;
-		GetPos(childs[i].e, offset);
+		if(!TransformGetPos(childs[i].e, offset))
+			continue;
 		vec3_add(pos, pos, offset);
 		TransformSet(childs[i].e, pos[0], pos[1], pos[2]);
 	}

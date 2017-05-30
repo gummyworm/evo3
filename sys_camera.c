@@ -99,9 +99,9 @@ void drawRender(mat4x4 v, mat4x4 p, int i) {
 
 	if (!Enabled(renders[i].e))
 		return;
-	if (!GetPos(renders[i].e, pos))
+	if (!TransformGetPos(renders[i].e, pos))
 		return;
-	if (!GetScale(renders[i].e, &sx, &sy, &sz))
+	if (!TransformGetScale(renders[i].e, &sx, &sy, &sz))
 		return;
 
 	mat4x4_identity(m);
@@ -132,7 +132,7 @@ void UpdateCameraSystem() {
 		c = cameras + i;
 		if (!Enabled(c->e))
 			continue;
-		if (!GetPos(c->e, pos))
+		if (!TransformGetPos(c->e, pos))
 			return;
 		if (!GetViewDir(c->e, &rot.x, &rot.y, &rot.z))
 			return;
@@ -161,7 +161,7 @@ void UpdateCameraSystem() {
 
 		{
 			vec3 eye, center, up;
-			GetPos(c->e, eye);
+			TransformGetPos(c->e, eye);
 			vec3_add(eye, eye, c->eye);
 			GetViewDir(c->e, &up[0], &up[1], &up[2]);
 			vec3_add(center, eye, up);
@@ -461,7 +461,7 @@ bool GetViewPos(Entity e, float *x, float *y, float *z) {
 	if ((c = getCamera(e)) == NULL)
 		return false;
 
-	GetPos(e, t);
+	TransformGetPos(e, t);
 
 	*x = c->eye[0] + t[0];
 	*y = c->eye[1] + t[1];
