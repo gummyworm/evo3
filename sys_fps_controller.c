@@ -7,20 +7,27 @@
 #include "sys_transform.h"
 #include "third-party/include/uthash.h"
 
-struct entityToFPSController {
-	Entity e;
-	struct FPSController *fpsController;
-	UT_hash_handle hh;
-};
+static void key(Entity e, int key, int scancode, int action, int mods);
 
-static struct entityToFPSController *entitiesToFPSControllers;
-static struct FPSController fpsControllers[MAX_FPS_CONTROLLERS];
-static int numFPSControllers;
+SYSDEF(FPSController, float speed)
+C->speed = speed;
+C->turnSpeed = 3.0f;
+C->jumpSpeed = 0.2f;
+C->timeToJumpApex = 0.4f;
+C->canJump = true;
+C->keyCodes.forward = GLFW_KEY_UP;
+C->keyCodes.backward = GLFW_KEY_DOWN;
+C->keyCodes.left = GLFW_KEY_COMMA;
+C->keyCodes.right = GLFW_KEY_PERIOD;
+C->keyCodes.turnL = GLFW_KEY_LEFT;
+C->keyCodes.turnR = GLFW_KEY_RIGHT;
+C->keyCodes.jump = GLFW_KEY_SPACE;
 
-static int numUpdates;
-static struct FPSControllerUpdate updates[MAX_FPS_CONTROLLERS];
+InputRegisterKeyEvent(e, INPUT_LAYER_DEFAULT, key);
+}
 
-static struct FPSController *getFPSController(Entity e);
+/* init initializes the FPSController system. */
+void init() {}
 
 /* key is the input callback to handle key events. */
 static void key(Entity e, int key, int scancode, int action, int mods) {
@@ -34,7 +41,7 @@ static void key(Entity e, int key, int scancode, int action, int mods) {
 	float cosa, sina;
 	bool rotate, translate;
 
-	if ((f = getFPSController(e)) == NULL)
+	if ((f = GetFPSController(e)) == NULL)
 		return;
 	if (!Enabled(f->e))
 		return;
@@ -96,100 +103,21 @@ static void key(Entity e, int key, int scancode, int action, int mods) {
 	}
 }
 
-/* getFPSController returns the fpsController attached to entity e (if there is
- * one). */
-static struct FPSController *getFPSController(Entity e) {
-	struct entityToFPSController *f;
-
-	if (entitiesToFPSControllers == NULL)
-		return NULL;
-
-	HASH_FIND_INT(entitiesToFPSControllers, &e, f);
-	return f->fpsController;
-}
-
-/* InitFPSControllerSystem initializes the fpsController system. */
-void InitFPSControllerSystem() {
-	if (entitiesToFPSControllers != NULL) {
-		struct entityToFPSController *f, *tmp;
-		HASH_ITER(hh, entitiesToFPSControllers, f, tmp) {
-			HASH_DEL(entitiesToFPSControllers,
-			         f); /* delete; users advances to next */
-			free(f);     /* optional- if you want to free  */
-		}
-	}
-	numFPSControllers = 0;
-}
-
-/* UpdateFPSControllerSystem updates all fpsControllers that have been created.
+/* update updates all fpsControllers that have been created.
  */
-void UpdateFPSControllerSystem() {
+void update() {
 	int i;
-	for (i = 0; i < numFPSControllers; ++i) {
-		struct FPSController *f = &fpsControllers[i];
+	for (i = 0; i < numComponents; ++i) {
+		struct FPSController *f = components + i;
 		if (f->jumpTime < f->timeToJumpApex) {
 			TransformMove(f->e, 0.0f, f->jumpSpeed, 0.f);
 		} else {
 			vec3 pos;
 			TransformMove(f->e, 0.0f, -f->jumpSpeed, 0.f);
-			if (TransformGetPos(f->e, pos) && pos[1] == TRANSFORM_MIN_Y)
+			if (TransformGetPos(f->e, pos) &&
+			    pos[1] == TRANSFORM_MIN_Y)
 				f->canJump = true;
 		}
 		f->jumpTime += GetTimeDelta();
 	}
-}
-
-/* AddFPSController adds a fpsController component to the entity e. */
-void AddFPSController(Entity e, float speed) {
-	struct entityToFPSController *item;
-
-	if (getFPSController(e) != NULL)
-		return;
-
-	item = malloc(sizeof(struct entityToFPSController));
-	item->fpsController = fpsControllers + numFPSControllers;
-	item->e = e;
-	HASH_ADD_INT(entitiesToFPSControllers, e, item);
-
-	fpsControllers[numFPSControllers].e = e;
-	fpsControllers[numFPSControllers].speed = speed;
-	fpsControllers[numFPSControllers].turnSpeed = 3.0f;
-	fpsControllers[numFPSControllers].jumpSpeed = 0.2f;
-	fpsControllers[numFPSControllers].timeToJumpApex = 0.4f;
-	fpsControllers[numFPSControllers].canJump = true;
-	fpsControllers[numFPSControllers].keyCodes.forward = GLFW_KEY_UP;
-	fpsControllers[numFPSControllers].keyCodes.backward = GLFW_KEY_DOWN;
-	fpsControllers[numFPSControllers].keyCodes.left = GLFW_KEY_COMMA;
-	fpsControllers[numFPSControllers].keyCodes.right = GLFW_KEY_PERIOD;
-	fpsControllers[numFPSControllers].keyCodes.turnL = GLFW_KEY_LEFT;
-	fpsControllers[numFPSControllers].keyCodes.turnR = GLFW_KEY_RIGHT;
-	fpsControllers[numFPSControllers].keyCodes.jump = GLFW_KEY_SPACE;
-
-	InputRegisterKeyEvent(e, INPUT_LAYER_DEFAULT, key);
-	numFPSControllers++;
-}
-
-/* RemoveFPSController removes the fpsController attached to e from the
- * FPSController system. */
-void RemoveFPSController(Entity e) {
-	struct entityToFPSController *c;
-
-	if (entitiesToFPSControllers == NULL)
-		return;
-
-	HASH_FIND_INT(entitiesToFPSControllers, &e, c);
-	if (c != NULL) {
-		struct FPSController *sys = c->fpsController;
-		int sz = (fpsControllers + numFPSControllers) - sys;
-		memmove(sys, sys + 1, sz);
-		HASH_DEL(entitiesToFPSControllers, c);
-		free(c);
-		numFPSControllers--;
-	}
-}
-
-/* GetFPSControllerUpdates returns the fpsController updates this frame. */
-struct FPSControllerUpdate *GetFPSControllerUpdates(int *num) {
-	*num = numUpdates;
-	return updates;
 }
