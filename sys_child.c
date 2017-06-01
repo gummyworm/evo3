@@ -51,12 +51,9 @@ void UpdateChildSystem() {
 	/* move each child relative to its parent. */
 	for (i = 0; i < numChilds; ++i) {
 		vec3 pos;
-		vec3 offset = {0, 0, 0};
 		if (!TransformGetPos(childs[i].parent, pos))
 			continue;
-		if (!TransformGetPos(childs[i].e, offset))
-			continue;
-		vec3_add(pos, pos, offset);
+		vec3_add(pos, pos, childs[i].offset);
 		TransformSet(childs[i].e, pos[0], pos[1], pos[2]);
 	}
 }
@@ -73,6 +70,9 @@ void AddChild(Entity e, float parent) {
 
 	childs[numChilds].e = e;
 	childs[numChilds].parent = parent;
+	childs[numChilds].offset[0] = 0.f;
+	childs[numChilds].offset[1] = 0.f;
+	childs[numChilds].offset[2] = 0.f;
 
 	HASH_ADD_INT(entitiesToChilds, e, item);
 	numChilds++;

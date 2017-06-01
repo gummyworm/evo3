@@ -90,6 +90,7 @@ void GunFire(Entity e) {
 		Entity bullet = NewEntity();
 		g->projectile(bullet);
 		TransformGetPos(e, pos);
+		dprintv3(pos);
 		TransformSet(bullet, pos[0], pos[1], pos[2]);
 	}
 	g->update.cooldown = g->rate;

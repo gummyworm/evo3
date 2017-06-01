@@ -14,6 +14,7 @@ struct Child {
 	Entity e;
 	Entity parent;
 	struct ChildUpdate update;
+	vec3 offset;
 };
 
 void InitChildSystem();
