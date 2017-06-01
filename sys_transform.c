@@ -2,6 +2,7 @@
 #include "entities.h"
 #include "sys_actor.h"
 #include "sys_camera.h"
+#include "sys_child.h"
 #include "third-party/include/uthash.h"
 
 SYSDEF(Transform, float x, float y, float z)
@@ -64,13 +65,15 @@ bool SYSFUNC(Transform, GetPos, vec3 pos) {
 	COMPONENT(Transform, C);
 	if (C == NULL)
 		return false;
+
 	pos[0] = C->x;
 	pos[1] = C->y;
 	pos[2] = C->z;
 	return true;
 }
 
-/* GetRot sets the x, y, and z rotation of entity e and returns the
+/* GetRot sets the x, y, and z rotation of entity e and returns
+ * the
  * success. */
 bool SYSFUNC(Transform, GetRot, float *x, float *y, float *z) {
 	COMPONENT(Transform, C);
@@ -82,7 +85,8 @@ bool SYSFUNC(Transform, GetRot, float *x, float *y, float *z) {
 	return true;
 }
 
-/* GetScale sets the x, y, and z scale of entity e and returns the
+/* GetScale sets the x, y, and z scale of entity e and returns
+ * the
  * success. */
 bool SYSFUNC(Transform, GetScale, float *x, float *y, float *z) {
 	COMPONENT(Transform, C);
@@ -94,7 +98,8 @@ bool SYSFUNC(Transform, GetScale, float *x, float *y, float *z) {
 	return true;
 }
 
-/* SetScale sets the transform attached to e's scale to {x, y, z}. */
+/* SetScale sets the transform attached to e's scale to {x, y,
+ * z}. */
 void SYSFUNC(Transform, SetScale, float x, float y, float z) {
 	COMPONENT(Transform, C);
 	if (C == NULL)
@@ -107,7 +112,8 @@ void SYSFUNC(Transform, SetScale, float x, float y, float z) {
 /* init initializes the Transform system. */
 void init() {}
 
-/* update updates all Transform components that have been created. */
+/* update updates all Transform components that have been
+ * created. */
 void update(struct Transform *transforms, int num) {
 	UNUSED(transforms);
 	UNUSED(num);
@@ -122,7 +128,8 @@ static bool contains(vec3 pt, vec3 center, vec3 dim) {
 	       (pt[2] > llnCorner[2]) && (pt[2] < llnCorner[2] + dim[2]);
 }
 
-/* contains returns true if pt lies within the given 2D bounds. */
+/* contains returns true if pt lies within the given 2D bounds.
+ */
 static bool contains2d(vec2 pt, vec2 center, vec2 dim) {
 	vec3 llnCorner = {center[0] - dim[0] / 2.f, center[1] - dim[1] / 2.f,
 	                  center[2] - dim[2] / 2.f};
@@ -130,8 +137,12 @@ static bool contains2d(vec2 pt, vec2 center, vec2 dim) {
 	       (pt[1] > llnCorner[1]) && (pt[1] < llnCorner[1] + dim[1]);
 }
 
-/* GetInBounds sets up to max entities found in the selection area and returns
- * the number found.  A function, filter, may be passed.  If not NULL, it should
+/* GetInBounds sets up to max entities found in the selection
+ * area and
+ * returns
+ * the number found.  A function, filter, may be passed.  If not
+ * NULL,
+ * it should
  * return true if an entity is to be included in found. */
 int GetInBounds(Entity *found, int max, vec3 center, vec3 dim,
                 bool (*filter)(Entity)) {

@@ -17,8 +17,8 @@ static int numChilds;
 int numChildUpdates;
 static struct ChildUpdate updates[MAX_COLLIDERS];
 
-/* getChild returns the child attached to entity e (if there is one). */
-static struct Child *getChild(Entity e) {
+/* GetChild returns the child attached to entity e (if there is one). */
+struct Child *GetChild(Entity e) {
 	struct entityToChild *t;
 
 	if (entitiesToChilds == NULL)
@@ -54,7 +54,7 @@ void UpdateChildSystem() {
 		vec3 offset = {0, 0, 0};
 		if (!TransformGetPos(childs[i].parent, pos))
 			continue;
-		if(!TransformGetPos(childs[i].e, offset))
+		if (!TransformGetPos(childs[i].e, offset))
 			continue;
 		vec3_add(pos, pos, offset);
 		TransformSet(childs[i].e, pos[0], pos[1], pos[2]);
@@ -65,7 +65,7 @@ void UpdateChildSystem() {
 void AddChild(Entity e, float parent) {
 	struct entityToChild *item;
 
-	if (getChild(e) != NULL)
+	if (GetChild(e) != NULL)
 		return;
 	item = malloc(sizeof(struct entityToChild));
 	item->child = childs + numChilds;
@@ -101,7 +101,7 @@ void RemoveChild(Entity e) {
 struct ChildUpdate *GetChildUpdate(Entity e) {
 	struct Child *c;
 
-	if ((c = getChild(e)))
+	if ((c = GetChild(e)))
 		return &c->update;
 
 	return NULL;

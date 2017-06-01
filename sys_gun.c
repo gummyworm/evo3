@@ -85,6 +85,12 @@ void GunFire(Entity e) {
 	if (g->update.cooldown > 0)
 		return;
 
-	g->projectile(NewEntity());
+	{
+		vec3 pos;
+		Entity bullet = NewEntity();
+		g->projectile(bullet);
+		TransformGetPos(e, pos);
+		TransformSet(bullet, pos[0], pos[1], pos[2]);
+	}
 	g->update.cooldown = g->rate;
 }

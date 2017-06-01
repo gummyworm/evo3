@@ -23,6 +23,7 @@ void RemoveChild(Entity);
 void ChildSystemClearUpdates();
 struct ChildUpdate *GetChildUpdates(int *);
 struct ChildUpdate *GetChildUpdate(Entity);
+struct Child *GetChild(Entity);
 
 extern int numChildUpdates;
 
