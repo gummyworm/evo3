@@ -25,5 +25,6 @@ void UpdateMovementSystem();
 void AddMovement(Entity, float, vec3);
 void RemoveMovement(Entity);
 struct MovementUpdate *GetMovementUpdates(int *);
+void MovementSetDir(Entity, vec3);
 
 #endif

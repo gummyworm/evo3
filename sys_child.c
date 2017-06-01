@@ -112,3 +112,11 @@ struct ChildUpdate *GetChildUpdates(int *num) {
 	*num = numChildUpdates;
 	return updates;
 }
+
+/* ChildGetParent returns the parent of the child component attached to e. */
+Entity ChildGetParent(Entity e) {
+	struct Child *child = GetChild(e);
+	if (child != NULL)
+		return child->parent;
+	return 0;
+}

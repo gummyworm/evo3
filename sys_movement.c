@@ -16,8 +16,8 @@ static int numMovements;
 static int numUpdates;
 static struct MovementUpdate updates[MAX_MOVEMENTS];
 
-/* getMovement returns the movement attached to entity e (if there is one). */
-static struct Movement *getMovement(Entity e) {
+/* GetMovement returns the movement attached to entity e (if there is one). */
+struct Movement *GetMovement(Entity e) {
 	struct entityToMovement *m;
 
 	if (entitiesToMovements == NULL)
@@ -65,7 +65,7 @@ void UpdateMovementSystem() {
 void AddMovement(Entity e, float vel, vec3 dir) {
 	struct entityToMovement *item;
 
-	if (getMovement(e) != NULL)
+	if (GetMovement(e) != NULL)
 		return;
 
 	item = malloc(sizeof(struct entityToMovement));
@@ -105,4 +105,14 @@ void RemoveMovement(Entity e) {
 struct MovementUpdate *GetMovementUpdates(int *num) {
 	*num = numUpdates;
 	return updates;
+}
+
+/* SetDir sets the direction of the movement to dir. */
+void SYSFUNC(Movement, SetDir, vec3 dir) {
+	COMPONENT(Movement, m);
+	if (m == NULL)
+		return;
+	m->dir[0] = dir[0];
+	m->dir[1] = dir[1];
+	m->dir[2] = dir[2];
 }

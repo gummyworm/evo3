@@ -1,4 +1,7 @@
 #include "sys_gun.h"
+#include "sys_camera.h"
+#include "sys_child.h"
+#include "sys_movement.h"
 #include "sys_time.h"
 #include "sys_transform.h"
 #include "third-party/include/uthash.h"
@@ -86,12 +89,16 @@ void GunFire(Entity e) {
 		return;
 
 	{
-		vec3 pos;
+		vec3 pos, dir;
 		Entity bullet = NewEntity();
 		g->projectile(bullet);
 		TransformGetPos(e, pos);
 		dprintv3(pos);
 		TransformSet(bullet, pos[0], pos[1], pos[2]);
+
+		/* fire in the direction of the parent's view */
+		if (GetViewDir(ChildGetParent(e), &dir[0], &dir[1], &dir[2]))
+			MovementSetDir(bullet, dir);
 	}
 	g->update.cooldown = g->rate;
 }

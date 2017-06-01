@@ -8,7 +8,7 @@ int Bullet(Entity e) {
 	TransformSetScale(e, .1f, .1f, .1f);
 
 	AddDamage(e, 10.f);
-	AddMovement(e, 0.1f, dir);
+	AddMovement(e, 1.0f, dir);
 	AddCollider(e, 1.f);
 	AddColorRender(e, "cube.obj", 0.1f, 0.1f, 0.1f, 1.f);
 	return 0;

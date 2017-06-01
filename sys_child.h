@@ -25,6 +25,7 @@ void ChildSystemClearUpdates();
 struct ChildUpdate *GetChildUpdates(int *);
 struct ChildUpdate *GetChildUpdate(Entity);
 struct Child *GetChild(Entity);
+Entity ChildGetParent(Entity);
 
 extern int numChildUpdates;
 
