@@ -8,6 +8,7 @@ int main() {
 	RUNTEST(testMovementSystem);
 	RUNTEST(testTransformSystem);
 	RUNTEST(testUnitSystem);
+	RUNTEST(testShatterSystem);
 
 	return 0;
 }

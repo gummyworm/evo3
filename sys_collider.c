@@ -27,8 +27,8 @@ static float dist(struct Collider *c1, struct Collider *c2) {
 	return -1.f;
 }
 
-/* getCollider returns the collider attached to entity e (if there is one). */
-static struct Collider *getCollider(Entity e) {
+/* GetCollider returns the collider attached to entity e (if there is one). */
+struct Collider *GetCollider(Entity e) {
 	struct entityToCollider *t;
 
 	if (entitiesToColliders == NULL)
@@ -80,10 +80,10 @@ void UpdateColliderSystem() {
 }
 
 /* AddCollider adds a collider component to the entity e. */
-void AddCollider(Entity e, float r) {
+void AddCollider(Entity e, float r, enum CollisionLayer layers) {
 	struct entityToCollider *item;
 
-	if (getCollider(e) != NULL)
+	if (GetCollider(e) != NULL)
 		return;
 	item = malloc(sizeof(struct entityToCollider));
 	item->collider = colliders + numColliders;
@@ -91,6 +91,7 @@ void AddCollider(Entity e, float r) {
 
 	colliders[numColliders].e = e;
 	colliders[numColliders].radius = r;
+	colliders[numColliders].layers = layers;
 
 	HASH_ADD_INT(entitiesToColliders, e, item);
 	numColliders++;
@@ -119,7 +120,7 @@ void RemoveCollider(Entity e) {
 struct ColliderUpdate *GetColliderUpdate(Entity e) {
 	struct Collider *c;
 
-	if ((c = getCollider(e)))
+	if ((c = GetCollider(e)))
 		return &c->update;
 
 	return NULL;

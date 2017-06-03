@@ -112,8 +112,7 @@ void SYSFUNC(Transform, SetScale, float x, float y, float z) {
 /* init initializes the Transform system. */
 void init() {}
 
-/* update updates all Transform components that have been
- * created. */
+/* update updates all Transform components that have been created. */
 void update(struct Transform *transforms, int num) {
 	UNUSED(transforms);
 	UNUSED(num);

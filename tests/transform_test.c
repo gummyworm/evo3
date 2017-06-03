@@ -12,7 +12,7 @@ void testTransformSystem(struct Test *t) {
 	{
 		const vec3 start = {1.f, 2.f, 3.f};
 		AddTransform(e, start[0], start[1], start[2]);
-		tassert(t, GetPos(e, pos));
+		tassert(t, TransformGetPos(e, pos));
 		tassertv3(t, start, pos);
 	}
 
@@ -22,7 +22,7 @@ void testTransformSystem(struct Test *t) {
 		const vec3 newPos = {6.f, 7.f, 8.f};
 
 		TransformSet(e, newPos[0], newPos[1], newPos[2]);
-		tassert(t, GetPos(e, pos));
+		tassert(t, TransformGetPos(e, pos));
 		tassertv3(t, newPos, pos);
 
 		transforms = GetTransforms(&num);

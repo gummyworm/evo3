@@ -58,6 +58,7 @@ void InitSystems(struct GLFWwindow *win) {
 	InitGunSystem();
 	InitChildSystem();
 	InitGunControllerSystem();
+	InitShatterSystem();
 
 	InitWidgetSystem(win);
 	InitCameraSystem(win);
@@ -74,6 +75,8 @@ void UpdateSystems() {
 	update(UpdateInputSystem);
 	update(UpdateFPSControllerSystem);
 	update(UpdateGunSystem);
+	update(UpdateColliderSystem);
+	update(UpdateShatterSystem);
 	update(UpdateDamageSystem);
 	update(UpdateUnitSystem);
 

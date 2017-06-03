@@ -16,6 +16,7 @@ enum { SYS_ERR_NO_COMPONENT = -1,
 	void Init##name##System();                                             \
 	void Update##name##System();                                           \
 	struct name *Get##name(Entity);                                        \
+	struct name *Get##name##s(int *num);                                   \
 	void Remove##name(Entity);                                             \
 	void Add##name(Entity e, __VA_ARGS__);                                 \
 	struct name

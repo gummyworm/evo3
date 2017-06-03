@@ -21,7 +21,7 @@ void testChildSystem(struct Test *t) {
 	UpdateChildSystem();
 	{
 		vec3 pos;
-		GetPos(c, pos);
+		TransformGetPos(c, pos);
 		tassert(t, pos[0] == px);
 		tassert(t, pos[1] == px);
 		tassert(t, pos[2] == px);

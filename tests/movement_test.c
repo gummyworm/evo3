@@ -16,13 +16,13 @@ void testMovementSystem(struct Test *t) {
 	InitMovementSystem();
 
 	AddTransform(e, start[0], start[1], start[2]);
-	GetPos(e, pos);
+	TransformGetPos(e, pos);
 	AddMovement(e, vel, dir);
 
 	{
 		SetTime(dt);
 		UpdateMovementSystem();
-		GetPos(e, pos);
+		TransformGetPos(e, pos);
 
 		tassertf(t, pos[0], (start[0] + dir[0] * vel * dt));
 		tassertf(t, pos[1], (start[1] + dir[1] * vel * dt));

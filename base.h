@@ -7,6 +7,7 @@
 
 #include "debug.h"
 #include "sys_limits.h"
+#include "third-party/include/uthash.h"
 
 #define UNUSED(X) ((void)X)
 
