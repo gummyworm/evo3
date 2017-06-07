@@ -73,7 +73,6 @@ void UpdateColliderSystem() {
 				/* collision between c1 and c2 */
 				c1->update =
 				    (struct ColliderUpdate){.into = c2->e};
-				dinfof("collision: distance %f", dist(c1, c2));
 			}
 		}
 	}

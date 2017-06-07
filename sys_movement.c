@@ -116,3 +116,21 @@ void SYSFUNC(Movement, SetDir, vec3 dir) {
 	m->dir[1] = dir[1];
 	m->dir[2] = dir[2];
 }
+
+/* SetDirTo sets the direction of the movement to dir to the direction toward
+ * to. */
+void SYSFUNC(Movement, SetDirTo, Entity to) {
+	vec3 selfPos, targetPos, dir;
+	COMPONENT(Movement, m);
+	if (m == NULL)
+		return;
+
+	TransformGetPos(e, selfPos);
+	TransformGetPos(to, targetPos);
+	vec3_sub(selfPos, selfPos, targetPos);
+	vec3_norm(dir, selfPos);
+
+	m->dir[0] = dir[0];
+	m->dir[1] = dir[1];
+	m->dir[2] = dir[2];
+}
