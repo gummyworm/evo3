@@ -73,7 +73,6 @@ void UpdateSystems() {
 	update(UpdateMovementSystem);
 	update(UpdateTransformSystem);
 	update(UpdateInputSystem);
-	update(UpdateFPSControllerSystem);
 	update(UpdateGunSystem);
 	update(UpdateColliderSystem);
 	update(UpdateShatterSystem);
@@ -97,6 +96,7 @@ void UpdateSystems() {
 	update(UpdateCommanderSystem);
 	update(UpdateConsoleSystem);
 	update(UpdateWidgetSystem);
+	update(UpdateFPSControllerSystem);
 	// update(UpdateLabelSystem);
 }
 
