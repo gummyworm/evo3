@@ -15,7 +15,7 @@ int onAudio(const void *inputBuffer, void *outputBuffer,
 	UNUSED(timeInfo);
 	UNUSED(statusFlags);
 
-	/* Cast data passed through stream to our structure. */
+	/* cast data passed through stream to our structure. */
 	paTestData *data = (paTestData *)userData;
 	float *out = (float *)outputBuffer;
 	unsigned int i;

@@ -13,6 +13,5 @@ SYSTEM(Shatter, enum CollisionLayer) {
 };
 
 struct Shatter *GetShatter(Entity);
-void RemoveShatter(Entity);
 
 #endif
