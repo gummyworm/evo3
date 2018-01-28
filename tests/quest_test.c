@@ -3,7 +3,6 @@
 #include <assert.h>
 
 static bool pass;
-
 static bool chk() { return true; }
 void done() { pass = true; }
 
@@ -15,7 +14,6 @@ void testQuestSystem(struct Test *t) {
 
 	AddQuest(e, "test quest", chk, done);
 
-	/* assert entity is removed after update */
 	UpdateQuestSystem();
 	tassert(t, GetQuest(e));
 	UpdateQuestSystem();
