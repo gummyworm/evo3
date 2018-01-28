@@ -6,13 +6,42 @@
 #include "systems.h"
 #include "third-party/include/linmath.h"
 #include "third-party/include/uthash.h"
+#include <assert.h>
+#include <limits.h>
+#include <math.h>
+#include <math.h>
+#include <stdarg.h>
+#include <stdint.h>
 #include <stdio.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 
 #define MAX_VERTEX_BUFFER 512 * 1024
 #define MAX_ELEMENT_BUFFER 128 * 1024
 
 #define GUI_NEAR_PLANE -1.f
 #define GUI_FAR_PLANE 1.f
+
+#define NK_INCLUDE_FIXED_TYPES
+#define NK_INCLUDE_STANDARD_IO
+#define NK_INCLUDE_STANDARD_VARARGS
+#define NK_INCLUDE_DEFAULT_ALLOCATOR
+#define NK_INCLUDE_VERTEX_BUFFER_OUTPUT
+#define NK_INCLUDE_FONT_BAKING
+#define NK_INCLUDE_DEFAULT_FONT
+#define NK_IMPLEMENTATION
+#define NK_GLFW_GL3_IMPLEMENTATION
+#include "third-party/include/KHR/nuklear/nuklear.h"
+
+#include "nuklear_glfw_gl3.h"
+
+#define MAX_VERTEX_BUFFER 512 * 1024
+#define MAX_ELEMENT_BUFFER 128 * 1024
 
 struct entityToWidget {
 	Entity e;
@@ -30,49 +59,32 @@ static struct WidgetUpdate updates[MAX_WIDGETS];
 static GLFWwindow *win;
 
 static struct { GLuint overlay; } skin;
+static struct nk_context *ctx;
+static struct nk_colorf bg;
 
 /* drawTextbox renders the textbox w. */
 static void drawTextbox(struct Widget *w) {
-	mat4x4 proj;
-	mat4x4_identity(proj);
-	GuiProjection(proj);
-	Text(proj, w->x, w->y, w->data.textbox.fontsize, w->data.textbox.text);
+	if (nk_begin(ctx, "INFO", nk_rect(50, 50, 200, 100),
+	             NK_WINDOW_CLOSABLE | NK_WINDOW_MOVABLE)) {
+		nk_layout_row_static(ctx, 30, 80, 1);
+		nk_label(ctx, w->data.textbox.text, NK_TEXT_LEFT);
+	}
+	nk_end(ctx);
 }
 
 /* drawWindow renders the window w. */
 static void drawWindow(struct Widget *w) {
-	mat4x4 proj, gui, trans;
-
-	{
-		GLint vp[4];
-		float xs, ys;
-		glGetIntegerv(GL_VIEWPORT, vp);
-
-		xs = (float)vp[2] / GUI_WIDTH;
-		ys = (float)vp[3] / GUI_HEIGHT;
-
-		glEnable(GL_SCISSOR_TEST);
-		glScissor(w->x * xs, ys * (GUI_HEIGHT - w->y - w->height),
-		          xs * w->width, ys * w->height);
+	return;
+	if (nk_begin(
+	        ctx, "Nuklear",
+	        nk_rect(GUI_WIDTH / 2 - 110, GUI_HEIGHT / 2 - 110, 220, 220),
+	        NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_CLOSABLE)) {
 	}
-
-	GuiProjection(proj);
-	Rect(proj, w->x, w->y + w->border.height, w->width,
-	     w->height - w->border.height, 0x000000ff);
-
-	mat4x4_translate(trans, w->x, w->y + w->border.height, 0.f);
-	GuiProjection(gui);
-	mat4x4_mul(proj, gui, trans);
-	w->data.window.render(w->e, proj, w->width, w->height);
-
-	GuiProjection(proj);
-	TexRect(proj, TEXTURE_PROGRAM, w->x, w->y, w->width, w->height, 0.f,
-	        0.f, 1.f, 1.f, skin.overlay);
-
-	glDisable(GL_SCISSOR_TEST);
+	nk_end(ctx);
 }
 
-/* getWidget returns the widget attached to entity e (if there is one). */
+/* getWidget returns the widget attached to entity e (if there is one).
+ */
 static struct Widget *getWidget(Entity e) {
 	struct entityToWidget *t;
 
@@ -103,7 +115,8 @@ static void addWidget(Entity e, struct Widget *w) {
 	numWidgets++;
 }
 
-/* RemoveWidget removes the widget attached to e from the Widget system. */
+/* RemoveWidget removes the widget attached to e from the Widget system.
+ */
 void RemoveWidget(Entity e) {
 	struct entityToWidget *c;
 
@@ -125,19 +138,25 @@ void RemoveWidget(Entity e) {
 void InitWidgetSystem(GLFWwindow *w) {
 	win = w;
 	skin.overlay = GetTexture("res/consoleoverlay.png");
+
+	struct nk_font_atlas *atlas;
+	ctx = nk_glfw3_init(win, NK_GLFW3_INSTALL_CALLBACKS);
+	nk_glfw3_font_stash_begin(&atlas);
+	nk_glfw3_font_stash_end();
+	bg.r = 0.10f, bg.g = 0.18f, bg.b = 0.24f, bg.a = 1.0f;
 }
 
 /* UpdateWidgetSystem updates all widgets that have been created. */
 void UpdateWidgetSystem() {
 	int i;
 
+	nk_glfw3_new_frame();
 	for (i = 0; i < numWidgets; ++i) {
 		struct Widget *w;
 		w = widgets + i;
 
 		if (!Enabled(w->e))
 			continue;
-
 		switch (w->type) {
 		case TEXTBOX:
 			drawTextbox(w);
@@ -148,8 +167,9 @@ void UpdateWidgetSystem() {
 			break;
 		}
 	}
-
 	numUpdates = 0;
+	nk_glfw3_render(NK_ANTI_ALIASING_ON, MAX_VERTEX_BUFFER,
+	                MAX_ELEMENT_BUFFER);
 }
 
 /* AddWidget adds a widget component to the entity e. */
@@ -179,7 +199,6 @@ void DrawWidget(struct Widget *w) {
 	mat4x4 proj;
 	mat4x4_identity(proj);
 	GuiProjection(proj);
-
 	Rect(proj, w->x, w->y, w->width, w->height, w->color);
 }
 
@@ -246,8 +265,8 @@ void GuiProjection(mat4x4 proj) {
 	             GUI_FAR_PLANE);
 }
 
-/* ScreenToGui sets (x, y) to the GUI coordinates that correspond to the given
- * screen coordiantes (sx, sy). */
+/* ScreenToGui sets (x, y) to the GUI coordinates that correspond to the
+ * given screen coordiantes (sx, sy). */
 void ScreenToGui(int sx, int sy, int *x, int *y) {
 	int w, h;
 	glfwGetFramebufferSize(win, &w, &h);
@@ -255,8 +274,8 @@ void ScreenToGui(int sx, int sy, int *x, int *y) {
 	*y = (int)(sy * ((float)GUI_HEIGHT / (float)h));
 }
 
-/* WindowToGui sets (x, y) to the GUI coordinates that correspond to the given
- * window coordiantes (sx, sy). */
+/* WindowToGui sets (x, y) to the GUI coordinates that correspond to the
+ * given window coordiantes (sx, sy). */
 void WindowToGui(int sx, int sy, int *x, int *y) {
 	int w, h;
 	glfwGetWindowSize(win, &w, &h);
@@ -264,9 +283,8 @@ void WindowToGui(int sx, int sy, int *x, int *y) {
 	*y = (int)(sy * ((float)GUI_HEIGHT / (float)h));
 }
 
-/* GuiToWindow sets (x, y) to the window coordinates that correspond to the
- * given
- * GUI coordiantes (sx, sy). */
+/* GuiToWindow sets (x, y) to the window coordinates that correspond to
+ * the given GUI coordiantes (sx, sy). */
 void GuiToWindow(int sx, int sy, int *x, int *y) {
 	int w, h;
 	glfwGetWindowSize(win, &w, &h);
@@ -274,7 +292,8 @@ void GuiToWindow(int sx, int sy, int *x, int *y) {
 	*y = (int)(sy * ((float)h / GUI_HEIGHT));
 }
 
-/* GetWidgetPos sets x and y to the (x, y) coordinates of the widget attached to
+/* GetWidgetPos sets x and y to the (x, y) coordinates of the widget
+ * attached to
  * e. */
 bool GetWidgetPos(Entity e, int *x, int *y) {
 	struct Widget *w;
@@ -287,8 +306,8 @@ bool GetWidgetPos(Entity e, int *x, int *y) {
 	return true;
 }
 
-/* GetRelWidgetPos sets x and y to the relative coordinates of (x, y) from the
- * upper left corner of the widget attached to e. */
+/* GetRelWidgetPos sets x and y to the relative coordinates of (x, y)
+ * from the upper left corner of the widget attached to e. */
 bool GetRelWidgetPos(Entity e, int x, int y, int *rx, int *ry) {
 	struct Widget *w;
 
@@ -300,7 +319,8 @@ bool GetRelWidgetPos(Entity e, int x, int y, int *rx, int *ry) {
 	return true;
 }
 
-/* GetWidgetDim sets w and h to the dimensions of the widget attached to e. */
+/* GetWidgetDim sets w and h to the dimensions of the widget attached to
+ * e. */
 bool GetWidgetDim(Entity e, int *w, int *h) {
 	struct Widget *widget;
 

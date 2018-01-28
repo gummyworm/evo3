@@ -9,6 +9,7 @@ enum { E_PLAYER = 1,
        E_WORM,
        E_WEATHER,
        E_TEST_ROOM,
+       E_GUI,
        E_ROOM,
        E_ROOM_END = 200,
 };

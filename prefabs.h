@@ -3,6 +3,7 @@
 
 #include "entity.h"
 
+int GUI(Entity);
 int Berry(Entity, float, float, float);
 int Player(Entity);
 int OverworldCommander(Entity);

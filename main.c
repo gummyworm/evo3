@@ -2,7 +2,6 @@
 
 #include "debug.h"
 #include "draw.h"
-#include "nk_gui.h"
 #include "systems.h"
 #include <SOIL.h>
 #include <stdio.h>
@@ -23,7 +22,6 @@ static void init(GLFWwindow *win) {
 	DrawInit();
 	InitShaders();
 	InitSystems(win);
-	InitGUI(win);
 }
 
 /* deinit deinitializes the various systems used in the game. */
@@ -64,6 +62,8 @@ static void test() {
 
 	Weather(E_WEATHER, 0, 0, 0);
 	Worm(E_WORM, 0.f, 0.f, -1.f);
+
+	GUI(E_GUI);
 }
 
 /* ClearUpdates resets all systems' updates. */
@@ -118,7 +118,6 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		update();
-		UpdateGUI();
 		glfwSwapBuffers(window);
 
 		ClearUpdates();
