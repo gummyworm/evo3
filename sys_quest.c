@@ -5,9 +5,10 @@
 #include "sys_child.h"
 #include "third-party/include/uthash.h"
 
-SYSDEF(Quest, const char *name, bool *completeFlag, void (*onComplete)(Entity))
+SYSDEF(Quest, const char *name, bool (*isComplete)(),
+       void (*onComplete)(Entity))
 strncpy(C->name, name, sizeof(C->name));
-C->completed = completeFlag;
+C->isComplete = isComplete;
 C->onComplete = onComplete;
 }
 
@@ -22,7 +23,7 @@ void update(struct Quest *components, int num) {
 	for (i = 0; i < num; ++i) {
 		struct Quest *q;
 		if ((q = GetQuest(components[i].e))) {
-			if (*q->completed) {
+			if (q->isComplete()) {
 				q->onComplete(components[i].e);
 			}
 		}

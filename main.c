@@ -2,6 +2,7 @@
 
 #include "debug.h"
 #include "draw.h"
+#include "nk_gui.h"
 #include "systems.h"
 #include <SOIL.h>
 #include <stdio.h>
@@ -22,6 +23,7 @@ static void init(GLFWwindow *win) {
 	DrawInit();
 	InitShaders();
 	InitSystems(win);
+	InitGUI(win);
 }
 
 /* deinit deinitializes the various systems used in the game. */
@@ -34,6 +36,9 @@ static void deinit(GLFWwindow *win) {
 /* update updates the game. */
 static void update() { UpdateSystems(); }
 
+void onAppleDead(Entity e) {}
+bool appleDead(Entity e) { return GetTransform(E_APPLE) == NULL; }
+
 /* test spawns test entities. */
 extern void TestRoom(int);
 static void test() {
@@ -42,6 +47,7 @@ static void test() {
 	TestMap(E_TEST_ROOM, 0.f, 0.f, 0.f);
 	Player(E_PLAYER);
 	Gun(E_GUN, E_PLAYER);
+	AddQuest(E_PLAYER, "bad apple", &appleDead, &onAppleDead);
 
 	AddTransform(E_APPLE, 0, 0, -7.0f);
 	AddRender(E_APPLE, "person.obj");
@@ -74,7 +80,7 @@ int main() {
 		exit(EXIT_FAILURE);
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	window = glfwCreateWindow(640, 480, "game", NULL, NULL);
@@ -85,7 +91,12 @@ int main() {
 	}
 
 	glfwMakeContextCurrent(window);
-	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+	// gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+	glewExperimental = 1;
+	if (glewInit() != GLEW_OK) {
+		fprintf(stderr, "Failed to setup GLEW\n");
+		exit(1);
+	}
 	glfwSwapInterval(1);
 
 	init(window);
@@ -107,6 +118,7 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		update();
+		UpdateGUI();
 		glfwSwapBuffers(window);
 
 		ClearUpdates();

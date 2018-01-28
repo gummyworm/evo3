@@ -1,4 +1,4 @@
-LIBS  = -lm -lSOIL -lglfw -framework OpenGL -framework CoreFoundation -lassimp -lportaudio
+LIBS  = -lm -lSOIL -lglfw -lglew -framework OpenGL -framework CoreFoundation -lassimp -lportaudio
 INCLUDE = -I. -Ithird-party/include
 CFLAGS = -Wall --std=c11 -DDEBUG
 

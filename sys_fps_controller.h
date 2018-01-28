@@ -21,7 +21,7 @@ struct FPSController {
 	float timeToJumpApex;
 
 	vec3 dpos;
-	float drot;
+	vec3 drot;
 
 	bool canJump;
 	bool aiming;
@@ -29,6 +29,7 @@ struct FPSController {
 	bool turning;
 
 	float angle;
+	float pitch;
 	struct {
 		int forward;
 		int backward;
@@ -36,6 +37,8 @@ struct FPSController {
 		int right;
 		int turnL;
 		int turnR;
+		int lookU;
+		int lookD;
 		int jump;
 		int aim;
 	} keyCodes;

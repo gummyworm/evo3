@@ -23,6 +23,7 @@
 #include "sys_mesh.h"
 #include "sys_movement.h"
 #include "sys_party.h"
+#include "sys_quest.h"
 #include "sys_room.h"
 #include "sys_shatter.h"
 #include "sys_sprite.h"

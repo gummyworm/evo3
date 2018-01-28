@@ -5,10 +5,10 @@
 #include "entity.h"
 #include "system.h"
 
-SYSTEM(Quest, const char *name, bool *completeFlag,
+SYSTEM(Quest, const char *name, bool (*isComplete)(),
        void (*onComplete)(Entity)) {
 	Entity e;
-	bool *completed;
+	bool (*isComplete)();
 	void (*onComplete)(Entity);
 	char name[31];
 };

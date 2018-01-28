@@ -26,6 +26,8 @@ C->keyCodes.left = GLFW_KEY_COMMA;
 C->keyCodes.right = GLFW_KEY_PERIOD;
 C->keyCodes.turnL = GLFW_KEY_LEFT;
 C->keyCodes.turnR = GLFW_KEY_RIGHT;
+C->keyCodes.lookU = GLFW_KEY_UP;
+C->keyCodes.lookD = GLFW_KEY_DOWN;
 C->keyCodes.jump = GLFW_KEY_SPACE;
 C->keyCodes.aim = GLFW_KEY_R;
 
@@ -60,13 +62,15 @@ static void key(Entity e, int key, int scancode, int action, int mods) {
 		f->dpos[0] = -sina;
 		f->dpos[1] = 0;
 		f->dpos[2] = -cosa;
-		f->moving = action == GLFW_PRESS || action == GLFW_REPEAT;
+		f->moving = !f->aiming &&
+		            (action == GLFW_PRESS || action == GLFW_REPEAT);
 	}
 	if (key == f->keyCodes.backward) {
 		f->dpos[0] = sina;
 		f->dpos[1] = 0;
 		f->dpos[2] = cosa;
-		f->moving = action == GLFW_PRESS || action == GLFW_REPEAT;
+		f->moving = !f->aiming &&
+		            (action == GLFW_PRESS || action == GLFW_REPEAT);
 	}
 	if (key == f->keyCodes.left) {
 		f->dpos[0] = -cosa;
@@ -81,12 +85,24 @@ static void key(Entity e, int key, int scancode, int action, int mods) {
 		f->moving = action == GLFW_PRESS || action == GLFW_REPEAT;
 	}
 	if (key == f->keyCodes.turnL) {
-		f->drot = -1.f;
+		f->drot[1] = -1.f;
 		f->turning = action == GLFW_PRESS || action == GLFW_REPEAT;
 	}
 	if (key == f->keyCodes.turnR) {
-		f->drot = 1.f;
+		f->drot[1] = 1.f;
 		f->turning = action == GLFW_PRESS || action == GLFW_REPEAT;
+	}
+	if (key == f->keyCodes.lookU) {
+		if (action == GLFW_PRESS || action == GLFW_REPEAT)
+			f->drot[0] = -1.f;
+		else
+			f->drot[0] = 0.f;
+	}
+	if (key == f->keyCodes.lookD) {
+		if (action == GLFW_PRESS || action == GLFW_REPEAT)
+			f->drot[0] = 1.f;
+		else
+			f->drot[0] = 0.f;
 	}
 	if (key == f->keyCodes.jump && f->canJump) {
 		f->jumpTime = 0.f;
@@ -121,7 +137,7 @@ void update() {
 		}
 
 		if (f->turning) {
-			f->angle -= f->drot * GetTimeDelta();
+			f->angle -= f->drot[1] * GetTimeDelta();
 			vec3 dir = {-sin(f->angle), 0, -cos(f->angle)};
 			vec3_scale(dir, dir, GetTimeDelta() * f->turnSpeed);
 			SetViewDir(f->e, dir[0], dir[1], dir[2]);
@@ -129,6 +145,13 @@ void update() {
 
 		if (f->aiming) {
 			mat4x4 mvp;
+
+			f->pitch -= f->drot[1] * GetTimeDelta();
+			vec3 dir = {-sin(f->angle), sin(f->pitch),
+			            -cos(f->angle)};
+			vec3_scale(dir, dir, GetTimeDelta() * f->turnSpeed);
+			SetViewDir(f->e, dir[0], dir[1], dir[2]);
+
 			GuiProjection(mvp);
 			TexRect(mvp, TEXTURE_PROGRAM,
 			        GUI_WIDTH / 2 - FPS_AIMER_W / 2,

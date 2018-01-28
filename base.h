@@ -1,8 +1,9 @@
 #ifndef BASE_H
 #define BASE_H
 
-#include <glad/glad.h>
+//#include <glad/glad.h>
 
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 #include "debug.h"
