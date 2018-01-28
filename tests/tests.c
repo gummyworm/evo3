@@ -9,6 +9,7 @@ int main() {
 	RUNTEST(testTransformSystem);
 	RUNTEST(testUnitSystem);
 	RUNTEST(testShatterSystem);
+	RUNTEST(testQuestSystem);
 
 	return 0;
 }

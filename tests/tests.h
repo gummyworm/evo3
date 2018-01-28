@@ -22,6 +22,7 @@ void testMovementSystem(struct Test *t);
 void testTransformSystem(struct Test *t);
 void testUnitSystem(struct Test *t);
 void testShatterSystem(struct Test *t);
+void testQuestSystem(struct Test *t);
 
 #define RUNTEST(X)                                                             \
 	do {                                                                   \

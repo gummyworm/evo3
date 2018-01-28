@@ -37,7 +37,7 @@ static void deinit(GLFWwindow *win) {
 static void update() { UpdateSystems(); }
 
 void onAppleDead(Entity e) {}
-bool appleDead(Entity e) { return GetTransform(E_APPLE) == NULL; }
+bool appleDead() { return GetTransform(E_APPLE) == NULL; }
 
 /* test spawns test entities. */
 extern void TestRoom(int);

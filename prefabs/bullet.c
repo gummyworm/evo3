@@ -10,6 +10,7 @@ int Bullet(Entity e) {
 	AddDamage(e, 10.f);
 	AddMovement(e, 19.0f, dir);
 	AddCollider(e, 1.f, 0);
+	AddShatter(e, COLLISION_LAYER_ENEMY);
 	AddColorRender(e, "cube.obj", 0.1f, 0.1f, 0.1f, 1.f);
 	return 0;
 }
