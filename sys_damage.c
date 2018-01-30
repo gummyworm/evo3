@@ -43,11 +43,12 @@ void InitDamageSystem() {
 
 /* UpdateDamageSystem updates all damages that have been created. */
 void UpdateDamageSystem() {
-	int i;
+	int i, j;
 	for (i = 0; i < numDamages; ++i) {
-		struct ColliderUpdate *u = GetColliderUpdate(damages[i].e);
-		if (u->into != 0)
-			UnitHarm(u->into, damages[i].value);
+		struct Collider *c = GetCollider(damages[i].e);
+		for (j = 0; j < c->numCollisions; ++j) {
+			UnitHarm(c->update[j].into, damages[i].value);
+		}
 	}
 }
 

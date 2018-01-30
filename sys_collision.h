@@ -1,6 +1,8 @@
 #ifndef SYS_COLLIDER_H
 #define SYS_COLLIDER_H
 
+#include "base.h"
+
 #include "entity.h"
 #include "third-party/include/linmath.h"
 #include <stdbool.h>
@@ -22,7 +24,9 @@ struct Collider {
 	Entity e;
 	enum CollisionLayer layers;
 	float radius;
-	struct ColliderUpdate update;
+
+	int numCollisions;
+	struct ColliderUpdate update[MAX_COLLISIONS];
 };
 
 void InitColliderSystem();

@@ -54,15 +54,8 @@ static void test() {
 	AddTransform(E_APPLE, 0, 0, -7.0f);
 	AddRender(E_APPLE, "person.obj");
 	AddLabel(E_APPLE, "apple", 1.0f);
-	AddCollider(E_APPLE, 1.f, 0);
+	AddCollider(E_APPLE, 1.f, COLLISION_LAYER_ENEMY);
 	AddContainer(E_APPLE, "APPLE", "It's a juicy red apple");
-
-	AddTransform(E_ORANGE, 1, 0, -6.0f);
-	AddThing(E_ORANGE, "ORANGE", "It's a bright citrus fruit");
-	AddSprite(E_ORANGE, "res/banana.png", 1.f, 1.f);
-	AddRender(E_ORANGE, "person.obj");
-	AddLabel(E_ORANGE, "orange", 1.0f);
-	AddToContainer(E_APPLE, E_ORANGE);
 
 	Weather(E_WEATHER, 0, 0, 0);
 	Worm(E_WORM, 0.f, 0.f, -1.f);

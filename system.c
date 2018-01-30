@@ -75,6 +75,8 @@ void UpdateSystems() {
 	update(UpdateInputSystem);
 	update(UpdateGunSystem);
 	update(UpdateColliderSystem);
+
+	/* post collision updates */
 	update(UpdateShatterSystem);
 	update(UpdateDamageSystem);
 	update(UpdateUnitSystem);

@@ -16,5 +16,7 @@ enum { MAX_UNITS = 8192,
        MAX_CHILDS = 1024,
        MAX_DAMAGES = 1024,
        MAX_QUESTS = 32,
+
+       MAX_COLLISIONS = 16,
 };
 #endif

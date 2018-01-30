@@ -14,12 +14,18 @@ void update(struct Shatter *components, int num) {
 	for (i = 0; i < num; ++i) {
 		struct Collider *c;
 		if ((c = GetCollider(components[i].e))) {
-			struct Collider *into = GetCollider(c->update.into);
-			if (into == NULL) {
-				continue;
-			}
-			if (into->layers & components[i].layers) {
-				RemoveEntity(components[i].e);
+			for (i = 0; i < c->numCollisions; ++i) {
+				struct Collider *into;
+				Entity other = c->update[i].into;
+				if (other == 0) {
+					continue;
+				}
+				into = GetCollider(other);
+				dinfof("%d %d\n", into->layers,
+				       components[i].layers);
+				if (into->layers & components[i].layers) {
+					RemoveEntity(components[i].e);
+				}
 			}
 		}
 	}

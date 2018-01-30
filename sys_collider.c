@@ -14,16 +14,13 @@ static struct entityToCollider *entitiesToColliders;
 static struct Collider colliders[MAX_COLLIDERS];
 static int numColliders;
 
-int numColliderUpdates;
-static struct ColliderUpdate updates[MAX_COLLIDERS];
-
 /* dist returns the distance between the colliders. */
 static float dist(struct Collider *c1, struct Collider *c2) {
 	vec3 p1, p2;
 	if (TransformGetPos(c1->e, p1) && TransformGetPos(c2->e, p2))
 		return sqrt((p1[0] - p2[0]) * (p1[0] - p2[0]) +
-		            (p1[1] - p2[0]) * (p1[1] - p2[1]) +
-		            (p1[2] - p2[2]) * (p2[2] - p2[2]));
+		            (p1[1] - p2[1]) * (p1[1] - p2[1]) +
+		            (p1[2] - p2[2]) * (p1[2] - p2[2]));
 	return -1.f;
 }
 
@@ -64,6 +61,7 @@ void UpdateColliderSystem() {
 		struct Collider *c1;
 		c1 = &colliders[i];
 
+		c1->numCollisions = 0;
 		for (j = 0; j < numColliders; ++j) {
 			struct Collider *c2;
 			if (i == j)
@@ -71,8 +69,9 @@ void UpdateColliderSystem() {
 			c2 = &colliders[j];
 			if (dist(c1, c2) < (c1->radius + c2->radius)) {
 				/* collision between c1 and c2 */
-				c1->update =
+				c1->update[c1->numCollisions] =
 				    (struct ColliderUpdate){.into = c2->e};
+				c1->numCollisions++;
 			}
 		}
 	}
@@ -113,20 +112,4 @@ void RemoveCollider(Entity e) {
 		free(c);
 		numColliders--;
 	}
-}
-
-/* GetColliderUpdate returns any collider updates for the entity e. */
-struct ColliderUpdate *GetColliderUpdate(Entity e) {
-	struct Collider *c;
-
-	if ((c = GetCollider(e)))
-		return &c->update;
-
-	return NULL;
-}
-
-/* GetColliderUpdates returns the collider updates this frame. */
-struct ColliderUpdate *GetColliderUpdates(int *num) {
-	*num = numColliderUpdates;
-	return updates;
 }

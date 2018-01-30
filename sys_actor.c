@@ -33,9 +33,14 @@ void InitActorSystem() {}
 /* HandleActorCollisions updates the actor system according to any collisions
  * that occured between actors. */
 static void handleActorCollisions(Entity e) {
-	struct ColliderUpdate *c;
-	if ((c = GetColliderUpdate(e)))
-		dinfof("collision between entities %x and %x\n", e, c->into);
+	struct Collider *c;
+	if ((c = GetCollider(e))) {
+		int i;
+		for (i = 0; i < c->numCollisions; i++) {
+			dinfof("collision between entities %x and %x\n", e,
+			       c->update[i].into);
+		}
+	}
 }
 
 /* UpdateActorSystem updates all actors that have been created. */
