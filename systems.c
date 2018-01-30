@@ -26,6 +26,7 @@ void RemoveEntity(Entity e) {
 	RemoveRoom(e);
 	RemoveUnit(e);
 	RemoveShatter(e);
+	RemoveWidget(e);
 }
 
 /* DisableEntity notifies systems that e is not to be updated. */

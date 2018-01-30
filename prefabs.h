@@ -3,6 +3,7 @@
 
 #include "entity.h"
 
+int GUIAlert(Entity, const char *);
 int GUI(Entity);
 int Berry(Entity, float, float, float);
 int Player(Entity);

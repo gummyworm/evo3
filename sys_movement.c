@@ -57,6 +57,8 @@ void UpdateMovementSystem() {
 			vec3_add(newPos, currPos, dpos);
 			TransformSet(movements[i].e, newPos[0], newPos[1],
 			             newPos[2]);
+			dinfof("UPDATED %f %f %f\n", newPos[0], newPos[1],
+			       newPos[2]);
 		}
 	}
 }

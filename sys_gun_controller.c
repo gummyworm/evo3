@@ -30,9 +30,8 @@ static void key(Entity e, int key, int scancode, int action, int mods) {
 	if (!Enabled(g->e))
 		return;
 
-	if (key == g->keyCodes.fire) {
+	if (key == g->keyCodes.fire)
 		GunFire(e);
-	}
 }
 
 /* getGunController returns the fpsController attached to entity e (if there is

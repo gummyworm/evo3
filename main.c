@@ -34,8 +34,12 @@ static void deinit(GLFWwindow *win) {
 /* update updates the game. */
 static void update() { UpdateSystems(); }
 
-void onAppleDead(Entity e) {}
-bool appleDead() { return GetTransform(E_APPLE) == NULL; }
+void onAppleDead(Entity e) {
+	char msg[256];
+	sprintf(msg, "you have slain the %s!", GetActorName(e));
+	GUIAlert(E_QUEST_MSG, msg);
+}
+bool appleDead() { return GetTransform(E_WORM) == NULL; }
 
 /* test spawns test entities. */
 extern void TestRoom(int);
